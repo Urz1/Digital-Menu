@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #E8590C;
+    --primary-hover: #D9480F;
+    --primary-rgb: 232, 89, 12;
+    --accent: #F76707;
+    --radius-token: 14px;
+    --font-brand: 'Playfair Display', Georgia, serif;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --background: #F8F9FA;
+    --foreground: #1E2124;
+    --card: #FFFFFF;
+    --card-foreground: #1E2124;
+    --border: #E9ECEF;
+    --muted: #6C757D;
+    --muted-foreground: #868E96;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-mode="light"]) {
+      --background: #101115;
+      --foreground: #F8F9FA;
+      --card: #181A20;
+      --card-foreground: #F8F9FA;
+      --border: #2C303B;
+      --muted: #A0A6B2;
+      --muted-foreground: #717784;
+    }
+  }
+
+  [data-mode="dark"] {
+    --background: #101115;
+    --foreground: #F8F9FA;
+    --card: #181A20;
+    --card-foreground: #F8F9FA;
+    --border: #2C303B;
+    --muted: #A0A6B2;
+    --muted-foreground: #717784;
+  }
+
+  [data-mode="light"] {
+    --background: #F8F9FA;
+    --foreground: #1E2124;
+    --card: #FFFFFF;
+    --card-foreground: #1E2124;
+    --border: #E9ECEF;
+    --muted: #6C757D;
+    --muted-foreground: #868E96;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+.font-brand {
+  font-family: var(--font-brand);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+@keyframes toastSlide {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-toast {
+  animation: toastSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
