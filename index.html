@@ -1,0 +1,3815 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="modern-minimal" data-theme-mode="auto" data-layout="list">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <title>Aura Bistro & Lounge — Digital Dining Experience</title>
+  <meta name="description" content="Explore our seasonal culinary offerings, artisanal wood-fired specialties, and handcrafted mixology. Scan, customize, and order seamlessly.">
+  <meta name="theme-color" content="#121316">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- ==========================================================================
+       OWNER CONFIGURATION GUIDE:
+       1. Change restaurant details, currency, & menu items in the <script> block at the bottom.
+       2. Customize brand colors and font styles in the <style> CSS variables below.
+       3. Each dish can be marked 'soldOut: true' or 'chefsPick: true' in MENU_CONFIG.items.
+       ========================================================================== -->
+
+  <!-- Typography: Luxury Display Pairing (Playfair Display for headings & Plus Jakarta Sans for body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       CSS DESIGN TOKENS & 4 READY-MADE BRAND THEMES
+       Owners: Tweak colors here or choose a ready-made theme
+       ========================================================================== */
+    :root {
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --transition-fast: 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --touch-min: 44px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.14);
+      --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    /* THEME 1: MODERN MINIMAL (Default: Architectural slate & vibrant citrus amber) */
+    [data-theme="modern-minimal"] {
+      --primary: #E8590C;
+      --primary-hover: #D9480F;
+      --primary-rgb: 232, 89, 12;
+      --primary-surface: rgba(232, 89, 12, 0.10);
+      --accent: #F76707;
+      --bg: #F8F9FA;
+      --surface: #FFFFFF;
+      --surface-subtle: #F1F3F5;
+      --surface-elevated: #FFFFFF;
+      --border: #E9ECEF;
+      --border-focus: #CED4DA;
+      --text: #1E2124;
+      --text-muted: #6C757D;
+      --text-subtle: #868E96;
+      --badge-chefs: #FFF3BF;
+      --badge-chefs-text: #B15E00;
+      --badge-soldout: #F1F3F5;
+      --badge-soldout-text: #868E96;
+      --badge-veg: #EBFBEE;
+      --badge-veg-text: #2B8A3E;
+    }
+
+    /* THEME 2: CLASSIC ELEGANCE (Warm Champagne Gold & Espresso Velvet) */
+    [data-theme="classic-elegance"] {
+      --primary: #B88E3E;
+      --primary-hover: #9E7528;
+      --primary-rgb: 184, 142, 62;
+      --primary-surface: rgba(184, 142, 62, 0.12);
+      --accent: #8E6822;
+      --bg: #FAF7F2;
+      --surface: #FFFFFF;
+      --surface-subtle: #F2EDE4;
+      --surface-elevated: #FFFFFF;
+      --border: #E6DECE;
+      --border-focus: #D4C8B2;
+      --text: #25201A;
+      --text-muted: #6B6358;
+      --text-subtle: #948A7B;
+      --badge-chefs: #FDF4E3;
+      --badge-chefs-text: #8E6822;
+      --badge-soldout: #ECE7DE;
+      --badge-soldout-text: #8A8174;
+      --badge-veg: #EBF5ED;
+      --badge-veg-text: #2F6C3C;
+    }
+
+    /* THEME 3: BOLD DARK (Midnight Obsidian & High-Voltage Electric Coral) */
+    [data-theme="bold-dark"] {
+      --primary: #FF3B5C;
+      --primary-hover: #E02747;
+      --primary-rgb: 255, 59, 92;
+      --primary-surface: rgba(255, 59, 92, 0.14);
+      --accent: #FF5E7E;
+      --bg: #0C0D11;
+      --surface: #15171E;
+      --surface-subtle: #1D212B;
+      --surface-elevated: #242936;
+      --border: #2A303F;
+      --border-focus: #3F475D;
+      --text: #F3F5F9;
+      --text-muted: #9BA4B5;
+      --text-subtle: #687387;
+      --badge-chefs: rgba(255, 193, 7, 0.15);
+      --badge-chefs-text: #FFD152;
+      --badge-soldout: #232733;
+      --badge-soldout-text: #687387;
+      --badge-veg: rgba(40, 167, 69, 0.16);
+      --badge-veg-text: #4CD964;
+    }
+
+    /* THEME 4: WARM RUSTIC (Terracotta Clay & Hearth Linen) */
+    [data-theme="warm-rustic"] {
+      --primary: #C05621;
+      --primary-hover: #9C4215;
+      --primary-rgb: 192, 86, 33;
+      --primary-surface: rgba(192, 86, 33, 0.12);
+      --accent: #556B2F;
+      --bg: #F6F3EE;
+      --surface: #FFFFFF;
+      --surface-subtle: #EBE5DB;
+      --surface-elevated: #FFFFFF;
+      --border: #DFD7C9;
+      --border-focus: #C4B9A4;
+      --text: #2E241E;
+      --text-muted: #6E6157;
+      --text-subtle: #96887D;
+      --badge-chefs: #FEEDD8;
+      --badge-chefs-text: #A64716;
+      --badge-soldout: #E6DFD4;
+      --badge-soldout-text: #8C7F72;
+      --badge-veg: #EBF4E7;
+      --badge-veg-text: #39632B;
+    }
+
+    /* DARK MODE AUTOMATIC & MANUAL STYLING */
+    html[data-theme-mode="dark"],
+    html[data-theme-mode="auto"] {
+      @media (prefers-color-scheme: dark) {
+        &:not([data-theme-mode="light"]) {
+          --bg: #101115;
+          --surface: #181A20;
+          --surface-subtle: #22252D;
+          --surface-elevated: #2A2E38;
+          --border: #2C303B;
+          --border-focus: #3E4453;
+          --text: #F8F9FA;
+          --text-muted: #A0A6B2;
+          --text-subtle: #717784;
+          --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+          --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.50);
+          --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+          --badge-chefs: rgba(245, 159, 0, 0.18);
+          --badge-chefs-text: #FFD43B;
+          --badge-soldout: #22252D;
+          --badge-soldout-text: #717784;
+          --badge-veg: rgba(43, 138, 62, 0.2);
+          --badge-veg-text: #51CF66;
+        }
+      }
+    }
+
+    html[data-theme-mode="dark"] {
+      --bg: #101115;
+      --surface: #181A20;
+      --surface-subtle: #22252D;
+      --surface-elevated: #2A2E38;
+      --border: #2C303B;
+      --border-focus: #3E4453;
+      --text: #F8F9FA;
+      --text-muted: #A0A6B2;
+      --text-subtle: #717784;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.50);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+      --badge-chefs: rgba(245, 159, 0, 0.18);
+      --badge-chefs-text: #FFD43B;
+      --badge-soldout: #22252D;
+      --badge-soldout-text: #717784;
+      --badge-veg: rgba(43, 138, 62, 0.2);
+      --badge-veg-text: #51CF66;
+    }
+
+    /* ==========================================================================
+       BASE & RESET
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--bg);
+      overflow-x: hidden;
+      padding-bottom: calc(90px + var(--safe-bottom));
+    }
+
+    /* Mobile viewport container (360-480px, responsive on larger viewports) */
+    .app-viewport {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg);
+      position: relative;
+      transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+    @media (min-width: 481px) {
+      body {
+        background-color: #0A0A0C;
+        padding-top: 16px;
+        padding-bottom: 24px;
+      }
+      .app-viewport {
+        border-radius: 28px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      min-width: var(--touch-min);
+      transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       UNIFIED STICKY HEADER (Branding + Search + Categories)
+       ========================================================================== */
+    .sticky-header-container {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--transition-base), background-color var(--transition-base);
+    }
+
+    .top-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: calc(10px + var(--safe-top)) 16px 8px 16px;
+    }
+
+    .brand-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      min-width: 0;
+    }
+
+    .brand-logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #FFFFFF;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .brand-subline {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #2ECC71;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      color: var(--text);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .icon-btn:hover {
+      background: var(--border);
+    }
+
+    .badge-counter {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--surface);
+      transform: scale(0);
+      transition: transform var(--transition-fast);
+    }
+
+    .badge-counter.active {
+      transform: scale(1);
+    }
+
+    /* Announcement Bar */
+    .announcement-bar {
+      margin: 0 16px 8px 16px;
+      background: var(--primary-surface);
+      color: var(--primary);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .announcement-bar span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Table & Info quick strip */
+    .table-info-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px 8px 16px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .table-pill {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Search Container */
+    .search-container {
+      padding: 4px 16px 10px 16px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search-input-wrap svg.search-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 40px 0 42px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 4px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .search-clear-btn.visible {
+      display: flex;
+    }
+
+    /* Horizontally scrollable Category Tabs Bar */
+    .categories-bar-wrapper {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .categories-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 16px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-snap-type: x mandatory;
+    }
+
+    .categories-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-tab {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      height: 38px;
+      padding: 0 15px;
+      border-radius: var(--radius-full);
+      background: var(--surface-subtle);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      gap: 6px;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+
+    .category-tab.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.28);
+    }
+
+    /* ==========================================================================
+       FILTER STRIP & VIEW CONTROLS
+       ========================================================================== */
+    .filter-strip {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg);
+    }
+
+    .filter-chips-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-grow: 1;
+    }
+
+    .filter-chips-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip-btn {
+      flex: 0 0 auto;
+      min-height: 32px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip-btn.active {
+      background: var(--text);
+      color: var(--surface);
+      border-color: var(--text);
+      font-weight: 600;
+    }
+
+    .view-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .sort-select {
+      height: 32px;
+      padding: 0 8px;
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      border: 1px solid var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .layout-toggle-btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ==========================================================================
+       MENU SECTIONS & CARDS
+       ========================================================================== */
+    .menu-main {
+      padding: 8px 16px 40px 16px;
+    }
+
+    .category-section {
+      margin-bottom: 28px;
+      scroll-margin-top: 150px;
+    }
+
+    .category-header {
+      margin-bottom: 14px;
+      padding-top: 8px;
+    }
+
+    .category-heading {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .category-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .items-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    [data-layout="grid"] .items-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    /* MENU CARD */
+    .menu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      position: relative;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .menu-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-focus);
+    }
+
+    .menu-card:active {
+      transform: scale(0.985);
+    }
+
+    .menu-card.sold-out {
+      opacity: 0.65;
+    }
+
+    .card-thumb-wrap {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      flex-shrink: 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--surface-subtle);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-card:hover .card-img {
+      transform: scale(1.05);
+    }
+
+    .img-skeleton {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--surface-subtle) 25%, var(--border) 50%, var(--surface-subtle) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.4s infinite;
+    }
+
+    @keyframes skeletonShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .card-fav-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      color: #FFFFFF;
+      z-index: 2;
+    }
+
+    .card-fav-btn.active {
+      background: #E03131;
+      color: #FFFFFF;
+    }
+
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .badge-pill {
+      align-self: flex-start;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    .badge-chefs {
+      background: var(--badge-chefs);
+      color: var(--badge-chefs-text);
+    }
+
+    .badge-soldout-pill {
+      background: var(--badge-soldout);
+      color: var(--badge-soldout-text);
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-top: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-dietary-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+
+    .dietary-tag {
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--surface-subtle);
+      color: var(--text-subtle);
+      font-weight: 600;
+    }
+
+    .card-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      gap: 8px;
+    }
+
+    .card-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .quick-add-btn {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      min-height: 34px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 3px 8px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .quick-add-btn:disabled {
+      background: var(--border);
+      color: var(--text-subtle);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    [data-layout="grid"] .menu-card {
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+    }
+
+    [data-layout="grid"] .card-thumb-wrap {
+      width: 100%;
+      height: 125px;
+    }
+
+    [data-layout="grid"] .card-desc {
+      -webkit-line-clamp: 1;
+    }
+
+    /* Empty States */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .empty-state-icon {
+      font-size: 2.8rem;
+      margin-bottom: 4px;
+      opacity: 0.85;
+    }
+
+    .empty-state-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .empty-state-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 280px;
+    }
+
+    .empty-action-btn {
+      margin-top: 8px;
+      padding: 0 20px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    /* ==========================================================================
+       FLOATING BOTTOM BAR ("MY ORDER")
+       ========================================================================== */
+    .order-bar-container {
+      position: fixed;
+      bottom: calc(14px + var(--safe-bottom));
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      z-index: 150;
+      pointer-events: none;
+      transform: translateY(120%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .order-bar-container.visible {
+      transform: translateY(0);
+    }
+
+    .order-bar-btn {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 440px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-float);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .order-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .order-bar-count-pill {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .order-bar-total {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .order-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* Back To Top Button */
+    .back-to-top-btn {
+      position: fixed;
+      bottom: calc(78px + var(--safe-bottom));
+      right: 20px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: var(--shadow-md);
+      z-index: 140;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: all var(--transition-base);
+    }
+
+    .back-to-top-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       MODALS & BOTTOM SHEETS
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      width: 100%;
+      max-width: 480px;
+      max-height: 88vh;
+      background: var(--surface);
+      border-top-left-radius: var(--radius-xl);
+      border-top-right-radius: var(--radius-xl);
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-backdrop.active .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle-wrap {
+      width: 100%;
+      padding: 10px 0 6px 0;
+      display: flex;
+      justify-content: center;
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      border-radius: var(--radius-full);
+      background: var(--border-focus);
+    }
+
+    .sheet-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text);
+      z-index: 20;
+    }
+
+    .detail-hero-wrap {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: var(--surface-subtle);
+    }
+
+    .detail-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-content {
+      padding: 18px 20px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .detail-price {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .detail-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .detail-meta-box {
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+
+    .meta-label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .allergens-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .allergen-pill {
+      font-size: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      color: var(--text);
+    }
+
+    .options-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-subheading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .addon-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .addon-item:hover {
+      border-color: var(--border-focus);
+    }
+
+    .addon-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary);
+      margin-right: 10px;
+    }
+
+    .addon-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .addon-name {
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .addon-price {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .special-notes-input {
+      width: 100%;
+      height: 70px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      color: var(--text);
+      font-size: 0.85rem;
+      resize: none;
+      outline: none;
+    }
+
+    .special-notes-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .detail-footer-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px calc(12px + var(--safe-bottom)) 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .quantity-stepper {
+      display: flex;
+      align-items: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 2px;
+    }
+
+    .stepper-btn {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      min-height: 38px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stepper-value {
+      width: 32px;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .add-to-cart-submit {
+      flex: 1;
+      height: 48px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.35);
+    }
+
+    /* ORDER SUMMARY */
+    .order-sheet-content {
+      padding: 12px 20px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .order-sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .order-sheet-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .clear-order-btn {
+      font-size: 0.78rem;
+      color: #E03131;
+      font-weight: 600;
+      padding: 4px 8px;
+    }
+
+    .order-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .order-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .order-row-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-row-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .order-row-addons {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .order-row-price {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 2px;
+    }
+
+    .order-breakdown-card {
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .breakdown-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .breakdown-line.total {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text);
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .order-actions-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .waiter-mode-btn {
+      height: 50px;
+      border-radius: var(--radius-full);
+      background: var(--text);
+      color: var(--surface);
+      font-weight: 700;
+      font-size: 0.95rem;
+      gap: 8px;
+    }
+
+    .call-waiter-sheet-btn {
+      height: 46px;
+      border-radius: var(--radius-full);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.88rem;
+      gap: 8px;
+    }
+
+    /* FULLSCREEN SERVER MODE */
+    .waiter-card-modal {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      color: #FFFFFF;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .waiter-card-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .waiter-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .waiter-card-title {
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9E9E9E;
+    }
+
+    .waiter-card-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .waiter-table-banner {
+      background: #1C1C1E;
+      border: 2px solid #333333;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .waiter-table-number {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #FFD43B;
+    }
+
+    .waiter-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .waiter-item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .waiter-qty-badge {
+      background: #333333;
+      padding: 2px 10px;
+      border-radius: 8px;
+      color: #FFFFFF;
+      font-size: 1.1rem;
+    }
+
+    /* ALLERGEN LEGEND */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .legend-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .legend-icon {
+      font-size: 1.3rem;
+      width: 32px;
+      text-align: center;
+    }
+
+    .legend-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .legend-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* THEME DRAWER */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .theme-option-card {
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      background: var(--surface);
+      text-align: left;
+    }
+
+    .theme-option-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-surface);
+    }
+
+    .theme-swatch {
+      width: 100%;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      overflow: hidden;
+    }
+
+    .theme-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .service-request-btn {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      justify-content: flex-start;
+      color: var(--text);
+    }
+
+    .service-request-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .qr-modal-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .qr-canvas-wrap {
+      padding: 16px;
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid #E9ECEF;
+      display: inline-flex;
+    }
+
+    .qr-img {
+      width: 190px;
+      height: 190px;
+      display: block;
+    }
+
+    /* TOAST */
+    .toast-container {
+      position: fixed;
+      top: calc(20px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 400;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .toast {
+      background: var(--text);
+      color: var(--surface);
+      padding: 12px 18px;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-lg);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: toastSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes toastSlideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* FOOTER */
+    .app-footer {
+      padding: 24px 16px 32px 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link-btn {
+      font-size: 0.78rem;
+      color: var(--primary);
+      font-weight: 600;
+      min-height: 32px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MOBILE-FIRST VIEWPORT CONTAINER -->
+  <div class="app-viewport" id="appViewport">
+
+    <!-- 1. UNIFIED STICKY HEADER (Branding + Search Drawer + Category Tabs) -->
+    <header class="sticky-header-container" id="stickyHeader" role="banner">
+      <div class="top-header-row">
+        <!-- Logo & Restaurant Title -->
+        <a href="#top" class="brand-identity" id="brandLink" aria-label="Restaurant Home">
+          <div class="brand-logo-badge" id="brandLogoBadge">A</div>
+          <div class="brand-text">
+            <span class="brand-title" id="brandTitle">Aura Bistro</span>
+            <span class="brand-subline">
+              <span class="status-dot"></span>
+              <span id="openStatusText">Open Now • Dine-In</span>
+            </span>
+          </div>
+        </a>
+
+        <!-- Header Actions: Search, Favorites, Call Waiter, Settings -->
+        <div class="header-actions">
+          <button type="button" class="icon-btn" id="searchToggleBtn" aria-label="Toggle Search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+
+          <button type="button" class="icon-btn" id="favoritesHeaderBtn" aria-label="View Favorites">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="badge-counter" id="favCounterBadge">0</span>
+          </button>
+
+          <button type="button" class="icon-btn" id="callWaiterHeaderBtn" aria-label="Call Waiter">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <button type="button" class="icon-btn" id="settingsToggleBtn" aria-label="Menu Settings and Themes">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Announcement Banner -->
+      <div class="announcement-bar" id="announcementBanner">
+        <span id="announcementText">✨ Chef's Seasonal Truffle Menu is now available</span>
+        <span style="cursor: pointer;" onclick="document.getElementById('announcementBanner').style.display='none'">✕</span>
+      </div>
+
+      <!-- Quick Info Strip: Table & WiFi -->
+      <div class="table-info-strip">
+        <div class="table-pill" id="tablePill">
+          <span>📍</span>
+          <span id="tableLabel">Table 14</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="chip-btn" id="wifiQuickBtn" style="border: none; padding: 0 8px;">
+            <span>📶 Guest WiFi</span>
+          </button>
+          <button type="button" class="chip-btn" id="legendQuickBtn" style="border: none; padding: 0 8px;">
+            <span>ℹ️ Allergens</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Drawer -->
+      <div class="search-container" id="searchContainer" style="display: none;">
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" class="search-input" id="menuSearchInput" placeholder="Search dishes, ingredients, dietary tags..." autocomplete="off">
+          <button type="button" class="search-clear-btn" id="searchClearBtn" aria-label="Clear Search">✕</button>
+        </div>
+      </div>
+
+      <!-- Horizontally Scrollable Category Tabs -->
+      <nav class="categories-bar-wrapper" aria-label="Menu Categories">
+        <div class="categories-scroll" id="categoriesNavScroll" role="tablist">
+          <!-- Populated by JavaScript -->
+        </div>
+      </nav>
+    </header>
+
+    <!-- 2. FILTER CHIPS & LAYOUT TOGGLE -->
+    <section class="filter-strip" aria-label="Filter and Sort Menu">
+      <div class="filter-chips-scroll" id="filterChipsScroll">
+        <button type="button" class="chip-btn active" data-filter="all">All</button>
+        <button type="button" class="chip-btn" data-filter="chefsPick">⭐ Chef's Picks</button>
+        <button type="button" class="chip-btn" data-filter="vegetarian">🌱 Vegetarian</button>
+        <button type="button" class="chip-btn" data-filter="vegan">🌿 Vegan</button>
+        <button type="button" class="chip-btn" data-filter="gluten-free">🌾 Gluten-Free</button>
+        <button type="button" class="chip-btn" data-filter="halal">🥩 Halal</button>
+        <button type="button" class="chip-btn" data-filter="spicy">🌶️ Spicy</button>
+        <button type="button" class="chip-btn" data-filter="nut-free">🥜 Nut-Free</button>
+      </div>
+
+      <div class="view-controls">
+        <select class="sort-select" id="sortSelect" aria-label="Sort Menu Items">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Name: A–Z</option>
+        </select>
+
+        <button type="button" class="layout-toggle-btn" id="layoutToggleBtn" aria-label="Toggle Grid or List Layout" title="Switch layout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. MAIN MENU CONTENT (CATEGORY SECTIONS & CARDS) -->
+    <main class="menu-main" id="menuMain" role="main">
+      <!-- Populated dynamically via renderMenu() -->
+    </main>
+
+    <!-- 4. FLOATING THUMB-ZONE ACTION BAR ("MY ORDER") -->
+    <aside class="order-bar-container" id="orderBarContainer">
+      <button type="button" class="order-bar-btn" id="viewOrderBarBtn" aria-label="View My Order">
+        <div class="order-bar-left">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="order-bar-count-pill" id="orderBarCount">0 items</span>
+          <span class="order-bar-total" id="orderBarTotal">$0.00</span>
+        </div>
+        <div class="order-bar-right">
+          <span id="orderBarActionLabel">Review Order</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </div>
+      </button>
+    </aside>
+
+    <!-- Back to Top Button -->
+    <button type="button" class="back-to-top-btn" id="backToTopBtn" aria-label="Back to Top">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+
+    <!-- 5. APP FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-brand" id="footerBrandTitle">Aura Bistro & Lounge</div>
+      <p id="footerHours">Hours: Tue – Sun: 11:30 AM – 11:00 PM</p>
+      <p id="footerAddress">742 Evergreen Terrace, Culinary Arts District</p>
+      <div class="footer-links">
+        <button type="button" class="footer-link-btn" id="footerQrBtn">📱 Table QR Code</button>
+        <button type="button" class="footer-link-btn" id="footerShareBtn">🔗 Share Menu</button>
+        <button type="button" class="footer-link-btn" id="footerLegendBtn">ℹ️ Allergen Guide</button>
+      </div>
+      <p style="font-size: 0.72rem; opacity: 0.7; margin-top: 10px;">
+        Designed for instant mobile scanning. Tap any dish for allergens & customization.
+      </p>
+    </footer>
+
+  </div> <!-- /app-viewport -->
+
+  <!-- ==========================================================================
+       6. BOTTOM SHEETS & MODALS
+       ========================================================================== -->
+
+  <!-- A. ITEM DETAIL BOTTOM SHEET -->
+  <div class="modal-backdrop" id="itemDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalItemTitle">
+    <div class="bottom-sheet" id="itemDetailSheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeDetailBtn" aria-label="Close details">✕</button>
+
+      <div class="detail-hero-wrap">
+        <img class="detail-hero-img" id="detailHeroImg" src="" alt="Menu item preview">
+      </div>
+
+      <div class="detail-content">
+        <div class="detail-title-group">
+          <div style="display: flex; gap: 6px; align-items: center;" id="detailBadgeRow"></div>
+          <h2 class="detail-title" id="modalItemTitle">Item Name</h2>
+          <div class="detail-price" id="modalItemPrice">$0.00</div>
+        </div>
+
+        <p class="detail-desc" id="modalItemDesc">Rich culinary description.</p>
+
+        <div class="detail-meta-box">
+          <div class="meta-row">
+            <span class="meta-label">Spice Level:</span>
+            <span class="meta-value" id="modalSpiceLevel">None</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Dietary:</span>
+            <span class="meta-value" id="modalDietaryList">None</span>
+          </div>
+          <div>
+            <span class="meta-label">Contains Allergens:</span>
+            <div class="allergens-list" id="modalAllergensList"></div>
+          </div>
+        </div>
+
+        <div class="options-section" id="modalOptionsSection">
+          <h3 class="section-subheading">Customize Your Selection</h3>
+          <div id="modalAddonsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <div class="options-section">
+          <h3 class="section-subheading">Special Instructions</h3>
+          <textarea class="special-notes-input" id="detailSpecialNotes" placeholder="e.g. Dressing on the side, extra crispy, allergy note..."></textarea>
+        </div>
+      </div>
+
+      <div class="detail-footer-bar">
+        <div class="quantity-stepper">
+          <button type="button" class="stepper-btn" id="detailQtyMinus" aria-label="Decrease quantity">−</button>
+          <span class="stepper-value" id="detailQtyVal">1</span>
+          <button type="button" class="stepper-btn" id="detailQtyPlus" aria-label="Increase quantity">+</button>
+        </div>
+        <button type="button" class="add-to-cart-submit" id="detailAddToCartBtn">
+          Add to Order • <span id="detailButtonTotal">$0.00</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. ORDER SUMMARY SHEET -->
+  <div class="modal-backdrop" id="orderSummaryModal" role="dialog" aria-modal="true" aria-labelledby="orderSummaryTitle">
+    <div class="bottom-sheet" id="orderSummarySheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeOrderSummaryBtn" aria-label="Close order">✕</button>
+
+      <div class="order-sheet-content">
+        <div class="order-sheet-header">
+          <h2 class="order-sheet-title" id="orderSummaryTitle">My Order</h2>
+          <button type="button" class="clear-order-btn" id="clearOrderBtn">Clear All</button>
+        </div>
+
+        <div class="order-items-list" id="orderSummaryItemsList"></div>
+
+        <div class="order-breakdown-card">
+          <div class="breakdown-line">
+            <span>Subtotal</span>
+            <span id="orderSummarySubtotal">$0.00</span>
+          </div>
+          <div class="breakdown-line">
+            <span>Estimated Tax (8%)</span>
+            <span id="orderSummaryTax">$0.00</span>
+          </div>
+          <div class="breakdown-line total">
+            <span>Estimated Total</span>
+            <span id="orderSummaryTotal">$0.00</span>
+          </div>
+        </div>
+
+        <div class="order-actions-stack">
+          <button type="button" class="waiter-mode-btn" id="showWaiterModeBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            Show Order to Waiter
+          </button>
+          <button type="button" class="call-waiter-sheet-btn" id="callWaiterFromOrderBtn">
+            🛎️ Call Server to Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C. "SHOW TO WAITER" HIGH-CONTRAST CARD -->
+  <div class="waiter-card-modal" id="waiterCardModal" role="dialog" aria-modal="true">
+    <div class="waiter-card-header">
+      <span class="waiter-card-title">AURA • SERVER SUMMARY</span>
+      <button type="button" class="sheet-close-btn" id="closeWaiterModalBtn" style="position: static; color: #FFF; background: #333;" aria-label="Close server view">✕</button>
+    </div>
+
+    <div class="waiter-card-body">
+      <div class="waiter-table-banner">
+        <div style="font-size: 0.9rem; text-transform: uppercase; color: #AAA;">Customer Seating</div>
+        <div class="waiter-table-number" id="waiterCardTable">TABLE 14</div>
+      </div>
+
+      <div class="waiter-items-list" id="waiterItemsDisplayList"></div>
+
+      <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="font-size: 1.1rem; color: #AAA;">Total Items: <span id="waiterTotalCount" style="color: #FFF;">0</span></span>
+        <span style="font-size: 1.8rem; font-weight: 900; color: #FFD43B;" id="waiterTotalPrice">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- D. THEMES, LANGUAGE & PREFERENCES DRAWER -->
+  <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="bottom-sheet" id="settingsSheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeSettingsBtn" aria-label="Close settings">✕</button>
+
+      <div class="detail-content">
+        <h2 class="detail-title" id="settingsTitle">Display & Theme Settings</h2>
+
+        <div class="options-section">
+          <label for="languageSelect" class="section-subheading">Language / Idioma</label>
+          <select id="languageSelect" class="sort-select" style="width: 100%; height: 44px; font-size: 0.9rem;">
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+        </div>
+
+        <div class="options-section">
+          <label class="section-subheading">Color Mode</label>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="chip-btn" id="modeLightBtn" style="flex: 1; height: 40px;">☀️ Light</button>
+            <button type="button" class="chip-btn" id="modeDarkBtn" style="flex: 1; height: 40px;">🌙 Dark</button>
+            <button type="button" class="chip-btn" id="modeAutoBtn" style="flex: 1; height: 40px;">⚙️ Device</button>
+          </div>
+        </div>
+
+        <div class="options-section">
+          <label class="section-subheading">Atmosphere / Theme</label>
+          <div class="theme-grid" id="themeOptionsGrid">
+            <div class="theme-option-card" data-theme-name="modern-minimal">
+              <div class="theme-swatch" style="background: linear-gradient(90deg, #E8590C 40%, #1E2124 100%);"></div>
+              <span class="theme-name">Modern Minimal</span>
+            </div>
+            <div class="theme-option-card" data-theme-name="classic-elegance">
+              <div class="theme-swatch" style="background: linear-gradient(90deg, #B88E3E 40%, #25201A 100%);"></div>
+              <span class="theme-name">Classic Elegance</span>
+            </div>
+            <div class="theme-option-card" data-theme-name="bold-dark">
+              <div class="theme-swatch" style="background: linear-gradient(90deg, #FF3B5C 40%, #0C0D11 100%);"></div>
+              <span class="theme-name">Bold Dark</span>
+            </div>
+            <div class="theme-option-card" data-theme-name="warm-rustic">
+              <div class="theme-swatch" style="background: linear-gradient(90deg, #C05621 40%, #556B2F 100%);"></div>
+              <span class="theme-name">Warm Rustic</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="options-section">
+          <label class="section-subheading">Dining Information</label>
+          <div class="detail-meta-box">
+            <div class="meta-row">
+              <span class="meta-label">Table Number:</span>
+              <input type="text" id="settingTableInput" value="Table 14" style="background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-weight: 700; width: 100px; text-align: right; color: var(--text);">
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Guest WiFi:</span>
+              <span class="meta-value" id="settingWifiInfo">Aura-Guest (Pass: tastethevibes)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E. CALL WAITER SERVICE MODAL -->
+  <div class="modal-backdrop" id="callWaiterModal" role="dialog" aria-modal="true" aria-labelledby="waiterServiceTitle">
+    <div class="bottom-sheet" id="callWaiterSheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeWaiterServiceBtn" aria-label="Close service request">✕</button>
+
+      <div class="detail-content">
+        <h2 class="detail-title" id="waiterServiceTitle">Server Assistance</h2>
+        <p class="detail-desc">Tap a button below to alert your server immediately for <strong id="waiterModalTable">Table 14</strong>.</p>
+
+        <div class="waiter-service-options" style="display: grid; gap: 10px; margin-top: 12px;">
+          <button type="button" class="service-request-btn" data-service="server">
+            <span>🛎️</span>
+            <span>Request Waiter Assistance</span>
+          </button>
+          <button type="button" class="service-request-btn" data-service="water">
+            <span>💧</span>
+            <span>Request Water Refill</span>
+          </button>
+          <button type="button" class="service-request-btn" data-service="cutlery">
+            <span>🍽️</span>
+            <span>Extra Napkins / Cutlery</span>
+          </button>
+          <button type="button" class="service-request-btn" data-service="bill">
+            <span>💳</span>
+            <span>Request The Bill (Check)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F. ALLERGEN LEGEND MODAL -->
+  <div class="modal-backdrop" id="legendModal" role="dialog" aria-modal="true" aria-labelledby="legendTitle">
+    <div class="bottom-sheet" id="legendSheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeLegendBtn" aria-label="Close allergen guide">✕</button>
+
+      <div class="detail-content">
+        <h2 class="detail-title" id="legendTitle">Dietary & Allergen Guide</h2>
+        <p class="detail-desc">Our culinary team takes cross-contamination and guest wellness seriously. Please inform your server of any severe allergies.</p>
+
+        <div class="legend-grid">
+          <div class="legend-card">
+            <span class="legend-icon">🌱</span>
+            <div>
+              <div class="legend-name">Vegetarian (V)</div>
+              <div class="legend-desc">Contains no meat, poultry, or seafood. May contain dairy or eggs.</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">🌿</span>
+            <div>
+              <div class="legend-name">Vegan (VG)</div>
+              <div class="legend-desc">100% plant-based with zero animal products or byproducts.</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">🌾</span>
+            <div>
+              <div class="legend-name">Gluten-Free (GF)</div>
+              <div class="legend-desc">Prepared without gluten or with certified gluten-free grains.</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">🥩</span>
+            <div>
+              <div class="legend-name">Halal Certified</div>
+              <div class="legend-desc">Meats sourced exclusively from certified suppliers.</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">🥜</span>
+            <div>
+              <div class="legend-name">Nut-Free</div>
+              <div class="legend-desc">Formulated without peanuts or tree nuts.</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">🌶️</span>
+            <div>
+              <div class="legend-name">Spice Indicators</div>
+              <div class="legend-desc">Mild (🌶️) • Medium (🌶️🌶️) • Fiery Hot (🌶️🌶️🌶️)</div>
+            </div>
+          </div>
+          <div class="legend-card">
+            <span class="legend-icon">⭐</span>
+            <div>
+              <div class="legend-name">Chef's Selection</div>
+              <div class="legend-desc">House signature dishes hand-crafted and highly recommended.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G. TABLE QR CODE MODAL -->
+  <div class="modal-backdrop" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="bottom-sheet" id="qrSheet">
+      <div class="sheet-handle-wrap">
+        <div class="sheet-handle"></div>
+      </div>
+      <button type="button" class="sheet-close-btn" id="closeQrBtn" aria-label="Close QR">✕</button>
+
+      <div class="qr-modal-body">
+        <h2 class="detail-title" id="qrTitle">Scan Table Menu</h2>
+        <p class="detail-desc">Diners can scan this code with their phone camera to instantly access the live interactive menu.</p>
+
+        <div class="qr-canvas-wrap">
+          <img id="qrCodeImage" class="qr-img" src="" alt="Menu QR Code">
+        </div>
+
+        <button type="button" class="add-to-cart-submit" id="copyMenuUrlBtn" style="width: 100%; height: 44px;">
+          📋 Copy Menu Link
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       7. JAVASCRIPT: OWNER CONFIGURATION & APPLICATION LOGIC
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       OWNER CONFIGURATION & MENU DATA
+       Owners: Modify restaurant branding, currency, tax, and dishes below!
+       ========================================================================== */
+    const MENU_CONFIG = {
+      // 1. RESTAURANT BRANDING & INFO
+      restaurant: {
+        name: "Aura Bistro & Lounge",
+        shortName: "Aura Bistro",
+        logoLetter: "A",
+        tagline: "Contemporary Artisanal Dining & Craft Mixology",
+        currency: "$",
+        currencyCode: "USD",
+        defaultTable: "Table 14", // Can be overridden in URL with ?table=XX
+        hours: "Tue – Sun: 11:30 AM – 11:00 PM",
+        address: "742 Evergreen Terrace, Culinary Arts District",
+        wifi: {
+          ssid: "Aura-Guest",
+          password: "tastethevibes"
+        },
+        announcement: "✨ Chef's Seasonal Truffle Menu is now available for a limited time!",
+        openStatus: "Open Now • Dine-In",
+      },
+
+      // 2. THEME & DEFAULT SETTINGS
+      settings: {
+        defaultTheme: "modern-minimal", // 'modern-minimal' | 'classic-elegance' | 'bold-dark' | 'warm-rustic'
+        defaultMode: "auto",            // 'auto' | 'light' | 'dark'
+        defaultLayout: "list",          // 'list' | 'grid'
+        taxRate: 0.08,                  // 8% estimated tax calculation
+      },
+
+      // 3. MULTI-LANGUAGE TRANSLATION STRINGS (English & Español)
+      i18n: {
+        en: {
+          searchPlaceholder: "Search dishes, ingredients, dietary tags...",
+          openNow: "Open Now • Dine-In",
+          all: "All",
+          chefsPicks: "⭐ Chef's Picks",
+          featured: "Featured",
+          sortPriceAsc: "Price: Low to High",
+          sortPriceDesc: "Price: High to Low",
+          sortNameAsc: "Name: A–Z",
+          soldOut: "Sold Out",
+          chefsPickBadge: "Chef's Pick",
+          addToOrder: "Add to Order",
+          reviewOrder: "Review Order",
+          myOrder: "My Order",
+          clearAll: "Clear All",
+          subtotal: "Subtotal",
+          tax: "Estimated Tax (8%)",
+          total: "Estimated Total",
+          showToWaiter: "Show Order to Waiter",
+          callServerOrder: "🛎️ Call Server to Place Order",
+          serverAssistance: "Server Assistance",
+          alertServerText: "Tap a button below to alert your server immediately for",
+          reqAssistance: "Request Waiter Assistance",
+          reqWater: "Request Water Refill",
+          reqCutlery: "Extra Napkins / Cutlery",
+          reqBill: "Request The Bill (Check)",
+          table: "Table",
+          guestWifi: "Guest WiFi",
+          emptyTitle: "No dishes found",
+          emptyDesc: "Try adjusting your search terms or clearing your dietary filters.",
+          resetFilters: "Reset All Filters",
+          favEmptyTitle: "No favorites yet",
+          favEmptyDesc: "Tap the heart icon on any dish to save it here for quick viewing.",
+          orderSentToast: "🛎️ Server notified for {table}! Someone is on the way.",
+          itemAddedToast: "Added to your order",
+          linkCopiedToast: "Menu link copied to clipboard!",
+        },
+        es: {
+          searchPlaceholder: "Buscar platos, ingredientes, dietas...",
+          openNow: "Abierto Ahora • En Sala",
+          all: "Todo",
+          chefsPicks: "⭐ Recomendados",
+          featured: "Destacados",
+          sortPriceAsc: "Precio: Menor a Mayor",
+          sortPriceDesc: "Precio: Mayor a Menor",
+          sortNameAsc: "Nombre: A–Z",
+          soldOut: "Agotado",
+          chefsPickBadge: "Elección del Chef",
+          addToOrder: "Agregar a la Orden",
+          reviewOrder: "Ver Orden",
+          myOrder: "Mi Orden",
+          clearAll: "Vaciar Todo",
+          subtotal: "Subtotal",
+          tax: "Impuesto Estimado (8%)",
+          total: "Total Estimado",
+          showToWaiter: "Mostrar Orden al Camarero",
+          callServerOrder: "🛎️ Llamar al Camarero",
+          serverAssistance: "Atención del Personal",
+          alertServerText: "Toca un botón para avisar a tu camarero de la mesa",
+          reqAssistance: "Llamar al Camarero",
+          reqWater: "Solicitar Agua",
+          reqCutlery: "Servilletas / Cubiertos",
+          reqBill: "Pedir la Cuenta",
+          table: "Mesa",
+          guestWifi: "WiFi Clientes",
+          emptyTitle: "No se encontraron platos",
+          emptyDesc: "Intenta cambiar tu búsqueda o restablecer los filtros dietéticos.",
+          resetFilters: "Restablecer Filtros",
+          favEmptyTitle: "Sin favoritos aún",
+          favEmptyDesc: "Toca el corazón en cualquier plato para guardarlo aquí durante tu visita.",
+          orderSentToast: "🛎️ ¡Camarero avisado para la {table}! En camino.",
+          itemAddedToast: "Agregado a tu orden",
+          linkCopiedToast: "¡Enlace del menú copiado!",
+        }
+      },
+
+      // 4. CATEGORIES (6 DISTINCT CATEGORIES)
+      categories: [
+        {
+          id: "starters",
+          name: "Starters & Tapas",
+          name_es: "Entrantes & Tapas",
+          icon: "🥗",
+          description: "Artisanal appetizers crafted to awaken the senses and share with the table.",
+          description_es: "Aperitivos artesanales diseñados para abrir el apetito y compartir."
+        },
+        {
+          id: "mains",
+          name: "Chef's Entrées & Prime Cuts",
+          name_es: "Platos Fuertes & Carnes",
+          icon: "🥩",
+          description: "Prime dry-aged steaks, pan-roasted wild catches, and heritage cuts.",
+          description_es: "Cortes madurados selectos, pesca fresca y recetas de autor."
+        },
+        {
+          id: "wood-fired",
+          name: "Wood-Fired Specialties",
+          name_es: "Horno de Leña & Brasas",
+          icon: "🍕",
+          description: "72-hour fermented sourdough crusts and gourmet brioche burgers.",
+          description_es: "Masa madre fermentada por 72 horas y hamburguesas gourmet al carbón."
+        },
+        {
+          id: "greens",
+          name: "Artisanal Greens & Bowls",
+          name_es: "Ensaladas & Bowls",
+          icon: "🥑",
+          description: "Hyper-seasonal produce, crisp organic greens, and superfood vinaigrettes.",
+          description_es: "Vegetales orgánicos de temporada, granos ancestrales y vinagretas de autor."
+        },
+        {
+          id: "desserts",
+          name: "Pastry & Decadence",
+          name_es: "Postres Artesanales",
+          icon: "🍰",
+          description: "Handcrafted confectionary, French pastry creations, and house churned gelato.",
+          description_es: "Repostería fina hecha en casa, helados artesanales y postres clásicos."
+        },
+        {
+          id: "drinks",
+          name: "Craft Mixology & Cellar",
+          name_es: "Coctelería & Cava",
+          icon: "🍸",
+          description: "Botanical cocktails, barrel-aged classics, and sommelier-selected wines.",
+          description_es: "Cócteles de autor, clásicos añejados en barrica y vinos seleccionados."
+        }
+      ],
+
+      // 5. MENU ITEMS (25 REALISTIC ITEMS WITH ALLERGENS, OPTIONS, SPICE, AVAILABILITY)
+      // Tip: Set soldOut: true or chefsPick: true to update any dish instantly.
+      items: [
+        // --- STARTERS & TAPAS ---
+        {
+          id: "starters-1",
+          categoryId: "starters",
+          name: "Truffle Burrata & Heirloom Crudo",
+          name_es: "Burrata Trufada con Tomates Heirloom",
+          description: "Creamy Puglia burrata paired with marinated heirloom tomatoes, aged Modena balsamic caviar, micro-basil, and warm grilled rustic focaccia.",
+          description_es: "Burrata cremosa de Puglia con tomates de huerta macerados, caviar de balsámico de Módena y focaccia a la brasa.",
+          price: 18.50,
+          image: "https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "chefsPick"],
+          allergens: ["Dairy", "Gluten"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Add Prosciutto di Parma +$4.50", price: 4.50 },
+            { name: "Extra Grilled Garlic Focaccia +$2.50", price: 2.50 }
+          ]
+        },
+        {
+          id: "starters-2",
+          categoryId: "starters",
+          name: "Crispy Point Judith Calamari Fritti",
+          name_es: "Calamares Crujientes Fritti",
+          description: "Flash-fried tender squid tossed with pickled cherry peppers, charred lemon wheel, and served with a smoked paprika remoulade.",
+          description_es: "Calamares frescos fritos con pimientos encurtidos, limón braseado y salsa tártara de pimentón ahumado.",
+          price: 17.00,
+          image: "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80",
+          tags: ["spicy", "halal"],
+          allergens: ["Seafood", "Gluten", "Egg"],
+          spiceLevel: 1,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Extra Spiced Smoked Remoulade +$1.50", price: 1.50 }
+          ]
+        },
+        {
+          id: "starters-3",
+          categoryId: "starters",
+          name: "Wagyu Beef Carpaccio",
+          name_es: "Carpaccio de Res Wagyu",
+          description: "Thinly sliced A5 Miyazaki Wagyu, caper berries, shaved Parmigiano Reggiano 24-month, black winter truffle oil, and wild baby arugula.",
+          description_es: "Finas láminas de Wagyu A5 con alcaparras gigantes, lascas de Parmigiano Reggiano, aceite de trufa y rúcula.",
+          price: 22.00,
+          image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+          tags: ["chefsPick", "gluten-free", "halal"],
+          allergens: ["Dairy"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Shaved Fresh Black Truffle +$8.00", price: 8.00 }
+          ]
+        },
+        {
+          id: "starters-4",
+          categoryId: "starters",
+          name: "Charred Edamame & Togarashi",
+          name_es: "Edamame a la Brasa con Togarashi",
+          description: "Wok-seared organic soy pods glazed with sesame tamari reduction, Maldon sea salt flakes, and Japanese seven-spice blend.",
+          description_es: "Vainas de soya tostadas al wok con reducción de tamari y sésamo, sal Maldon y togarashi.",
+          price: 11.50,
+          image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegan", "vegetarian", "gluten-free", "spicy"],
+          allergens: ["Soy", "Sesame"],
+          spiceLevel: 2,
+          soldOut: true, // Example sold out dish
+          chefsPick: false,
+          options: []
+        },
+        {
+          id: "starters-5",
+          categoryId: "starters",
+          name: "Wild Forest Mushroom Arancini",
+          name_es: "Arancini de Setas Silvestres",
+          description: "Crispy saffron risotto balls stuffed with smoked scamorza cheese, sautéed porcini mushrooms, served over roasted garlic tomato coulis.",
+          description_es: "Croquetas crujientes de arroz al azafrán rellenas de queso scamorza y hongos porcini sobre coulis de tomate.",
+          price: 15.00,
+          image: "https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian"],
+          allergens: ["Dairy", "Gluten"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Truffle Aioli Dip +$2.00", price: 2.00 }
+          ]
+        },
+
+        // --- ENTRÉES & PRIME CUTS ---
+        {
+          id: "mains-1",
+          categoryId: "mains",
+          name: "45-Day Dry-Aged Prime Ribeye (14oz)",
+          name_es: "Ribeye Prime Madurado 45 Días (14oz)",
+          description: "Cast-iron seared USDA Prime ribeye, rosemary bone marrow butter, roasted Cipollini onions, and red wine demi-glace reduction.",
+          description_es: "Ojo de bife madurado a la mantequilla de tuétano y romero, cebollas caramelizadas y reducción de vino tinto.",
+          price: 54.00,
+          image: "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=600&q=80",
+          tags: ["chefsPick", "gluten-free", "halal"],
+          allergens: ["Dairy"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Cooking: Rare", price: 0 },
+            { name: "Cooking: Medium Rare (Chef Recommend)", price: 0 },
+            { name: "Cooking: Medium", price: 0 },
+            { name: "Cooking: Medium Well", price: 0 },
+            { name: "Add Jumbo Garlic Butter Prawns +$12.00", price: 12.00 },
+            { name: "Add Truffle Mashed Yukon Gold +$6.50", price: 6.50 }
+          ]
+        },
+        {
+          id: "mains-2",
+          categoryId: "mains",
+          name: "Pan-Seared Chilean Sea Bass",
+          name_es: "Corvina Chilena Sellada",
+          description: "Sustainably caught sea bass fillet, lemongrass miso broth, baby bok choy, pickled beech mushrooms, and ginger scallion emulsion.",
+          description_es: "Filete de lubina chilena sustentable en caldo de miso y limoncillo con baby bok choy y emulsión de jengibre.",
+          price: 46.00,
+          image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80",
+          tags: ["gluten-free", "halal"],
+          allergens: ["Fish", "Soy"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Substitute Black Forbidden Rice +$3.00", price: 3.00 }
+          ]
+        },
+        {
+          id: "mains-3",
+          categoryId: "mains",
+          name: "Braised Beef Short Rib Tagliatelle",
+          name_es: "Tagliatelle con Costilla Braseada",
+          description: "Handmade egg pasta ribbons, 12-hour braised chuck ragù, san marzano tomato, fresh thyme, and shaved Pecorino Romano.",
+          description_es: "Pasta fresca hecha a mano con ragú de costilla braseada durante 12 horas y pecorino romano.",
+          price: 32.00,
+          image: "https://images.unsplash.com/photo-1621996346565-e3d5d6281729?auto=format&fit=crop&w=600&q=80",
+          tags: ["halal"],
+          allergens: ["Gluten", "Dairy", "Egg"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Gluten-Free Pasta Substitute +$2.50", price: 2.50 },
+            { name: "Extra Fresh Shaved Truffle +$7.00", price: 7.00 }
+          ]
+        },
+        {
+          id: "mains-4",
+          categoryId: "mains",
+          name: "Roasted Organic Cauliflower Steak",
+          name_es: "Bife de Coliflor Rostizada",
+          description: "Za'atar-spiced thick cauliflower steak, golden turmeric tahini puree, pomegranate molasses reduction, toasted pine nuts, and mint chimichurri.",
+          description_es: "Filete de coliflor al za'atar con puré dorado de tahini y cúrcuma, reducción de granada y chimichurri de menta.",
+          price: 24.00,
+          image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegan", "vegetarian", "gluten-free"],
+          allergens: ["Sesame", "Tree Nuts"],
+          spiceLevel: 1,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Nut-Free (Remove Pine Nuts)", price: 0 }
+          ]
+        },
+        {
+          id: "mains-5",
+          categoryId: "mains",
+          name: "Herb-Crusted Colorado Rack of Lamb",
+          name_es: "Costillar de Cordero en Costra de Hierbas",
+          description: "Dijon-parsley crusted lamb chops, charred baby carrots, goat cheese polenta, and blackberry port wine jus.",
+          description_es: "Costillas de cordero con costra de mostaza Dijon y hierbas, polenta de queso de cabra y jugo de moras al oporto.",
+          price: 48.00,
+          image: "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=600&q=80",
+          tags: ["chefsPick", "halal"],
+          allergens: ["Dairy", "Gluten"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Cooking: Medium Rare (Recommended)", price: 0 },
+            { name: "Cooking: Medium", price: 0 }
+          ]
+        },
+
+        // --- WOOD-FIRED SPECIALTIES ---
+        {
+          id: "wood-1",
+          categoryId: "wood-fired",
+          name: "Tartufo & Wild Morel Sourdough Pizza",
+          name_es: "Pizza de Masa Madre con Trufa & Morillas",
+          description: "White sauce base, fior di latte mozzarella, fontina, wild morel mushrooms, fresh shaved black truffle, and cracked black pepper.",
+          description_es: "Base blanca, fior di latte, fontina, setas colmenillas silvestres, láminas de trufa negra fresca y pimienta.",
+          price: 25.50,
+          image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "chefsPick"],
+          allergens: ["Gluten", "Dairy"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Cauliflower Gluten-Free Crust +$3.50", price: 3.50 },
+            { name: "Add Prosciutto di San Daniele +$4.00", price: 4.00 }
+          ]
+        },
+        {
+          id: "wood-2",
+          categoryId: "wood-fired",
+          name: "Spicy Diavola Calabrian Salami Pizza",
+          name_es: "Pizza Diavola con Salami Calabrés",
+          description: "San Marzano tomatoes, spicy soppressata, chili-infused hot honey drizzle, fresh oregano, and Calabrian chili oil.",
+          description_es: "Salsa de tomate San Marzano, soppressata picante, miel aromatizada con chile, orégano y aceite de Calabria.",
+          price: 23.00,
+          image: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=600&q=80",
+          tags: ["spicy"],
+          allergens: ["Gluten", "Dairy"],
+          spiceLevel: 2,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Extra Hot Honey Drizzle +$1.50", price: 1.50 },
+            { name: "Double Cheese +$2.50", price: 2.50 }
+          ]
+        },
+        {
+          id: "wood-3",
+          categoryId: "wood-fired",
+          name: "The Aura Smoked Bacon & Wagyu Smash Burger",
+          name_es: "Hamburguesa Smash de Wagyu Aura",
+          description: "Two 4oz Wagyu patties, thick bourbon applewood bacon, aged Vermont cheddar, caramelized onions, house truffle relish, brioche bun.",
+          description_es: "Doble carne Wagyu smash, tocino ahumado al bourbon, cheddar de Vermont, cebolla caramelizada y salsa trufada en pan brioche.",
+          price: 21.00,
+          image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+          tags: ["halal"],
+          allergens: ["Gluten", "Dairy", "Egg"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Truffle Parmesan Fries +$4.00", price: 4.00 },
+            { name: "Gluten-Free Bun +$2.00", price: 2.00 },
+            { name: "Add Fried Farm Egg +$2.00", price: 2.00 }
+          ]
+        },
+        {
+          id: "wood-4",
+          categoryId: "wood-fired",
+          name: "Crispy Hot Honey Chicken Brioche",
+          name_es: "Sandwich de Pollo Crujiente Hot Honey",
+          description: "Buttermilk marinated fried chicken breast, Nashville spice dip, bread & butter pickles, creamy apple slaw, toasted sesame brioche.",
+          description_es: "Pechuga de pollo marinada en suero de mantequilla y frita, dip Nashville picante, pepinillos y ensalada de col.",
+          price: 19.50,
+          image: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=600&q=80",
+          tags: ["spicy", "halal"],
+          allergens: ["Gluten", "Dairy", "Egg", "Sesame"],
+          spiceLevel: 3,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Mild Spice Glaze", price: 0 },
+            { name: "Extra Fiery Ghost Pepper Glaze +$1.00", price: 1.00 }
+          ]
+        },
+
+        // --- ARTISANAL GREENS & BOWLS ---
+        {
+          id: "greens-1",
+          categoryId: "greens",
+          name: "Citrus Poached Salmon & Quinoa Bowl",
+          name_es: "Bowl de Salmón Pochado y Quinoa",
+          description: "Wild Alaskan salmon, organic tri-color quinoa, Hass avocado, edamame, cucumber ribbons, and a yuzu ginger vinaigrette.",
+          description_es: "Salmón salvaje pochado en cítricos, quinoa tricolor, aguacate Hass, edamame y vinagreta de yuzu y jengibre.",
+          price: 24.50,
+          image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
+          tags: ["gluten-free", "halal", "nut-free"],
+          allergens: ["Fish", "Soy"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Double Salmon Protein +$9.00", price: 9.00 }
+          ]
+        },
+        {
+          id: "greens-2",
+          categoryId: "greens",
+          name: "Tuscan Kale & Grilled Peach Caesar",
+          name_es: "César de Col Toscana y Melocotón Asado",
+          description: "Baby Tuscan kale, charred Georgia peaches, sourdough croutons, shaved 24-month parmesan, and garlic anchovy dressing.",
+          description_es: "Col toscana tierna con melocotones asados, croutons de masa madre, lascas de parmesano y aderezo césar clásico.",
+          price: 16.50,
+          image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian"],
+          allergens: ["Dairy", "Gluten", "Fish"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Add Grilled Chicken Breast +$6.00", price: 6.00 },
+            { name: "Add Grilled Prawns +$8.00", price: 8.00 }
+          ]
+        },
+        {
+          id: "greens-3",
+          categoryId: "greens",
+          name: "Mediterranean Mezze Superfood Bowl",
+          name_es: "Superfood Bowl Mezze Mediterráneo",
+          description: "Spiced crispy chickpeas, beetroot hummus, Kalamata olives, Persian cucumbers, heirloom cherry tomatoes, quinoa, and lemon tahini.",
+          description_es: "Garbanzos crujientes especiados, hummus de remolacha, aceitunas kalamata, pepinos persas y aderezo de tahini.",
+          price: 18.00,
+          image: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegan", "vegetarian", "gluten-free", "nut-free"],
+          allergens: ["Sesame"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Add Grilled Halloumi Cheese +$4.00", price: 4.00 }
+          ]
+        },
+
+        // --- PASTRY & DECADENCE ---
+        {
+          id: "desserts-1",
+          categoryId: "desserts",
+          name: "Molten Valrhona 70% Dark Chocolate Fondant",
+          name_es: "Volcán de Chocolate Valrhona 70%",
+          description: "Warm single-origin Guanaja chocolate cake with a molten center, served with Madagascar vanilla gelato and gold leaf garnish.",
+          description_es: "Bizcocho tibio de chocolate puro Guanaja con centro fundido, helado de vainilla de Madagascar y lámina de oro.",
+          price: 14.50,
+          image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "chefsPick"],
+          allergens: ["Dairy", "Gluten", "Egg"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Add Espresso Shot on Gelato (Affogato) +$3.50", price: 3.50 }
+          ]
+        },
+        {
+          id: "desserts-2",
+          categoryId: "desserts",
+          name: "Bourbon Madagascar Vanilla Bean Crème Brûlée",
+          name_es: "Crème Brûlée de Vainilla Bourbon",
+          description: "Slow-baked silky custard infused with whole Bourbon vanilla pods, finished with a glass-like caramelized turbinado sugar crust.",
+          description_es: "Crema suave horneada con vainas de vainilla bourbon y corteza crujiente de azúcar caramelizado al fuego.",
+          price: 12.00,
+          image: "https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "gluten-free", "nut-free"],
+          allergens: ["Dairy", "Egg"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: []
+        },
+        {
+          id: "desserts-3",
+          categoryId: "desserts",
+          name: "Sicilian Pistachio & Espresso Tiramisu",
+          name_es: "Tiramisú de Pistacho Siciliano",
+          description: "Savoiardi ladyfingers soaked in single-estate espresso and amaretto, layered with Bronte pistachio mascarpone mousse.",
+          description_es: "Bizcochos savoiardi bañados en espresso, crema batida de mascarpone y pistacho de Bronte con cacao.",
+          price: 13.50,
+          image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian"],
+          allergens: ["Dairy", "Gluten", "Egg", "Tree Nuts"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: []
+        },
+        {
+          id: "desserts-4",
+          categoryId: "desserts",
+          name: "Meyer Lemon & Wild Blackberry Tart",
+          name_es: "Tarta de Limón Meyer y Moras",
+          description: "Crispy butter sable shell, silky Meyer lemon curd, fresh blackberries, Italian torched meringue, and candied zest.",
+          description_es: "Masa quebrada de mantequilla, crema de limón Meyer, moras frescas silvestres y merengue tostado.",
+          price: 13.00,
+          image: "https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "nut-free"],
+          allergens: ["Dairy", "Gluten", "Egg"],
+          spiceLevel: 0,
+          soldOut: true, // Example sold out
+          chefsPick: false,
+          options: []
+        },
+
+        // --- CRAFT MIXOLOGY & CELLAR ---
+        {
+          id: "drinks-1",
+          categoryId: "drinks",
+          name: "Smoked Rosemary Old Fashioned",
+          name_es: "Old Fashioned con Romero Ahumado",
+          description: "Small-batch Kentucky bourbon, Angostura & orange bitters, demerara syrup, torched fresh rosemary sprig, expressed orange peel.",
+          description_es: "Bourbon artesanal, amargos de naranja y angostura, jarabe demerara y romero fresco flameado en mesa.",
+          price: 17.50,
+          image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=600&q=80",
+          tags: ["chefsPick"],
+          allergens: [],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: true,
+          options: [
+            { name: "Upgrade to WhistlePig 10-Yr Rye +$5.00", price: 5.00 }
+          ]
+        },
+        {
+          id: "drinks-2",
+          categoryId: "drinks",
+          name: "Lavender Honey & Empress Gin Fizz",
+          name_es: "Gin Fizz de Lavanda y Miel de Azahar",
+          description: "Empress 1908 indigo gin, house lavender honey syrup, fresh squeezed lemon, topped with prosecco and culinary violet petals.",
+          description_es: "Ginebra añil Empress 1908, miel de lavanda casera, limón fresco y toque espumoso de prosecco.",
+          price: 16.00,
+          image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegetarian", "gluten-free", "nut-free"],
+          allergens: [],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: []
+        },
+        {
+          id: "drinks-3",
+          categoryId: "drinks",
+          name: "Yuzu Hibiscus Botanical Spritz (Zero-Proof)",
+          name_es: "Spritz Botánico de Yuzu e Hibisco (Sin Alcohol)",
+          description: "Sparkling craft mocktail: cold-brewed hibiscus flowers, Japanese yuzu citrus, crushed mint, organic agave, club soda.",
+          description_es: "Cóctel sin alcohol: infusión fría de flor de Jamaica, cítrico yuzu, menta fresca y soda artesanal.",
+          price: 10.50,
+          image: "https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=600&q=80",
+          tags: ["vegan", "vegetarian", "gluten-free", "halal", "nut-free"],
+          allergens: [],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: []
+        },
+        {
+          id: "drinks-4",
+          categoryId: "drinks",
+          name: "Sommelier's Reserve Pinot Noir, Willamette Valley",
+          name_es: "Pinot Noir Reserva del Sommelier (Copa)",
+          description: "Notes of black cherry, forest floor, and delicate toasted French oak. Silky tannins with an elegant, lingering finish.",
+          description_es: "Notas de cereza negra, sotobosque y roble francés tostado. Taninos sedosos con final persistente.",
+          price: 19.00,
+          image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+          tags: ["gluten-free", "vegan"],
+          allergens: ["Sulfites"],
+          spiceLevel: 0,
+          soldOut: false,
+          chefsPick: false,
+          options: [
+            { name: "Bottle (750ml) +$56.00", price: 56.00 }
+          ]
+        }
+      ]
+    };
+
+    /* ==========================================================================
+       APPLICATION STATE MANAGEMENT
+       ========================================================================== */
+    const state = {
+      theme: localStorage.getItem('aura_theme') || MENU_CONFIG.settings.defaultTheme,
+      mode: localStorage.getItem('aura_mode') || MENU_CONFIG.settings.defaultMode,
+      layout: localStorage.getItem('aura_layout') || MENU_CONFIG.settings.defaultLayout,
+      lang: localStorage.getItem('aura_lang') || 'en',
+      table: new URLSearchParams(window.location.search).get('table') || MENU_CONFIG.restaurant.defaultTable,
+      activeCategory: MENU_CONFIG.categories[0].id,
+      searchQuery: '',
+      activeFilter: 'all',
+      sortOrder: 'featured',
+      favorites: new Set(JSON.parse(sessionStorage.getItem('aura_favs') || '[]')),
+      cart: JSON.parse(sessionStorage.getItem('aura_cart') || '[]'),
+      activeDetailItem: null,
+      detailQty: 1,
+      selectedOptions: [],
+      specialNotes: '',
+    };
+
+    // SVG Fallback for food imagery
+    const SVG_FOOD_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none'%3E%3Crect width='120' height='120' fill='%2322252D'/%3E%3Cpath d='M60 40C46 40 34 50 34 62H86C86 50 74 40 60 40Z' fill='%23E8590C' opacity='0.7'/%3E%3Ccircle cx='60' cy='35' r='4' fill='%23E8590C'/%3E%3Crect x='30' y='65' width='60' height='5' rx='2.5' fill='%23868E96'/%3E%3C/svg%3E";
+
+    // Haptic feedback simulation
+    function triggerHaptic(duration = 12) {
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate(duration); } catch(e) {}
+      }
+    }
+
+    // Toast notification
+    function showToast(message, icon = '✓') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      triggerHaptic(15);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 2800);
+    }
+
+    // Money formatter
+    function formatMoney(amount) {
+      return `${MENU_CONFIG.restaurant.currency}${amount.toFixed(2)}`;
+    }
+
+    // Translation helper
+    function t(key) {
+      const lang = state.lang;
+      return (MENU_CONFIG.i18n[lang] && MENU_CONFIG.i18n[lang][key]) ||
+             (MENU_CONFIG.i18n.en && MENU_CONFIG.i18n.en[key]) || key;
+    }
+
+    /* ==========================================================================
+       THEME & DISPLAY
+       ========================================================================== */
+    function applyThemeSettings() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      document.documentElement.setAttribute('data-theme-mode', state.mode);
+      document.documentElement.setAttribute('data-layout', state.layout);
+
+      localStorage.setItem('aura_theme', state.theme);
+      localStorage.setItem('aura_mode', state.mode);
+      localStorage.setItem('aura_layout', state.layout);
+      localStorage.setItem('aura_lang', state.lang);
+
+      document.querySelectorAll('.theme-option-card').forEach(card => {
+        card.classList.toggle('selected', card.getAttribute('data-theme-name') === state.theme);
+      });
+
+      document.getElementById('modeLightBtn').classList.toggle('active', state.mode === 'light');
+      document.getElementById('modeDarkBtn').classList.toggle('active', state.mode === 'dark');
+      document.getElementById('modeAutoBtn').classList.toggle('active', state.mode === 'auto');
+
+      document.getElementById('tableLabel').textContent = state.table;
+      document.getElementById('settingTableInput').value = state.table;
+      document.getElementById('waiterCardTable').textContent = state.table.toUpperCase();
+      document.getElementById('waiterModalTable').textContent = state.table;
+      document.getElementById('languageSelect').value = state.lang;
+
+      const layoutIcon = document.getElementById('layoutToggleBtn');
+      if (state.layout === 'grid') {
+        layoutIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`;
+      } else {
+        layoutIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
+      }
+    }
+
+    /* ==========================================================================
+       CATEGORY TABS & MENU RENDERING
+       ========================================================================== */
+    function renderCategoryTabs() {
+      const nav = document.getElementById('categoriesNavScroll');
+      nav.innerHTML = '';
+
+      MENU_CONFIG.categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `category-tab ${cat.id === state.activeCategory ? 'active' : ''}`;
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', cat.id === state.activeCategory);
+        btn.setAttribute('data-cat-id', cat.id);
+        const name = (state.lang === 'es' && cat.name_es) ? cat.name_es : cat.name;
+        btn.innerHTML = `<span>${cat.icon}</span> <span>${name}</span>`;
+
+        btn.addEventListener('click', () => {
+          triggerHaptic(10);
+          state.activeCategory = cat.id;
+          updateActiveCategoryTab(cat.id);
+          const targetSection = document.getElementById(`cat-section-${cat.id}`);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+
+        nav.appendChild(btn);
+      });
+    }
+
+    function updateActiveCategoryTab(catId) {
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        const isActive = tab.getAttribute('data-cat-id') === catId;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive);
+        if (isActive) {
+          tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      });
+    }
+
+    function getFilteredAndSortedItems() {
+      let items = [...MENU_CONFIG.items];
+
+      if (state.searchQuery.trim().length > 0) {
+        const query = state.searchQuery.toLowerCase();
+        items = items.filter(item => {
+          const name = item.name.toLowerCase();
+          const nameEs = (item.name_es || '').toLowerCase();
+          const desc = item.description.toLowerCase();
+          const descEs = (item.description_es || '').toLowerCase();
+          const tags = (item.tags || []).join(' ').toLowerCase();
+          const allergens = (item.allergens || []).join(' ').toLowerCase();
+          return name.includes(query) || nameEs.includes(query) || desc.includes(query) || descEs.includes(query) || tags.includes(query) || allergens.includes(query);
+        });
+      }
+
+      if (state.activeFilter === 'chefsPick') {
+        items = items.filter(item => item.chefsPick);
+      } else if (state.activeFilter === 'favorites') {
+        items = items.filter(item => state.favorites.has(item.id));
+      } else if (state.activeFilter !== 'all') {
+        items = items.filter(item => item.tags && item.tags.includes(state.activeFilter));
+      }
+
+      if (state.sortOrder === 'price-asc') {
+        items.sort((a, b) => a.price - b.price);
+      } else if (state.sortOrder === 'price-desc') {
+        items.sort((a, b) => b.price - a.price);
+      } else if (state.sortOrder === 'name-asc') {
+        items.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      return items;
+    }
+
+    function renderMenu() {
+      const container = document.getElementById('menuMain');
+      container.innerHTML = '';
+
+      const filteredItems = getFilteredAndSortedItems();
+
+      if (filteredItems.length === 0) {
+        const isFavMode = state.activeFilter === 'favorites';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">${isFavMode ? '❤️' : '🔍'}</div>
+            <h3 class="empty-state-title">${isFavMode ? t('favEmptyTitle') : t('emptyTitle')}</h3>
+            <p class="empty-state-text">${isFavMode ? t('favEmptyDesc') : t('emptyDesc')}</p>
+            <button type="button" class="empty-action-btn" id="resetFiltersBtn">${t('resetFilters')}</button>
+          </div>
+        `;
+        document.getElementById('resetFiltersBtn')?.addEventListener('click', () => {
+          state.searchQuery = '';
+          document.getElementById('menuSearchInput').value = '';
+          document.getElementById('searchClearBtn').classList.remove('visible');
+          state.activeFilter = 'all';
+          document.querySelectorAll('.chip-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-filter') === 'all'));
+          renderMenu();
+        });
+        return;
+      }
+
+      const isFiltered = state.searchQuery.trim().length > 0 || state.activeFilter !== 'all';
+
+      if (isFiltered) {
+        const section = document.createElement('section');
+        section.className = 'category-section';
+
+        const header = document.createElement('div');
+        header.className = 'category-header';
+        header.innerHTML = `
+          <h2 class="category-heading">
+            <span>✨</span>
+            <span>${state.activeFilter === 'favorites' ? 'Your Saved Favorites' : 'Filtered Results'} (${filteredItems.length})</span>
+          </h2>
+        `;
+        section.appendChild(header);
+
+        const itemsWrap = document.createElement('div');
+        itemsWrap.className = 'items-container';
+        filteredItems.forEach(item => itemsWrap.appendChild(createItemCard(item)));
+        section.appendChild(itemsWrap);
+
+        container.appendChild(section);
+        return;
+      }
+
+      MENU_CONFIG.categories.forEach(cat => {
+        const catItems = filteredItems.filter(item => item.categoryId === cat.id);
+        if (catItems.length === 0) return;
+
+        const section = document.createElement('section');
+        section.className = 'category-section';
+        section.id = `cat-section-${cat.id}`;
+        section.setAttribute('data-category-id', cat.id);
+
+        const catName = (state.lang === 'es' && cat.name_es) ? cat.name_es : cat.name;
+        const catDesc = (state.lang === 'es' && cat.description_es) ? cat.description_es : cat.description;
+
+        const header = document.createElement('div');
+        header.className = 'category-header';
+        header.innerHTML = `
+          <h2 class="category-heading">
+            <span>${cat.icon}</span>
+            <span>${catName}</span>
+          </h2>
+          <p class="category-desc">${catDesc}</p>
+        `;
+        section.appendChild(header);
+
+        const itemsWrap = document.createElement('div');
+        itemsWrap.className = 'items-container';
+
+        catItems.forEach(item => {
+          itemsWrap.appendChild(createItemCard(item));
+        });
+
+        section.appendChild(itemsWrap);
+        container.appendChild(section);
+      });
+
+      setupScrollSpy();
+    }
+
+    function createItemCard(item) {
+      const card = document.createElement('article');
+      card.className = `menu-card ${item.soldOut ? 'sold-out' : ''}`;
+      card.setAttribute('data-id', item.id);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `${item.name}, ${formatMoney(item.price)}`);
+
+      const itemName = (state.lang === 'es' && item.name_es) ? item.name_es : item.name;
+      const itemDesc = (state.lang === 'es' && item.description_es) ? item.description_es : item.description;
+      const isFav = state.favorites.has(item.id);
+
+      let dietaryBadges = '';
+      if (item.tags) {
+        if (item.tags.includes('vegetarian')) dietaryBadges += `<span class="dietary-tag">🌱 Veg</span>`;
+        if (item.tags.includes('vegan')) dietaryBadges += `<span class="dietary-tag">🌿 Vegan</span>`;
+        if (item.tags.includes('gluten-free')) dietaryBadges += `<span class="dietary-tag">🌾 GF</span>`;
+        if (item.tags.includes('halal')) dietaryBadges += `<span class="dietary-tag">🥩 Halal</span>`;
+        if (item.tags.includes('spicy')) dietaryBadges += `<span class="dietary-tag">🌶️ Spicy</span>`;
+      }
+
+      card.innerHTML = `
+        <div class="card-thumb-wrap">
+          <div class="img-skeleton"></div>
+          <img class="card-img" src="${item.image}" alt="${itemName}" loading="lazy" onload="this.previousElementSibling.style.display='none'" onerror="this.onerror=null; this.src='${SVG_FOOD_FALLBACK}'; this.previousElementSibling.style.display='none';">
+          <button type="button" class="card-fav-btn ${isFav ? 'active' : ''}" aria-label="Favorite ${itemName}" data-fav-id="${item.id}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="card-body">
+          <div class="card-top">
+            ${item.chefsPick ? `<span class="badge-pill badge-chefs">⭐ ${t('chefsPickBadge')}</span>` : ''}
+            ${item.soldOut ? `<span class="badge-pill badge-soldout-pill">${t('soldOut')}</span>` : ''}
+            <div class="card-title-row">
+              <h3 class="card-title">${itemName}</h3>
+            </div>
+            <p class="card-desc">${itemDesc}</p>
+            <div class="card-dietary-row">${dietaryBadges}</div>
+          </div>
+
+          <div class="card-bottom-row">
+            <span class="card-price">${formatMoney(item.price)}</span>
+            <button type="button" class="quick-add-btn" aria-label="Add ${itemName} to order" data-add-id="${item.id}" ${item.soldOut ? 'disabled' : ''}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.card-fav-btn') || e.target.closest('.quick-add-btn')) return;
+        openItemDetail(item);
+      });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openItemDetail(item);
+        }
+      });
+
+      card.querySelector('.card-fav-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFavorite(item.id);
+      });
+
+      card.querySelector('.quick-add-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (item.soldOut) return;
+        if (item.options && item.options.length > 0) {
+          openItemDetail(item);
+        } else {
+          addToCart(item, 1, [], '');
+        }
+      });
+
+      return card;
+    }
+
+    function toggleFavorite(itemId) {
+      triggerHaptic(15);
+      if (state.favorites.has(itemId)) {
+        state.favorites.delete(itemId);
+      } else {
+        state.favorites.add(itemId);
+      }
+      sessionStorage.setItem('aura_favs', JSON.stringify([...state.favorites]));
+      updateFavoritesCounter();
+      renderMenu();
+    }
+
+    function updateFavoritesCounter() {
+      const badge = document.getElementById('favCounterBadge');
+      const count = state.favorites.size;
+      badge.textContent = count;
+      badge.classList.toggle('active', count > 0);
+    }
+
+    let scrollObserver = null;
+    function setupScrollSpy() {
+      if (scrollObserver) scrollObserver.disconnect();
+
+      const sections = document.querySelectorAll('.category-section[data-category-id]');
+      if (!sections.length) return;
+
+      const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -60% 0px',
+        threshold: 0
+      };
+
+      scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const catId = entry.target.getAttribute('data-category-id');
+            if (catId && catId !== state.activeCategory) {
+              state.activeCategory = catId;
+              updateActiveCategoryTab(catId);
+            }
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach(sec => scrollObserver.observe(sec));
+    }
+
+    /* ==========================================================================
+       ITEM DETAIL BOTTOM SHEET
+       ========================================================================== */
+    function openItemDetail(item) {
+      triggerHaptic(15);
+      state.activeDetailItem = item;
+      state.detailQty = 1;
+      state.selectedOptions = [];
+      state.specialNotes = '';
+
+      const modal = document.getElementById('itemDetailModal');
+      const itemName = (state.lang === 'es' && item.name_es) ? item.name_es : item.name;
+      const itemDesc = (state.lang === 'es' && item.description_es) ? item.description_es : item.description;
+
+      document.getElementById('modalItemTitle').textContent = itemName;
+      document.getElementById('modalItemPrice').textContent = formatMoney(item.price);
+      document.getElementById('modalItemDesc').textContent = itemDesc;
+
+      const heroImg = document.getElementById('detailHeroImg');
+      heroImg.src = item.image;
+      heroImg.alt = itemName;
+      heroImg.onerror = () => { heroImg.src = SVG_FOOD_FALLBACK; };
+
+      document.getElementById('detailQtyVal').textContent = '1';
+      document.getElementById('detailSpecialNotes').value = '';
+
+      const badgeRow = document.getElementById('detailBadgeRow');
+      badgeRow.innerHTML = '';
+      if (item.chefsPick) badgeRow.innerHTML += `<span class="badge-pill badge-chefs">⭐ ${t('chefsPickBadge')}</span>`;
+      if (item.soldOut) badgeRow.innerHTML += `<span class="badge-pill badge-soldout-pill">${t('soldOut')}</span>`;
+
+      const spiceMap = ['None', 'Mild 🌶️', 'Medium 🌶️🌶️', 'Hot 🌶️🌶️🌶️'];
+      document.getElementById('modalSpiceLevel').textContent = spiceMap[item.spiceLevel || 0];
+
+      const dietary = (item.tags || []).filter(t => t !== 'chefsPick').map(t => t.toUpperCase()).join(', ') || 'Standard';
+      document.getElementById('modalDietaryList').textContent = dietary;
+
+      const allergenContainer = document.getElementById('modalAllergensList');
+      allergenContainer.innerHTML = '';
+      if (item.allergens && item.allergens.length > 0) {
+        item.allergens.forEach(allg => {
+          const pill = document.createElement('span');
+          pill.className = 'allergen-pill';
+          pill.textContent = allg;
+          allergenContainer.appendChild(pill);
+        });
+      } else {
+        allergenContainer.innerHTML = `<span style="font-size:0.75rem; color:var(--text-muted);">None reported</span>`;
+      }
+
+      const optionsContainer = document.getElementById('modalOptionsSection');
+      const addonsList = document.getElementById('modalAddonsList');
+      addonsList.innerHTML = '';
+
+      if (item.options && item.options.length > 0) {
+        optionsContainer.style.display = 'block';
+        item.options.forEach((opt, idx) => {
+          const label = document.createElement('label');
+          label.className = 'addon-item';
+          label.innerHTML = `
+            <div class="addon-info">
+              <input type="checkbox" id="addon-${idx}" data-index="${idx}">
+              <span class="addon-name">${opt.name}</span>
+            </div>
+            <span class="addon-price">${opt.price > 0 ? `+${formatMoney(opt.price)}` : 'Free'}</span>
+          `;
+
+          const checkbox = label.querySelector('input');
+          checkbox.addEventListener('change', () => {
+            triggerHaptic(8);
+            if (checkbox.checked) {
+              state.selectedOptions.push(opt);
+            } else {
+              state.selectedOptions = state.selectedOptions.filter(o => o.name !== opt.name);
+            }
+            updateDetailTotal();
+          });
+
+          addonsList.appendChild(label);
+        });
+      } else {
+        optionsContainer.style.display = 'none';
+      }
+
+      const submitBtn = document.getElementById('detailAddToCartBtn');
+      if (item.soldOut) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = t('soldOut');
+      } else {
+        submitBtn.disabled = false;
+        updateDetailTotal();
+      }
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updateDetailTotal() {
+      if (!state.activeDetailItem) return;
+      const base = state.activeDetailItem.price;
+      const addonsTotal = state.selectedOptions.reduce((acc, opt) => acc + opt.price, 0);
+      const total = (base + addonsTotal) * state.detailQty;
+      document.getElementById('detailButtonTotal').textContent = formatMoney(total);
+    }
+
+    function closeDetailModal() {
+      document.getElementById('itemDetailModal').classList.remove('active');
+      document.body.style.overflow = '';
+      state.activeDetailItem = null;
+    }
+
+    document.getElementById('detailQtyMinus').addEventListener('click', () => {
+      if (state.detailQty > 1) {
+        triggerHaptic(10);
+        state.detailQty--;
+        document.getElementById('detailQtyVal').textContent = state.detailQty;
+        updateDetailTotal();
+      }
+    });
+
+    document.getElementById('detailQtyPlus').addEventListener('click', () => {
+      triggerHaptic(10);
+      state.detailQty++;
+      document.getElementById('detailQtyVal').textContent = state.detailQty;
+      updateDetailTotal();
+    });
+
+    document.getElementById('detailAddToCartBtn').addEventListener('click', () => {
+      if (!state.activeDetailItem || state.activeDetailItem.soldOut) return;
+      state.specialNotes = document.getElementById('detailSpecialNotes').value.trim();
+      addToCart(state.activeDetailItem, state.detailQty, [...state.selectedOptions], state.specialNotes);
+      closeDetailModal();
+    });
+
+    document.getElementById('closeDetailBtn').addEventListener('click', closeDetailModal);
+    document.getElementById('itemDetailModal').addEventListener('click', (e) => {
+      if (e.target.id === 'itemDetailModal') closeDetailModal();
+    });
+
+    /* ==========================================================================
+       CART & "MY ORDER" SHEET
+       ========================================================================== */
+    function addToCart(item, qty = 1, options = [], notes = '') {
+      triggerHaptic(20);
+      const addonsTotal = options.reduce((sum, o) => sum + o.price, 0);
+      const unitTotal = item.price + addonsTotal;
+
+      const optKeys = options.map(o => o.name).sort().join('|');
+      const existing = state.cart.find(c => c.item.id === item.id && c.optKey === optKeys && c.notes === notes);
+
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        state.cart.push({
+          cartId: Date.now() + Math.random(),
+          item,
+          qty,
+          options,
+          optKey: optKeys,
+          unitTotal,
+          notes
+        });
+      }
+
+      sessionStorage.setItem('aura_cart', JSON.stringify(state.cart));
+      updateOrderBar();
+      showToast(`${t('itemAddedToast')}: ${item.name}`);
+    }
+
+    function updateOrderBar() {
+      const bar = document.getElementById('orderBarContainer');
+      const totalCount = state.cart.reduce((sum, c) => sum + c.qty, 0);
+      const subtotal = state.cart.reduce((sum, c) => sum + (c.unitTotal * c.qty), 0);
+
+      document.getElementById('orderBarCount').textContent = `${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+      document.getElementById('orderBarTotal').textContent = formatMoney(subtotal);
+
+      if (totalCount > 0) {
+        bar.classList.add('visible');
+      } else {
+        bar.classList.remove('visible');
+      }
+    }
+
+    function openOrderSummary() {
+      triggerHaptic(15);
+      renderOrderSheet();
+      document.getElementById('orderSummaryModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeOrderSummary() {
+      document.getElementById('orderSummaryModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function renderOrderSheet() {
+      const container = document.getElementById('orderSummaryItemsList');
+      container.innerHTML = '';
+
+      if (state.cart.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🛍️</div>
+            <p>Your order is currently empty.</p>
+          </div>
+        `;
+        document.getElementById('orderSummarySubtotal').textContent = formatMoney(0);
+        document.getElementById('orderSummaryTax').textContent = formatMoney(0);
+        document.getElementById('orderSummaryTotal').textContent = formatMoney(0);
+        return;
+      }
+
+      let subtotal = 0;
+
+      state.cart.forEach(entry => {
+        const itemLineTotal = entry.unitTotal * entry.qty;
+        subtotal += itemLineTotal;
+
+        const row = document.createElement('div');
+        row.className = 'order-row-item';
+
+        const optText = entry.options.length > 0 ? entry.options.map(o => o.name).join(', ') : '';
+        const notesText = entry.notes ? `Note: "${entry.notes}"` : '';
+
+        row.innerHTML = `
+          <div class="order-row-info">
+            <div class="order-row-title">${entry.item.name}</div>
+            ${optText ? `<div class="order-row-addons">+ ${optText}</div>` : ''}
+            ${notesText ? `<div class="order-row-addons" style="font-style: italic;">${notesText}</div>` : ''}
+            <div class="order-row-price">${formatMoney(itemLineTotal)}</div>
+          </div>
+
+          <div class="quantity-stepper" style="transform: scale(0.9);">
+            <button type="button" class="stepper-btn" data-cart-minus="${entry.cartId}">−</button>
+            <span class="stepper-value">${entry.qty}</span>
+            <button type="button" class="stepper-btn" data-cart-plus="${entry.cartId}">+</button>
+          </div>
+        `;
+
+        row.querySelector('[data-cart-minus]').addEventListener('click', () => {
+          triggerHaptic(10);
+          if (entry.qty > 1) {
+            entry.qty--;
+          } else {
+            state.cart = state.cart.filter(c => c.cartId !== entry.cartId);
+          }
+          sessionStorage.setItem('aura_cart', JSON.stringify(state.cart));
+          updateOrderBar();
+          renderOrderSheet();
+        });
+
+        row.querySelector('[data-cart-plus]').addEventListener('click', () => {
+          triggerHaptic(10);
+          entry.qty++;
+          sessionStorage.setItem('aura_cart', JSON.stringify(state.cart));
+          updateOrderBar();
+          renderOrderSheet();
+        });
+
+        container.appendChild(row);
+      });
+
+      const tax = subtotal * MENU_CONFIG.settings.taxRate;
+      const total = subtotal + tax;
+
+      document.getElementById('orderSummarySubtotal').textContent = formatMoney(subtotal);
+      document.getElementById('orderSummaryTax').textContent = formatMoney(tax);
+      document.getElementById('orderSummaryTotal').textContent = formatMoney(total);
+    }
+
+    document.getElementById('viewOrderBarBtn').addEventListener('click', openOrderSummary);
+    document.getElementById('closeOrderSummaryBtn').addEventListener('click', closeOrderSummary);
+    document.getElementById('orderSummaryModal').addEventListener('click', (e) => {
+      if (e.target.id === 'orderSummaryModal') closeOrderSummary();
+    });
+
+    document.getElementById('clearOrderBtn').addEventListener('click', () => {
+      if (confirm('Clear all items from your order?')) {
+        triggerHaptic(15);
+        state.cart = [];
+        sessionStorage.setItem('aura_cart', '[]');
+        updateOrderBar();
+        renderOrderSheet();
+      }
+    });
+
+    /* ==========================================================================
+       "SHOW TO WAITER" FULL-SCREEN CARD
+       ========================================================================== */
+    function openWaiterCard() {
+      triggerHaptic(20);
+      const modal = document.getElementById('waiterCardModal');
+      const list = document.getElementById('waiterItemsDisplayList');
+      list.innerHTML = '';
+
+      if (state.cart.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 40px; color:#999; font-size:1.1rem;">No items in order</div>`;
+      } else {
+        state.cart.forEach(entry => {
+          const row = document.createElement('div');
+          row.className = 'waiter-item-row';
+          const optString = entry.options.map(o => o.name).join(' • ');
+          row.innerHTML = `
+            <span class="waiter-qty-badge">${entry.qty}x</span>
+            <div style="flex:1;">
+              <div>${entry.item.name}</div>
+              ${optString ? `<div style="font-size: 0.85rem; color: #AAA; font-weight: 400; margin-top: 2px;">${optString}</div>` : ''}
+              ${entry.notes ? `<div style="font-size: 0.85rem; color: #FFD43B; font-weight: 500; margin-top: 2px;">Note: "${entry.notes}"</div>` : ''}
+            </div>
+            <span style="font-size: 1.1rem; color: #CCC;">${formatMoney(entry.unitTotal * entry.qty)}</span>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      const totalCount = state.cart.reduce((sum, c) => sum + c.qty, 0);
+      const subtotal = state.cart.reduce((sum, c) => sum + (c.unitTotal * c.qty), 0);
+      const total = subtotal * (1 + MENU_CONFIG.settings.taxRate);
+
+      document.getElementById('waiterTotalCount').textContent = totalCount;
+      document.getElementById('waiterTotalPrice').textContent = formatMoney(total);
+
+      modal.classList.add('active');
+    }
+
+    document.getElementById('showWaiterModeBtn').addEventListener('click', () => {
+      closeOrderSummary();
+      openWaiterCard();
+    });
+
+    document.getElementById('closeWaiterModalBtn').addEventListener('click', () => {
+      document.getElementById('waiterCardModal').classList.remove('active');
+    });
+
+    /* ==========================================================================
+       CALL WAITER / SERVICE ASSISTANCE
+       ========================================================================== */
+    function openCallWaiterModal() {
+      triggerHaptic(15);
+      document.getElementById('callWaiterModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCallWaiterModal() {
+      document.getElementById('callWaiterModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('callWaiterHeaderBtn').addEventListener('click', openCallWaiterModal);
+    document.getElementById('closeWaiterServiceBtn').addEventListener('click', closeCallWaiterModal);
+    document.getElementById('callWaiterModal').addEventListener('click', (e) => {
+      if (e.target.id === 'callWaiterModal') closeCallWaiterModal();
+    });
+
+    document.getElementById('callWaiterFromOrderBtn').addEventListener('click', () => {
+      closeOrderSummary();
+      openCallWaiterModal();
+    });
+
+    document.querySelectorAll('.service-request-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.getAttribute('data-service');
+        closeCallWaiterModal();
+        let msg = t('orderSentToast').replace('{table}', state.table);
+        if (type === 'bill') msg = `💳 Bill request dispatched for ${state.table}. Server is printing check.`;
+        if (type === 'water') msg = `💧 Water refill requested for ${state.table}.`;
+        if (type === 'cutlery') msg = `🍽️ Extra napkins & cutlery on the way to ${state.table}.`;
+        showToast(msg, '🛎️');
+      });
+    });
+
+    /* ==========================================================================
+       SETTINGS & PREFERENCES
+       ========================================================================== */
+    function openSettingsModal() {
+      triggerHaptic(15);
+      document.getElementById('settingsModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('settingsToggleBtn').addEventListener('click', openSettingsModal);
+    document.getElementById('closeSettingsBtn').addEventListener('click', closeSettingsModal);
+    document.getElementById('settingsModal').addEventListener('click', (e) => {
+      if (e.target.id === 'settingsModal') closeSettingsModal();
+    });
+
+    document.querySelectorAll('.theme-option-card').forEach(card => {
+      card.addEventListener('click', () => {
+        triggerHaptic(12);
+        state.theme = card.getAttribute('data-theme-name');
+        applyThemeSettings();
+      });
+    });
+
+    document.getElementById('modeLightBtn').addEventListener('click', () => {
+      triggerHaptic(12);
+      state.mode = 'light';
+      applyThemeSettings();
+    });
+    document.getElementById('modeDarkBtn').addEventListener('click', () => {
+      triggerHaptic(12);
+      state.mode = 'dark';
+      applyThemeSettings();
+    });
+    document.getElementById('modeAutoBtn').addEventListener('click', () => {
+      triggerHaptic(12);
+      state.mode = 'auto';
+      applyThemeSettings();
+    });
+
+    document.getElementById('languageSelect').addEventListener('change', (e) => {
+      triggerHaptic(15);
+      state.lang = e.target.value;
+      localStorage.setItem('aura_lang', state.lang);
+      updateLanguageStrings();
+      renderCategoryTabs();
+      renderMenu();
+    });
+
+    document.getElementById('settingTableInput').addEventListener('input', (e) => {
+      state.table = e.target.value.trim() || 'Table 14';
+      applyThemeSettings();
+    });
+
+    document.getElementById('layoutToggleBtn').addEventListener('click', () => {
+      triggerHaptic(15);
+      state.layout = (state.layout === 'list') ? 'grid' : 'list';
+      applyThemeSettings();
+    });
+
+    /* ==========================================================================
+       SEARCH & FILTER CONTROLS
+       ========================================================================== */
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('menuSearchInput');
+    const searchClear = document.getElementById('searchClearBtn');
+
+    searchToggleBtn.addEventListener('click', () => {
+      triggerHaptic(10);
+      if (searchContainer.style.display === 'none') {
+        searchContainer.style.display = 'block';
+        searchInput.focus();
+      } else {
+        searchContainer.style.display = 'none';
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      state.searchQuery = e.target.value;
+      searchClear.classList.toggle('visible', state.searchQuery.length > 0);
+      renderMenu();
+    });
+
+    searchClear.addEventListener('click', () => {
+      state.searchQuery = '';
+      searchInput.value = '';
+      searchClear.classList.remove('visible');
+      searchInput.focus();
+      renderMenu();
+    });
+
+    document.querySelectorAll('.chip-btn[data-filter]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        triggerHaptic(10);
+        document.querySelectorAll('.chip-btn[data-filter]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.activeFilter = chip.getAttribute('data-filter');
+        renderMenu();
+      });
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      triggerHaptic(10);
+      state.sortOrder = e.target.value;
+      renderMenu();
+    });
+
+    document.getElementById('favoritesHeaderBtn').addEventListener('click', () => {
+      triggerHaptic(12);
+      state.activeFilter = (state.activeFilter === 'favorites') ? 'all' : 'favorites';
+      document.querySelectorAll('.chip-btn[data-filter]').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-filter') === state.activeFilter);
+      });
+      renderMenu();
+    });
+
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 350) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }, { passive: true });
+
+    backToTopBtn.addEventListener('click', () => {
+      triggerHaptic(15);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ==========================================================================
+       ALLERGEN LEGEND & QR CODE MODAL
+       ========================================================================== */
+    function openLegendModal() {
+      triggerHaptic(15);
+      document.getElementById('legendModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLegendModal() {
+      document.getElementById('legendModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('legendQuickBtn').addEventListener('click', openLegendModal);
+    document.getElementById('footerLegendBtn').addEventListener('click', openLegendModal);
+    document.getElementById('closeLegendBtn').addEventListener('click', closeLegendModal);
+    document.getElementById('legendModal').addEventListener('click', (e) => {
+      if (e.target.id === 'legendModal') closeLegendModal();
+    });
+
+    function openQrModal() {
+      triggerHaptic(15);
+      const url = encodeURIComponent(window.location.href);
+      const qrImg = document.getElementById('qrCodeImage');
+      // Uses standard fast QR service with graceful fallback
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${url}&color=1a1a1a&bgcolor=ffffff`;
+      qrImg.onerror = () => {
+        // Fallback SVG representation
+        qrImg.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='white'/%3E%3Crect x='20' y='20' width='40' height='40' fill='black'/%3E%3Crect x='140' y='20' width='40' height='40' fill='black'/%3E%3Crect x='20' y='140' width='40' height='40' fill='black'/%3E%3Crect x='30' y='30' width='20' height='20' fill='white'/%3E%3Crect x='150' y='30' width='20' height='20' fill='white'/%3E%3Crect x='30' y='150' width='20' height='20' fill='white'/%3E%3Crect x='80' y='80' width='40' height='40' fill='black'/%3E%3Ctext x='100' y='180' font-family='sans-serif' font-size='12' text-anchor='middle' fill='%23666'%3ETable QR Code%3C/text%3E%3C/svg%3E";
+      };
+      document.getElementById('qrModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('footerQrBtn').addEventListener('click', openQrModal);
+    document.getElementById('closeQrBtn').addEventListener('click', closeQrModal);
+    document.getElementById('qrModal').addEventListener('click', (e) => {
+      if (e.target.id === 'qrModal') closeQrModal();
+    });
+
+    document.getElementById('copyMenuUrlBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast(t('linkCopiedToast'), '📋');
+        closeQrModal();
+      }).catch(() => {
+        showToast(window.location.href, '📋');
+      });
+    });
+
+    document.getElementById('footerShareBtn').addEventListener('click', () => {
+      triggerHaptic(15);
+      if (navigator.share) {
+        navigator.share({
+          title: MENU_CONFIG.restaurant.name,
+          text: `Check out the menu at ${MENU_CONFIG.restaurant.name}!`,
+          url: window.location.href,
+        }).catch(() => {});
+      } else {
+        openQrModal();
+      }
+    });
+
+    document.getElementById('wifiQuickBtn').addEventListener('click', () => {
+      showToast(`📶 WiFi: ${MENU_CONFIG.restaurant.wifi.ssid} | Password: ${MENU_CONFIG.restaurant.wifi.password}`, '🔑');
+    });
+
+    /* ==========================================================================
+       DYNAMIC LOCALIZATION
+       ========================================================================== */
+    function updateLanguageStrings() {
+      document.getElementById('openStatusText').textContent = t('openNow');
+      document.getElementById('menuSearchInput').placeholder = t('searchPlaceholder');
+      document.getElementById('orderBarActionLabel').textContent = t('reviewOrder');
+      document.getElementById('orderSummaryTitle').textContent = t('myOrder');
+      document.getElementById('clearOrderBtn').textContent = t('clearAll');
+      document.getElementById('showWaiterModeBtn').textContent = t('showToWaiter');
+      document.getElementById('callWaiterFromOrderBtn').textContent = t('callServerOrder');
+      document.getElementById('waiterServiceTitle').textContent = t('serverAssistance');
+    }
+
+    /* ==========================================================================
+       APPLICATION INITIALIZATION
+       ========================================================================== */
+    function init() {
+      applyThemeSettings();
+      updateLanguageStrings();
+      updateFavoritesCounter();
+      updateOrderBar();
+      renderCategoryTabs();
+      renderMenu();
+
+      // Accessible Escape key to dismiss modals
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDetailModal();
+          closeOrderSummary();
+          closeSettingsModal();
+          closeCallWaiterModal();
+          closeLegendModal();
+          closeQrModal();
+          document.getElementById('waiterCardModal').classList.remove('active');
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
