@@ -1,6 +1,6 @@
-# Aura Bistro — Mobile-First Digital Restaurant Menu 🍽️
+# Addis — Mobile-First Digital Cafeteria Menu 🍽️
 
-A lightweight, single-file (`HTML`, `CSS`, and vanilla `JS`), mobile-first digital restaurant menu web app designed specifically for table QR code scanning. Built with zero dependencies, instantaneous load times, tactile haptic feedback, and a luxurious culinary aesthetic.
+A lightweight, single-file (`HTML`, `CSS`, and vanilla `JS`), mobile-first digital cafeteria menu web app designed specifically for table QR code scanning. Built with zero dependencies, instantaneous load times, tactile haptic feedback, and a luxurious culinary aesthetic.
 
 ![Digital Menu Screenshot](https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1200&q=80)
 
@@ -74,20 +74,20 @@ All restaurant details, categories, items, and settings are configured in **one 
 Look for `MENU_CONFIG.restaurant` near the bottom of `index.html`:
 ```javascript
 restaurant: {
-  name: "Aura Bistro & Lounge",
-  shortName: "Aura Bistro",
+  name: "Addis Cafeteria",
+  shortName: "Addis",
   logoLetter: "A",
-  tagline: "Contemporary Artisanal Dining & Craft Mixology",
+  tagline: "Artisanal Coffee, Fresh Pastries & Modern Comfort Bites",
   currency: "$",
   currencyCode: "USD",
   defaultTable: "Table 14",
-  hours: "Tue – Sun: 11:30 AM – 11:00 PM",
-  address: "742 Evergreen Terrace, Culinary Arts District",
+  hours: "Mon – Sun: 7:00 AM – 10:00 PM",
+  address: "742 Bole Road, Culinary Arts District",
   wifi: {
-    ssid: "Aura-Guest",
+    ssid: "Addis-Guest",
     password: "tastethevibes"
   },
-  announcement: "✨ Chef's Seasonal Truffle Menu is now available!",
+  announcement: "✨ Welcome to Addis! Fresh single-origin espresso & house specials are ready.",
 }
 ```
 
