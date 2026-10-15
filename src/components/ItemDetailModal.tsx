@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { MenuItem, ItemOption, DishReview, DishReviewStats } from '@/types/database';
 import { ItemPricingResult } from '@/lib/pricing-engine';
+import { getIntelligentPairings, PairingRecommendation } from '@/lib/recommendation-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
 import { X, Minus, Plus, Tag, Clock, Sparkles, Star, MessageSquare, Flag, Check } from 'lucide-react';
 
@@ -13,6 +14,7 @@ interface ItemDetailModalProps {
   reviewStats?: DishReviewStats;
   dishReviews?: DishReview[];
   pairingRecommendations?: MenuItem[];
+  allItems?: MenuItem[];
   currencySymbol?: string;
   onClose: () => void;
   onAddToCart: (item: MenuItem, quantity: number, options: ItemOption[], notes: string) => void;
@@ -28,6 +30,7 @@ export function ItemDetailModal({
   reviewStats,
   dishReviews = [],
   pairingRecommendations = [],
+  allItems = [],
   currencySymbol = '$',
   onClose,
   onAddToCart,
@@ -41,6 +44,20 @@ export function ItemDetailModal({
   const [notes, setNotes] = useState('');
   const [reportingReviewId, setReportingReviewId] = useState<string | null>(null);
   const [reportedReviewIds, setReportedReviewIds] = useState<Set<string>>(new Set());
+
+  // Research-backed intelligent pairings computation
+  const intelligentPairings: PairingRecommendation[] = React.useMemo(() => {
+    if (!item) return [];
+    if (allItems && allItems.length > 0) {
+      return getIntelligentPairings(item, allItems).slice(0, 3);
+    }
+    return (pairingRecommendations || []).slice(0, 3).map((p) => ({
+      item: p,
+      reasonText: 'Complements this dish nicely',
+      intentBadge: 'Pairs Well',
+      affinityScore: 50,
+    }));
+  }, [item, allItems, pairingRecommendations]);
 
   // Reset state when opening a new item
   useEffect(() => {
@@ -206,47 +223,58 @@ export function ItemDetailModal({
             </p>
           </div>
 
-          {/* Gentle "Goes well with" Row (Non-blocking) */}
-          {pairingRecommendations.length > 0 && (
+          {/* Gentle "Goes well with" Row (Non-blocking & Research-backed) */}
+          {intelligentPairings.length > 0 && (
             <div className="pt-2 border-t border-[var(--border)]">
-              <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
-                <h4 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
-                  Goes well with
-                </h4>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
+                  <h4 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
+                    Goes well with
+                  </h4>
+                </div>
+                <span className="text-[10px] text-[var(--muted)] font-medium">Authentic Pairing</span>
               </div>
 
               <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
-                {pairingRecommendations.slice(0, 3).map((pairing) => (
+                {intelligentPairings.map((rec) => (
                   <div
-                    key={pairing.id}
-                    className="flex-shrink-0 w-36 bg-[var(--background)] border border-[var(--border)] rounded-xl p-2 flex flex-col justify-between"
+                    key={rec.item.id}
+                    className="flex-shrink-0 w-44 bg-[var(--background)] border border-[var(--border)] rounded-xl p-2.5 flex flex-col justify-between hover:border-[var(--primary)] transition-colors"
                   >
-                    <div className="relative w-full h-16 rounded-lg overflow-hidden mb-1.5 bg-neutral-800">
-                      <Image
-                        src={pairing.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'}
-                        alt={pairing.name}
-                        fill
-                        className="object-cover"
-                        sizes="140px"
-                      />
+                    <div>
+                      <div className="relative w-full h-20 rounded-lg overflow-hidden mb-1.5 bg-neutral-800">
+                        <Image
+                          src={rec.item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'}
+                          alt={rec.item.name}
+                          fill
+                          className="object-cover"
+                          sizes="180px"
+                        />
+                        <span className="absolute top-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-black/75 backdrop-blur-xs text-amber-300">
+                          {rec.intentBadge}
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-[var(--foreground)] truncate block leading-tight">
+                        {rec.item.name}
+                      </span>
+                      <p className="text-[10px] text-[var(--muted)] line-clamp-2 mt-0.5 leading-snug">
+                        {rec.reasonText}
+                      </p>
                     </div>
-                    <span className="text-[11px] font-bold text-[var(--foreground)] truncate leading-tight">
-                      {pairing.name}
-                    </span>
-                    <div className="flex items-center justify-between mt-1 pt-1 border-t border-[var(--border)]">
-                      <span className="text-[11px] font-bold" style={{ color: 'var(--primary)' }}>
-                        +{formatMoney(pairing.price, currencySymbol)}
+                    <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-[var(--border)]">
+                      <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
+                        +{formatMoney(rec.item.price, currencySymbol)}
                       </span>
                       <button
                         type="button"
                         onClick={() => {
                           triggerHaptic(12);
-                          if (onQuickAddPairing) onQuickAddPairing(pairing);
+                          if (onQuickAddPairing) onQuickAddPairing(rec.item);
                         }}
-                        className="h-6 px-2 rounded-full text-[10px] font-bold text-white shadow-xs transition-transform active:scale-95"
+                        className="h-6 px-2.5 rounded-full text-[10px] font-bold text-white shadow-xs transition-transform active:scale-95"
                         style={{ backgroundColor: 'var(--primary)' }}
-                        title={`Add ${pairing.name}`}
+                        title={`Add ${rec.item.name}`}
                       >
                         + Add
                       </button>

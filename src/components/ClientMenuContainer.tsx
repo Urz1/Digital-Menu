@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Restaurant, Category, MenuItem, ItemOption, Offer, DishReview, RestaurantReviewSettings, DishReviewStats } from '@/types/database';
 import { CartItem, DietaryFilter, SortOrder } from '@/types/menu';
 import { MenuHeader } from './MenuHeader';
@@ -37,7 +37,7 @@ import {
 import { calculateDishReviewStats } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
 import Link from 'next/link';
-import { ArrowUp, Share2, QrCode, Info, Sparkles, Tag, Clock, X, WifiOff, Lock } from 'lucide-react';
+import { ArrowUp, Share2, QrCode, Info, Sparkles, Tag, Clock, X, WifiOff, Lock, ChevronDown } from 'lucide-react';
 
 interface ClientMenuContainerProps {
   restaurant: Restaurant;
@@ -220,6 +220,38 @@ export function ClientMenuContainer({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Track programmatic tab navigation so scroll-spy does not override intentional clicks
+  const isManualScrollRef = useRef(false);
+
+  // Active scroll-spy: synchronize category tabs with viewport scroll position
+  useEffect(() => {
+    if (activeFilter !== 'all' || searchQuery.trim().length > 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isManualScrollRef.current) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const catId = entry.target.id.replace('cat-', '');
+            setActiveCategoryId(catId);
+            break;
+          }
+        }
+      },
+      {
+        rootMargin: '-130px 0px -55% 0px',
+        threshold: 0.05,
+      }
+    );
+
+    const sectionEls = document.querySelectorAll('section[id^="cat-"]');
+    sectionEls.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [categories, activeFilter, searchQuery]);
 
   // ---------------------------------------------------------------------------
   // SUPABASE REALTIME: STREAM ITEMS & OFFERS INSTANTLY
@@ -575,6 +607,15 @@ export function ClientMenuContainer({
     );
   }, [items]);
 
+  // Category item counts for clear information scent in tabs
+  const itemCountsByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categories) {
+      counts[cat.id] = items.filter((i) => i.category_id === cat.id).length;
+    }
+    return counts;
+  }, [categories, items]);
+
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -675,7 +716,10 @@ export function ClientMenuContainer({
         categories={categories}
         activeCategoryId={activeCategoryId}
         hasActiveOffers={activeOffers.length > 0}
+        offersCount={activeOffers.length}
+        itemCounts={itemCountsByCategory}
         onSelectCategory={(id) => {
+          isManualScrollRef.current = true;
           setActiveCategoryId(id);
           if (id === 'offers') {
             setActiveFilter('onOffer');
@@ -684,6 +728,9 @@ export function ClientMenuContainer({
             const el = document.getElementById(`cat-${id}`);
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }
+          setTimeout(() => {
+            isManualScrollRef.current = false;
+          }, 800);
         }}
         locale={locale}
       />
@@ -782,21 +829,31 @@ export function ClientMenuContainer({
           </section>
         ) : (
           // Standard Category-grouped sections
-          categories.map((cat) => {
+          categories.map((cat, catIdx) => {
             const catItems = filteredItems.filter((i) => i.category_id === cat.id);
             if (catItems.length === 0) return null;
 
             const displayName = locale === 'es' && cat.name_es ? cat.name_es : cat.name;
             const displayDesc = locale === 'es' && cat.description_es ? cat.description_es : cat.description;
 
+            // Find next non-empty category
+            const nextCat = categories.slice(catIdx + 1).find((c) =>
+              filteredItems.some((i) => i.category_id === c.id)
+            );
+
             return (
-              <section key={cat.id} id={`cat-${cat.id}`} className="mb-8 scroll-mt-36">
-                <div className="mb-3">
-                  <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
-                    <span>{cat.icon}</span>
-                    <span>{displayName}</span>
-                  </h2>
-                  <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+              <section key={cat.id} id={`cat-${cat.id}`} className="mb-10 scroll-mt-36">
+                <div className="mb-3 flex items-baseline justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
+                      <span>{cat.icon}</span>
+                      <span>{displayName}</span>
+                    </h2>
+                    <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[var(--muted)]">
+                    {catItems.length} {catItems.length === 1 ? 'dish' : 'dishes'}
+                  </span>
                 </div>
 
                 <div className={layout === 'grid' ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
@@ -816,6 +873,34 @@ export function ClientMenuContainer({
                     />
                   ))}
                 </div>
+
+                {/* In-feed Next Category Transition Link */}
+                {nextCat && (
+                  <div className="mt-4 pt-3 border-t border-dashed border-[var(--border)] flex items-center justify-between">
+                    <span className="text-[11px] text-[var(--muted)]">
+                      End of {displayName}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic(8);
+                        isManualScrollRef.current = true;
+                        setActiveCategoryId(nextCat.id);
+                        const nextEl = document.getElementById(`cat-${nextCat.id}`);
+                        if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                          isManualScrollRef.current = false;
+                        }, 800);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:underline active:scale-95 transition-transform"
+                    >
+                      <span>
+                        Next: {nextCat.icon} {locale === 'es' && nextCat.name_es ? nextCat.name_es : nextCat.name}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </section>
             );
           })
@@ -901,6 +986,7 @@ export function ClientMenuContainer({
             : []
         }
         pairingRecommendations={pairingItems}
+        allItems={items}
         currencySymbol={restaurant.currency}
         onClose={() => setSelectedDetailItem(null)}
         onAddToCart={handleAddToCart}
