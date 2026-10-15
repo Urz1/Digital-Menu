@@ -101,7 +101,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     const searchInput = page.locator('[data-testid="menu-search-input"]');
     await searchInput.fill('Crispy Truffle Fries');
     await expect(page.locator('text=Crispy Truffle Fries')).toBeVisible();
-    await expect(page.locator('text=$12.50')).toBeVisible();
+    await expect(page.locator('text=12.50')).toBeVisible();
   });
 
   test('3. Availability Management: One-tap "Sold Out Today" toggle with instant visual feedback', async ({ page }) => {

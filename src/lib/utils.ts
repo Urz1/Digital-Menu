@@ -5,7 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatMoney(amount: number, currencySymbol: string = "$"): string {
+export function formatMoney(amount: number, currencySymbol: string = "ETB"): string {
+  if (currencySymbol === "ETB" || currencySymbol === "Br") {
+    const formatted = Number.isInteger(amount) ? amount.toLocaleString() : amount.toFixed(2);
+    return `${formatted} ${currencySymbol}`;
+  }
   return `${currencySymbol}${amount.toFixed(2)}`;
 }
 

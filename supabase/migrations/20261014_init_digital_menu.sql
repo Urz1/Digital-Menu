@@ -224,13 +224,13 @@ INSERT INTO public.restaurants (
     'Addis Cafeteria',
     'Addis',
     'A',
-    'Artisanal Roasts, Handcrafted Pastries & Modern Comfort Dining',
-    '$',
-    'USD',
+    'Authentic Ethiopian Cuisine, Wood-Fired Mendi & Artisanal Bakery',
+    'ETB',
+    'ETB',
     'Table 14',
-    'Mon – Sun: 7:00 AM – 10:00 PM',
-    '742 Bole Road, Culinary Arts District',
-    '✨ Welcome to Addis! Fresh single-origin espresso & seasonal pastries are ready.',
+    'Mon – Sun: 6:30 AM – 11:00 PM',
+    'Bole Medhanealem, Addis Ababa, Ethiopia',
+    '✨ Welcome to Addis Cafeteria & Bakery! Fresh injera, sizzling tibs, and artisanal pastries daily.',
     '{
       "primaryColor": "#E8590C",
       "primaryHover": "#D9480F",
@@ -244,4 +244,12 @@ INSERT INTO public.restaurants (
       "ssid": "Addis-Guest",
       "password": "tastethevibes"
     }'::jsonb
-) ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name;
+) ON CONFLICT (slug) DO UPDATE SET 
+    name = EXCLUDED.name,
+    currency = EXCLUDED.currency,
+    currency_code = EXCLUDED.currency_code,
+    tagline = EXCLUDED.tagline,
+    hours = EXCLUDED.hours,
+    address = EXCLUDED.address,
+    announcement = EXCLUDED.announcement;
+

@@ -567,7 +567,9 @@ export function ClientMenuContainer({
     return items.filter(
       (i) =>
         i.category_id === 'cat-drinks' ||
+        i.category_id === 'cat-juices' ||
         i.category_id === 'cat-desserts' ||
+        i.category_id === 'cat-snacks' ||
         i.category_id === 'cat-starters'
     );
   }, [items]);
