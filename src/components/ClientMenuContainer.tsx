@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Restaurant, Category, MenuItem, ItemOption, Offer, DishReview, RestaurantReviewSettings, DishReviewStats } from '@/types/database';
 import { CartItem, DietaryFilter, SortOrder } from '@/types/menu';
 import { MenuHeader } from './MenuHeader';
+import { MenuControlBar } from './MenuControlBar';
 import { CategoryTabs } from './CategoryTabs';
 import { FilterBar } from './FilterBar';
 import { ItemCard } from './ItemCard';
@@ -736,14 +737,25 @@ export function ClientMenuContainer({
         </div>
       )}
 
-      {/* 2. STICKY CATEGORY TABS (Includes Offers tab if active offers exist & Directory trigger) */}
-      <CategoryTabs
+      {/* 2. UNIFIED SINGLE STICKY MENU CONTROL BAR (Zero horizontal scrolling, unified category picker & bottom sheets) */}
+      <MenuControlBar
         categories={categories}
         activeCategoryId={activeCategoryId}
         hasActiveOffers={activeOffers.length > 0}
         offersCount={activeOffers.length}
         itemCounts={itemCountsByCategory}
         locale={locale}
+        activeFilter={activeFilter}
+        onFilterChange={(filter) => {
+          setActiveFilter(filter);
+          if (filter !== 'onOffer' && activeCategoryId === 'offers') {
+            setActiveCategoryId(categories[0]?.id || '');
+          }
+        }}
+        sortOrder={sortOrder}
+        onSortChange={setSortOrder}
+        layout={layout}
+        onToggleLayout={() => setLayout(layout === 'list' ? 'grid' : 'list')}
         onOpenCategoryDirectory={() => setIsCategoryDrawerOpen(true)}
         onSelectCategory={(id) => {
           isManualScrollRef.current = true;
@@ -759,22 +771,6 @@ export function ClientMenuContainer({
             isManualScrollRef.current = false;
           }, 800);
         }}
-      />
-
-      {/* 3. FILTER BAR (Includes "On offer" filter chip & tactile mobile sort drawer) */}
-      <FilterBar
-        activeFilter={activeFilter}
-        onFilterChange={(filter) => {
-          setActiveFilter(filter);
-          if (filter !== 'onOffer' && activeCategoryId === 'offers') {
-            setActiveCategoryId(categories[0]?.id || '');
-          }
-        }}
-        sortOrder={sortOrder}
-        onSortChange={setSortOrder}
-        layout={layout}
-        onToggleLayout={() => setLayout(layout === 'list' ? 'grid' : 'list')}
-        locale={locale}
       />
 
       {/* 4. MAIN MENU ITEMS */}
@@ -1155,6 +1151,37 @@ export function ClientMenuContainer({
 
             {/* Category Directory Cards */}
             <div className="overflow-y-auto flex-1 mt-3 flex flex-col gap-2 pr-1">
+              {activeOffers.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic(12);
+                    setActiveCategoryId('offers');
+                    setActiveFilter('onOffer');
+                    setIsCategoryDrawerOpen(false);
+                  }}
+                  className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                    activeCategoryId === 'offers' || activeFilter === 'onOffer'
+                      ? 'border-amber-500 bg-amber-500/10 shadow-xs'
+                      : 'border-[var(--border)] bg-[var(--background)] hover:border-amber-400'
+                  }`}
+                >
+                  <div className="flex items-start gap-3 min-w-0">
+                    <span className="text-2xl flex-shrink-0 mt-0.5">🏷️</span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold text-amber-600 dark:text-amber-400 truncate">
+                        {TRANSLATIONS[locale]?.specialOffer || 'Special Offers & Deals'}
+                      </div>
+                      <div className="text-xs text-[var(--muted)] line-clamp-1 mt-0.5">
+                        {activeOffers.length} {activeOffers.length === 1 ? 'deal live right now' : 'deals live right now'}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200 border border-amber-300 flex-shrink-0 ml-2">
+                    {activeOffers.length}
+                  </span>
+                </button>
+              )}
               {categories.map((cat) => {
                 const isSelected = activeCategoryId === cat.id;
                 const translatedName =
