@@ -13,6 +13,7 @@ export type DietaryFilter =
   | 'all'
   | 'onOffer'
   | 'chefsPick'
+  | 'fasting'
   | 'vegetarian'
   | 'vegan'
   | 'gluten-free'

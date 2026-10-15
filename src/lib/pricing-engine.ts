@@ -43,6 +43,8 @@ export interface CartPricingResult {
   netSubtotal: number;
   tax: number;
   total: number;
+  isTaxInclusive: boolean;
+  taxRate: number;
   appliedOffers: {
     offer: Offer;
     totalSavings: number;
@@ -59,6 +61,8 @@ export interface PricingContext {
   timezone?: string; // e.g. "Africa/Addis_Ababa", "America/New_York", "UTC"
   cart?: CartItem[];
   menuItemsMap?: Map<string, MenuItem>;
+  taxMode?: 'inclusive' | 'exclusive';
+  currencySymbol?: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -450,7 +454,7 @@ export function evaluateCartPricing(
         const item = context.menuItemsMap.get(offer.free_item_id)!;
         freeItemAwarded = {
           item,
-          reason: `Free gift for spending over $${offer.min_order_amount.toFixed(2)}`,
+          reason: `Free gift for spending over ${context.currencySymbol || 'ETB'} ${offer.min_order_amount.toFixed(2)}`,
         };
         appliedOfferMap.set(offer.id, {
           offer,
@@ -463,7 +467,10 @@ export function evaluateCartPricing(
   originalSubtotal = Number(originalSubtotal.toFixed(2));
   finalSubtotal = Number(finalSubtotal.toFixed(2));
   const totalSavings = Number((originalSubtotal - finalSubtotal).toFixed(2));
-  const tax = Number((finalSubtotal * taxRate).toFixed(2));
+  
+  // Tax evaluation: Owner chooses between Tax Inclusive (default) vs Tax Exclusive
+  const isTaxInclusive = context.taxMode === 'inclusive';
+  const tax = isTaxInclusive ? 0 : Number((finalSubtotal * taxRate).toFixed(2));
   const total = Number((finalSubtotal + tax).toFixed(2));
 
   const appliedOffersList = Array.from(appliedOfferMap.values()).map(({ offer, totalSavings }) => ({
@@ -479,6 +486,8 @@ export function evaluateCartPricing(
     netSubtotal: finalSubtotal,
     tax,
     total,
+    isTaxInclusive,
+    taxRate,
     appliedOffers: appliedOffersList,
     freeItemAwarded,
   };

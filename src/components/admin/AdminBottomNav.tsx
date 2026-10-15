@@ -9,7 +9,6 @@ import {
   UtensilsCrossed,
   Tag,
   Star,
-  Bell,
   Palette,
   BarChart3,
   Settings,
@@ -37,40 +36,29 @@ export function AdminBottomNav({
 }: AdminBottomNavProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-  // Primary 4 buttons based on role
+  // Primary buttons based on simplified role (Owner vs Staff)
   let primaryItems: { id: AdminSection; label: string; icon: React.ElementType; badge?: number }[] = [];
   let overflowItems: { id: AdminSection; label: string; icon: React.ElementType }[] = [];
 
   if (userRole === 'staff') {
     primaryItems = [
-      { id: 'requests', label: 'Requests', icon: Bell, badge: badgeCounts.requests },
       { id: 'menu', label: 'Sold Out', icon: UtensilsCrossed },
-    ];
-  } else if (userRole === 'manager') {
-    primaryItems = [
-      { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
-      { id: 'offers', label: 'Offers & Deals', icon: Tag, badge: badgeCounts.activeOffers },
-      { id: 'reviews', label: 'Dish Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
-      { id: 'requests', label: 'Requests', icon: Bell, badge: badgeCounts.requests },
-    ];
-    overflowItems = [
-      { id: 'qr', label: 'QR Studio', icon: QrCode },
-      { id: 'insights', label: 'Insights & Matrix', icon: BarChart3 },
+      { id: 'offers', label: 'Offers', icon: Tag, badge: badgeCounts.activeOffers },
+      { id: 'reviews', label: 'Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
     ];
   } else {
     // Owner
     primaryItems = [
       { id: 'home', label: 'Home', icon: Home },
       { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
-      { id: 'offers', label: 'Offers & Deals', icon: Tag, badge: badgeCounts.activeOffers },
-      { id: 'reviews', label: 'Dish Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
-      { id: 'requests', label: 'Requests', icon: Bell, badge: badgeCounts.requests },
+      { id: 'offers', label: 'Offers', icon: Tag, badge: badgeCounts.activeOffers },
+      { id: 'reviews', label: 'Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
     ];
     overflowItems = [
       { id: 'qr', label: 'QR Studio', icon: QrCode },
       { id: 'design', label: 'Design Studio', icon: Palette },
       { id: 'insights', label: 'Insights & Matrix', icon: BarChart3 },
-      { id: 'settings', label: 'Settings', icon: Settings },
+      { id: 'settings', label: 'Settings & Staff', icon: Settings },
     ];
   }
 

@@ -19,18 +19,7 @@
     --muted-foreground: #868E96;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-mode="light"]) {
-      --background: #101115;
-      --foreground: #F8F9FA;
-      --card: #181A20;
-      --card-foreground: #F8F9FA;
-      --border: #2C303B;
-      --muted: #A0A6B2;
-      --muted-foreground: #717784;
-    }
-  }
-
+  /* Default is strictly Light Mode across all devices */
   [data-mode="dark"] {
     --background: #101115;
     --foreground: #F8F9FA;

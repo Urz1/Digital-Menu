@@ -65,6 +65,7 @@ export interface Restaurant {
   theme_config: ThemeConfig;
   wifi_config: WifiConfig;
   tax_rate: number;
+  tax_mode?: 'inclusive' | 'exclusive'; // 'inclusive' = tax included in prices (default), 'exclusive' = calculated on top
   reviews_enabled?: boolean;
   feature_flags?: RestaurantFeatureFlags;
   custom_badges?: CustomBadge[];
@@ -78,13 +79,28 @@ export interface Restaurant {
   updated_at: string;
 }
 
+export interface StaffAccount {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  username: string; // phone or staff ID
+  pin_code: string; // 4-digit PIN or password
+  role: 'staff';
+  is_active: boolean;
+  created_at?: string;
+}
+
 export interface Category {
   id: string;
   restaurant_id: string;
   name: string;
+  name_am?: string;
+  name_so?: string;
   name_es?: string;
   icon: string;
   description: string;
+  description_am?: string;
+  description_so?: string;
   description_es?: string;
   sort_order: number;
   is_active: boolean;
@@ -94,6 +110,8 @@ export interface ItemOption {
   id: string;
   item_id: string;
   name: string;
+  name_am?: string;
+  name_so?: string;
   name_es?: string;
   price: number;
   is_required: boolean;
@@ -105,12 +123,16 @@ export interface MenuItem {
   restaurant_id: string;
   category_id: string;
   name: string;
+  name_am?: string;
+  name_so?: string;
   name_es?: string;
   description: string;
+  description_am?: string;
+  description_so?: string;
   description_es?: string;
   price: number;
   image_url: string;
-  tags: string[]; // e.g. ['vegetarian', 'vegan', 'gluten-free', 'halal', 'spicy', 'nut-free', 'chefsPick']
+  tags: string[]; // e.g. ['vegetarian', 'vegan', 'gluten-free', 'halal', 'spicy', 'nut-free', 'chefsPick', 'fasting']
   allergens: string[];
   spice_level: number; // 0, 1, 2, 3
   calories?: number;

@@ -109,8 +109,8 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await dishCard.click();
 
     // Verify dish modal details:
-    // 1. Plain language terms box
-    await expect(page.locator('text=Special Instructions')).toBeVisible();
+    // 1. Plain language terms box and reviews
+    await expect(page.locator('text=Guest Reviews')).toBeVisible();
 
     // 2. Gentle "Goes well with" row (non-blocking)
     const goesWellWith = page.locator('h4:has-text("Goes well with")');

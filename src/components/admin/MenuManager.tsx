@@ -891,8 +891,83 @@ export function MenuManager({
 
                   <div>
                     <label className="block text-xs font-semibold text-neutral-300 mb-1">
-                      Photo URL
+                      Dish Photo (Camera Snapshot, Gallery, or URL)
                     </label>
+
+                    {/* Live Image Preview */}
+                    {editingItem.image_url && (
+                      <div className="relative w-full h-36 rounded-xl overflow-hidden mb-2 border border-white/10 group bg-neutral-900">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={editingItem.image_url}
+                          alt="Dish preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setEditingItem({ ...editingItem, image_url: '' })}
+                          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer"
+                          title="Remove photo"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Direct Camera Capture & Gallery Upload Buttons */}
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <label className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold cursor-pointer transition-colors active:scale-95">
+                        <Camera className="w-4 h-4" />
+                        <span>Take Photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (uploadEvent) => {
+                                const result = uploadEvent.target?.result as string;
+                                if (result) {
+                                  triggerHaptic(12);
+                                  setEditingItem({ ...editingItem, image_url: result });
+                                  onShowToast('Photo captured successfully!', 'success');
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+
+                      <label className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-200 border border-white/10 text-xs font-bold cursor-pointer transition-colors active:scale-95">
+                        <Upload className="w-4 h-4" />
+                        <span>From Gallery</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (uploadEvent) => {
+                                const result = uploadEvent.target?.result as string;
+                                if (result) {
+                                  triggerHaptic(12);
+                                  setEditingItem({ ...editingItem, image_url: result });
+                                  onShowToast('Photo loaded from gallery!', 'success');
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -900,8 +975,8 @@ export function MenuManager({
                         onChange={(e) =>
                           setEditingItem({ ...editingItem, image_url: e.target.value })
                         }
-                        placeholder="https://..."
-                        className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 font-mono"
+                        placeholder="Or paste image URL (https://...)"
+                        className="w-full px-3.5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 font-mono"
                       />
                     </div>
                   </div>
@@ -911,9 +986,7 @@ export function MenuManager({
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2.5 text-xs text-neutral-400">
                   <Camera className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">Photo Tips:</span> Use soft natural
-                    lighting from the side. Landscape 4:3 or square format looks best on mobile screens.
-                    Images are automatically compressed for instantaneous guest loading.
+                    <span className="font-semibold text-white">Instant Capture Tip:</span> Snap food straight from your phone camera or select from your gallery. Photos are instantly compressed for ultra-fast mobile customer viewing.
                   </div>
                 </div>
               </div>
@@ -947,6 +1020,76 @@ export function MenuManager({
                         placeholder="Artisanal textures, flavors, pairings..."
                         className="w-full px-3.5 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
                       />
+                    </div>
+
+                    {/* Trilingual Localization Fields (Amharic & Somali) */}
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                      <div className="text-xs font-bold text-amber-300">
+                        Multilingual Translations (Amharic & Somali)
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                            Name (Amharic - አማርኛ)
+                          </label>
+                          <input
+                            type="text"
+                            value={editingItem.name_am || ''}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, name_am: e.target.value })
+                            }
+                            placeholder="የምግብ ስም በአማርኛ"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                            Name (Somali - Af-Soomaali)
+                          </label>
+                          <input
+                            type="text"
+                            value={editingItem.name_so || ''}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, name_so: e.target.value })
+                            }
+                            placeholder="Magaca cuntada ee Soomaaliga"
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                            Description (Amharic - አማርኛ)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={editingItem.description_am || ''}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, description_am: e.target.value })
+                            }
+                            placeholder="የምግቡ ዝርዝር መግለጫ..."
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                            Description (Somali - Af-Soomaali)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={editingItem.description_so || ''}
+                            onChange={(e) =>
+                              setEditingItem({ ...editingItem, description_so: e.target.value })
+                            }
+                            placeholder="Faahfaahinta cuntada..."
+                            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

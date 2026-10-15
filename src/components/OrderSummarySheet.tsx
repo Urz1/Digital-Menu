@@ -6,6 +6,8 @@ import { CartPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
 import { X, Minus, Plus, Tablet, BellRing, Tag, Gift } from 'lucide-react';
 
+import { Language, TRANSLATIONS } from '@/lib/translations';
+
 interface OrderSummarySheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,10 +16,11 @@ interface OrderSummarySheetProps {
   currencySymbol?: string;
   taxRate?: number;
   tableNumber: string;
+  locale?: Language | string;
   onUpdateQty: (cartId: string, delta: number) => void;
   onClearOrder: () => void;
   onShowWaiterCard: () => void;
-  onCallServer: () => void;
+  onCallServer?: () => void;
 }
 
 export function OrderSummarySheet({
@@ -25,15 +28,19 @@ export function OrderSummarySheet({
   onClose,
   cart,
   cartPricing,
-  currencySymbol = '$',
+  currencySymbol = 'ETB',
   taxRate = 0.08,
   tableNumber,
+  locale = 'en',
   onUpdateQty,
   onClearOrder,
   onShowWaiterCard,
   onCallServer,
 }: OrderSummarySheetProps) {
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const rawSubtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const subtotal = cartPricing?.netSubtotal ?? rawSubtotal;
@@ -71,7 +78,7 @@ export function OrderSummarySheet({
           {/* Header */}
           <div className="flex items-center justify-between pb-2 border-b border-[var(--border)]">
             <div>
-              <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">My Order</h2>
+              <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.myOrder}</h2>
               <span className="text-xs text-[var(--muted)]">{tableNumber}</span>
             </div>
             {cart.length > 0 && (
@@ -84,7 +91,7 @@ export function OrderSummarySheet({
                 }}
                 className="text-xs font-semibold text-red-500 hover:underline px-2 py-1"
               >
-                Clear All
+                {t.clearAll}
               </button>
             )}
           </div>
@@ -93,8 +100,8 @@ export function OrderSummarySheet({
           {cart.length === 0 ? (
             <div className="py-12 text-center text-[var(--muted)]">
               <span className="text-3xl block mb-2">🛍️</span>
-              <p className="text-sm font-medium">Your order is currently empty</p>
-              <p className="text-xs mt-1">Tap items on the menu to add them</p>
+              <p className="text-sm font-medium">{t.emptyOrder}</p>
+              <p className="text-xs mt-1">{t.emptyOrderHint}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3 divide-y divide-[var(--border)]">
@@ -122,11 +129,6 @@ export function OrderSummarySheet({
                       {optionsString && (
                         <p className="text-[11px] text-[var(--muted)] line-clamp-1 mt-0.5">
                           + {optionsString}
-                        </p>
-                      )}
-                      {entry.notes && (
-                        <p className="text-[11px] text-amber-600 dark:text-amber-400 italic line-clamp-1">
-                          Note: "{entry.notes}"
                         </p>
                       )}
 
@@ -193,7 +195,7 @@ export function OrderSummarySheet({
           {cart.length > 0 && (
             <div className="p-3.5 rounded-2xl bg-[var(--background)] border border-[var(--border)] text-xs flex flex-col gap-2 mt-2">
               <div className="flex justify-between text-[var(--muted)]">
-                <span>Items Subtotal</span>
+                <span>{t.itemsSubtotal}</span>
                 <span className="font-semibold text-[var(--foreground)]">{formatMoney(originalSubtotal, currencySymbol)}</span>
               </div>
 
@@ -214,18 +216,25 @@ export function OrderSummarySheet({
 
               {totalSavings > 0 && (
                 <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
-                  <span>Total Offer Savings</span>
+                  <span>{t.totalSavings}</span>
                   <span>-{formatMoney(totalSavings, currencySymbol)}</span>
                 </div>
               )}
 
-              <div className="flex justify-between text-[var(--muted)]">
-                <span>Estimated Tax ({(taxRate * 100).toFixed(0)}%)</span>
-                <span className="font-semibold text-[var(--foreground)]">{formatMoney(tax, currencySymbol)}</span>
-              </div>
+              {cartPricing?.isTaxInclusive ? (
+                <div className="flex justify-between text-[var(--muted)] text-[11px]">
+                  <span>{t.taxLabel}</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{t.taxIncluded}</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-[var(--muted)]">
+                  <span>{t.taxLabel} ({(taxRate * 100).toFixed(0)}%)</span>
+                  <span className="font-semibold text-[var(--foreground)]">{formatMoney(tax, currencySymbol)}</span>
+                </div>
+              )}
 
               <div className="flex justify-between text-base font-extrabold pt-2 border-t border-dashed border-[var(--border)] text-[var(--foreground)]">
-                <span>Total</span>
+                <span>{t.total}</span>
                 <span style={{ color: 'var(--primary)' }}>{formatMoney(total, currencySymbol)}</span>
               </div>
             </div>
@@ -243,19 +252,7 @@ export function OrderSummarySheet({
                 className="w-full h-12 rounded-full bg-[var(--foreground)] text-[var(--background)] font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-90 transition-opacity"
               >
                 <Tablet className="w-4 h-4" />
-                <span>Show Order to Waiter</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  triggerHaptic(15);
-                  onClose();
-                  onCallServer();
-                }}
-                className="w-full h-11 rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[var(--border)] transition-colors"
-              >
-                <BellRing className="w-4 h-4 text-[var(--primary)]" />
-                <span>Call Server to Place Order</span>
+                <span>{t.showToWaiter}</span>
               </button>
             </div>
           )}

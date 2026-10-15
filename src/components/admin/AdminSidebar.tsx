@@ -9,14 +9,12 @@ import {
   UtensilsCrossed,
   Tag,
   Star,
-  Bell,
   Palette,
   BarChart3,
   Settings,
   QrCode,
   ExternalLink,
   HelpCircle,
-  CheckCircle2,
   Sparkles,
 } from 'lucide-react';
 
@@ -62,7 +60,7 @@ export function AdminSidebar({
   onOpenOnboarding,
   onOpenHelp,
 }: AdminSidebarProps) {
-  // Navigation items definition
+  // Navigation items definition (Strict Owner vs Staff)
   const allNavItems: {
     id: AdminSection;
     label: string;
@@ -79,7 +77,7 @@ export function AdminSidebar({
     },
     {
       id: 'menu',
-      label: 'Menu & Dishes',
+      label: userRole === 'staff' ? 'Sold-Out Status' : 'Menu & Dishes',
       icon: UtensilsCrossed,
       badge: badgeCounts.totalDishes,
       badgeColor: 'bg-white/10 text-neutral-300',
@@ -87,7 +85,7 @@ export function AdminSidebar({
     },
     {
       id: 'offers',
-      label: 'Offers & Deals',
+      label: userRole === 'staff' ? 'Active Offers' : 'Offers & Deals',
       icon: Tag,
       badge: badgeCounts.activeOffers > 0 ? `${badgeCounts.activeOffers} Live` : undefined,
       badgeColor: 'bg-amber-500/20 text-amber-300',
@@ -99,14 +97,6 @@ export function AdminSidebar({
       icon: Star,
       badge: badgeCounts.reviewsAttention > 0 ? badgeCounts.reviewsAttention : undefined,
       badgeColor: 'bg-rose-500/20 text-rose-300',
-      allowedRoles: ['owner', 'manager'],
-    },
-    {
-      id: 'requests',
-      label: 'Kitchen & Service',
-      icon: Bell,
-      badge: badgeCounts.requests > 0 ? badgeCounts.requests : undefined,
-      badgeColor: 'bg-rose-500 text-white animate-pulse',
       allowedRoles: ['owner', 'manager', 'staff'],
     },
     {
@@ -129,7 +119,7 @@ export function AdminSidebar({
     },
     {
       id: 'settings',
-      label: 'Settings',
+      label: 'Settings & Staff',
       icon: Settings,
       allowedRoles: ['owner'],
     },
@@ -144,7 +134,7 @@ export function AdminSidebar({
         {/* Restaurant Header */}
         <div className="flex items-center gap-3 px-2 pt-1">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-md text-base"
+            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-md text-base flex-shrink-0"
             style={{ backgroundColor: restaurant.theme_config.primaryColor || '#E8590C' }}
           >
             {restaurant.logo_letter || 'A'}
@@ -156,7 +146,7 @@ export function AdminSidebar({
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span className="text-[11px] text-neutral-400 capitalize font-medium">
-                {userRole} Console
+                {userRole === 'owner' ? 'Owner Portal' : userRole === 'manager' ? 'Manager Portal' : 'Staff Portal'}
               </span>
             </div>
           </div>
@@ -169,20 +159,13 @@ export function AdminSidebar({
             const isActive = activeSection === item.id;
 
             return (
-              <div
-                role="button"
-                tabIndex={0}
+              <button
+                type="button"
                 key={item.id}
                 data-testid={`admin-nav-${item.id}`}
                 onClick={() => {
                   triggerHaptic(8);
                   onSelectSection(item.id);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    triggerHaptic(8);
-                    onSelectSection(item.id);
-                  }
                 }}
                 className={`w-full h-10 px-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all cursor-pointer ${
                   isActive
@@ -204,7 +187,7 @@ export function AdminSidebar({
                     {item.badge}
                   </span>
                 )}
-              </div>
+              </button>
             );
           })}
         </nav>
@@ -237,14 +220,17 @@ export function AdminSidebar({
           </div>
         )}
 
-        {/* Role Switcher Pill */}
+        {/* Role Switcher Pill (Owner vs Staff Only) */}
         <div className="p-1 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-[11px]">
-          {(['owner', 'manager', 'staff'] as const).map((r) => (
+          {(['owner', 'staff'] as const).map((r) => (
             <button
               key={r}
               onClick={() => {
                 triggerHaptic(10);
                 onRoleChange(r);
+                if (r === 'staff' && activeSection !== 'menu' && activeSection !== 'reviews') {
+                  onSelectSection('menu');
+                }
               }}
               className={`flex-1 py-1 rounded-lg font-bold capitalize transition-all ${
                 userRole === r

@@ -8,6 +8,8 @@ import { getIntelligentPairings, PairingRecommendation } from '@/lib/recommendat
 import { formatMoney, triggerHaptic } from '@/lib/utils';
 import { X, Minus, Plus, Tag, Clock, Sparkles, Star, MessageSquare, Flag, Check } from 'lucide-react';
 
+import { Language, TRANSLATIONS } from '@/lib/translations';
+
 interface ItemDetailModalProps {
   item: MenuItem | null;
   pricingResult?: ItemPricingResult;
@@ -21,7 +23,7 @@ interface ItemDetailModalProps {
   onQuickAddPairing?: (pairingItem: MenuItem) => void;
   onOpenReviewModal?: () => void;
   onReportReview?: (reviewId: string, reason: string) => void;
-  locale?: string;
+  locale?: Language | string;
 }
 
 export function ItemDetailModal({
@@ -31,7 +33,7 @@ export function ItemDetailModal({
   dishReviews = [],
   pairingRecommendations = [],
   allItems = [],
-  currencySymbol = '$',
+  currencySymbol = 'ETB',
   onClose,
   onAddToCart,
   onQuickAddPairing,
@@ -44,6 +46,9 @@ export function ItemDetailModal({
   const [notes, setNotes] = useState('');
   const [reportingReviewId, setReportingReviewId] = useState<string | null>(null);
   const [reportedReviewIds, setReportedReviewIds] = useState<Set<string>>(new Set());
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   // Research-backed intelligent pairings computation
   const intelligentPairings: PairingRecommendation[] = React.useMemo(() => {
@@ -71,8 +76,23 @@ export function ItemDetailModal({
 
   if (!item) return null;
 
-  const displayName = (locale === 'es' && item.name_es) ? item.name_es : item.name;
-  const displayDesc = (locale === 'es' && item.description_es) ? item.description_es : item.description;
+  const displayName =
+    currentLocale === 'am' && item.name_am
+      ? item.name_am
+      : currentLocale === 'so' && item.name_so
+      ? item.name_so
+      : currentLocale === 'es' && item.name_es
+      ? item.name_es
+      : item.name;
+
+  const displayDesc =
+    currentLocale === 'am' && item.description_am
+      ? item.description_am
+      : currentLocale === 'so' && item.description_so
+      ? item.description_so
+      : currentLocale === 'es' && item.description_es
+      ? item.description_es
+      : item.description;
 
   const toggleOption = (opt: ItemOption) => {
     triggerHaptic(8);
@@ -353,16 +373,6 @@ export function ItemDetailModal({
             </div>
           )}
 
-          {/* Special Requests / Notes */}
-          <div className="flex flex-col gap-1.5">
-            <h3 className="text-sm font-bold text-[var(--foreground)]">Special Instructions</h3>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Dressing on the side, extra crispy, sauce temperature..."
-              className="w-full h-18 p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs text-[var(--foreground)] resize-none outline-none focus:border-[var(--primary)]"
-            />
-          </div>
 
           {/* GUEST REVIEWS & RATINGS */}
           <div className="pt-3 border-t border-[var(--border)] flex flex-col gap-3">
@@ -555,7 +565,7 @@ export function ItemDetailModal({
             className="flex-1 h-11 rounded-full text-white font-bold text-sm shadow-md transition-all disabled:bg-neutral-500 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
             style={{ backgroundColor: item.is_available ? 'var(--primary)' : undefined }}
           >
-            <span>{item.is_available ? 'Add to Order' : 'Sold Out'}</span>
+            <span>{item.is_available ? t.addToOrder : t.soldOut}</span>
             {item.is_available && <span>• {formatMoney(lineTotal, currencySymbol)}</span>}
           </button>
         </div>

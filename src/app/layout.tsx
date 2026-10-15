@@ -13,7 +13,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#121316",
+  themeColor: "#F8F9FA",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -34,6 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-mode="light"
       className={`${plusJakartaSans.variable} ${playfairDisplay.variable} h-full antialiased`}
       suppressHydrationWarning
     >

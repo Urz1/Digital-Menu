@@ -6,6 +6,7 @@ import { MenuItem, DishReviewStats } from '@/types/database';
 import { ItemPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
 import { Heart, Plus, Tag, Clock, Star } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ItemCardProps {
   item: MenuItem;
@@ -17,14 +18,14 @@ interface ItemCardProps {
   onOpenDetails: (item: MenuItem) => void;
   onQuickAdd: (item: MenuItem) => void;
   layout?: 'list' | 'grid';
-  locale?: string;
+  locale?: Language | string;
 }
 
 export function ItemCard({
   item,
   pricingResult,
   reviewStats,
-  currencySymbol = '$',
+  currencySymbol = 'ETB',
   isFavorite,
   onToggleFavorite,
   onOpenDetails,
@@ -32,11 +33,28 @@ export function ItemCard({
   layout = 'list',
   locale = 'en',
 }: ItemCardProps) {
-  const displayName = (locale === 'es' && item.name_es) ? item.name_es : item.name;
-  const displayDesc = (locale === 'es' && item.description_es) ? item.description_es : item.description;
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
+
+  const displayName =
+    currentLocale === 'am' && item.name_am
+      ? item.name_am
+      : currentLocale === 'so' && item.name_so
+      ? item.name_so
+      : currentLocale === 'es' && item.name_es
+      ? item.name_es
+      : item.name;
+
+  const displayDesc =
+    currentLocale === 'am' && item.description_am
+      ? item.description_am
+      : currentLocale === 'so' && item.description_so
+      ? item.description_so
+      : currentLocale === 'es' && item.description_es
+      ? item.description_es
+      : item.description;
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // If clicked on favorite button or quick add button, don't open details modal
     if ((e.target as HTMLElement).closest('.action-prevent-modal')) return;
     onOpenDetails(item);
   };
@@ -91,32 +109,32 @@ export function ItemCard({
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             {hasOffer && (
               <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white inline-flex items-center gap-1 shadow-xs"
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white inline-flex items-center gap-1 shadow-2xs"
                 style={{ backgroundColor: 'var(--primary)' }}
               >
                 <Tag className="w-2.5 h-2.5" />
-                <span>{pricingResult?.badgeText || 'Offer'}</span>
+                <span>{pricingResult?.badgeText || t.specialOffer}</span>
               </span>
             )}
             {hasOffer && savings > 0 && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
-                Save {formatMoney(savings, currencySymbol)}
+                {t.saveAmount} {formatMoney(savings, currencySymbol)}
               </span>
             )}
             {pricingResult?.urgencyText && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 inline-flex items-center gap-0.5">
+              <span suppressHydrationWarning className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 inline-flex items-center gap-0.5">
                 <Clock className="w-2.5 h-2.5" />
-                <span>{pricingResult.urgencyText}</span>
+                <span suppressHydrationWarning>{pricingResult.urgencyText}</span>
               </span>
             )}
             {item.is_chefs_pick && !hasOffer && (
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
-                ⭐ Chef Pick
+                ⭐ {t.chefsPick}
               </span>
             )}
             {!item.is_available && (
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-                Sold Out
+                {t.soldOut}
               </span>
             )}
             {/* 3-Review Threshold: Show rating & count ONLY when review count >= 3 */}
@@ -139,19 +157,29 @@ export function ItemCard({
 
           {/* Dietary tags */}
           <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+            {item.tags?.includes('fasting') && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)]">
+                🥗 Tsom
+              </span>
+            )}
             {item.tags?.includes('vegetarian') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)]">
                 🌱 Veg
               </span>
             )}
             {item.tags?.includes('vegan') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-700 font-semibold">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-700 font-semibold border border-[var(--border)]">
                 🌿 Vegan
               </span>
             )}
             {item.tags?.includes('gluten-free') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-amber-700 font-semibold">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-amber-700 font-semibold border border-[var(--border)]">
                 🌾 GF
+              </span>
+            )}
+            {item.tags?.includes('halal') && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-neutral-700 font-semibold border border-[var(--border)]">
+                🥩 Halal
               </span>
             )}
             {item.spice_level > 0 && (
@@ -192,7 +220,7 @@ export function ItemCard({
                 onQuickAdd(item);
               }
             }}
-            className="action-prevent-modal w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform active:scale-90"
+            className="action-prevent-modal w-8 h-8 rounded-full flex items-center justify-center text-white shadow-xs disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform active:scale-90"
             style={{ backgroundColor: item.is_available ? 'var(--primary)' : undefined }}
             aria-label={`Add ${displayName} to order`}
           >
