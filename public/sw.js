@@ -1,5 +1,5 @@
 // Offline PWA Service Worker for Digital Menu
-const CACHE_NAME = 'digital-menu-cache-v1';
+const CACHE_NAME = 'digital-menu-cache-v2';
 const OFFLINE_URLS = [
   '/',
   '/addis',
@@ -33,27 +33,50 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  // Navigation requests: Network-first, fallback to cache
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          const fallback = await caches.match('/addis');
+          return fallback || caches.match('/');
+        })
+    );
+    return;
+  }
+
+  // Static assets & Images: Cache-first or Stale-While-Revalidate
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Cache valid responses for images & fonts
-        if (
-          response &&
-          response.status === 200 &&
-          (event.request.destination === 'image' || event.request.destination === 'font')
-        ) {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return response;
-      })
-      .catch(async () => {
-        const cached = await caches.match(event.request);
-        if (cached) return cached;
-        // Fallback to cached home/menu page
-        return caches.match('/addis');
-      })
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (
+            networkResponse &&
+            networkResponse.status === 200 &&
+            (event.request.destination === 'image' ||
+             event.request.destination === 'font' ||
+             event.request.destination === 'style' ||
+             event.request.destination === 'script')
+          ) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
+    })
   );
 });

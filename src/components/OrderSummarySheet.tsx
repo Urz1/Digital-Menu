@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { CartItem } from '@/types/menu';
+import { CartPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { X, Minus, Plus, Tablet, BellRing } from 'lucide-react';
+import { X, Minus, Plus, Tablet, BellRing, Tag, Gift } from 'lucide-react';
 
 interface OrderSummarySheetProps {
   isOpen: boolean;
   onClose: () => void;
   cart: CartItem[];
+  cartPricing?: CartPricingResult;
   currencySymbol?: string;
   taxRate?: number;
   tableNumber: string;
@@ -22,6 +24,7 @@ export function OrderSummarySheet({
   isOpen,
   onClose,
   cart,
+  cartPricing,
   currencySymbol = '$',
   taxRate = 0.08,
   tableNumber,
@@ -32,9 +35,12 @@ export function OrderSummarySheet({
 }: OrderSummarySheetProps) {
   if (!isOpen) return null;
 
-  const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const tax = subtotal * taxRate;
-  const total = subtotal + tax;
+  const rawSubtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+  const subtotal = cartPricing?.netSubtotal ?? rawSubtotal;
+  const originalSubtotal = cartPricing?.originalSubtotal ?? rawSubtotal;
+  const totalSavings = cartPricing?.totalSavings ?? 0;
+  const tax = cartPricing?.tax ?? subtotal * taxRate;
+  const total = cartPricing?.total ?? subtotal + tax;
 
   return (
     <div
@@ -93,15 +99,26 @@ export function OrderSummarySheet({
           ) : (
             <div className="flex flex-col gap-3 divide-y divide-[var(--border)]">
               {cart.map((entry) => {
-                const lineTotal = entry.unitPrice * entry.quantity;
+                const linePricing = cartPricing?.lines.find((l) => l.cartId === entry.cartId);
+                const originalLineTotal = linePricing?.originalLineTotal ?? entry.unitPrice * entry.quantity;
+                const finalLineTotal = linePricing?.finalLineTotal ?? originalLineTotal;
+                const lineSavings = linePricing?.lineSavings ?? 0;
                 const optionsString = entry.options.map((o) => o.name).join(', ');
 
                 return (
                   <div key={entry.cartId} className="pt-3 first:pt-0 flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm text-[var(--foreground)] truncate">
-                        {entry.item.name}
-                      </h4>
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="font-bold text-sm text-[var(--foreground)] truncate">
+                          {entry.item.name}
+                        </h4>
+                        {lineSavings > 0 && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                            Save {formatMoney(lineSavings, currencySymbol)}
+                          </span>
+                        )}
+                      </div>
+
                       {optionsString && (
                         <p className="text-[11px] text-[var(--muted)] line-clamp-1 mt-0.5">
                           + {optionsString}
@@ -112,9 +129,17 @@ export function OrderSummarySheet({
                           Note: "{entry.notes}"
                         </p>
                       )}
-                      <span className="text-xs font-extrabold mt-1 block" style={{ color: 'var(--primary)' }}>
-                        {formatMoney(lineTotal, currencySymbol)}
-                      </span>
+
+                      <div className="flex items-baseline gap-1.5 mt-1">
+                        <span className="text-xs font-extrabold" style={{ color: 'var(--primary)' }}>
+                          {formatMoney(finalLineTotal, currencySymbol)}
+                        </span>
+                        {lineSavings > 0 && (
+                          <span className="text-[11px] text-[var(--muted)] line-through">
+                            {formatMoney(originalLineTotal, currencySymbol)}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Quantity controls */}
@@ -149,17 +174,56 @@ export function OrderSummarySheet({
             </div>
           )}
 
+          {/* Complimentary Item Banner (Free item award) */}
+          {cartPricing?.freeItemAwarded && (
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs flex items-center gap-2.5">
+              <Gift className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="font-bold text-[var(--foreground)] block">
+                  Free Gift: {cartPricing.freeItemAwarded.item.name}
+                </span>
+                <span className="text-[11px] text-[var(--muted)]">
+                  {cartPricing.freeItemAwarded.reason}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Pricing Breakdown Card */}
           {cart.length > 0 && (
             <div className="p-3.5 rounded-2xl bg-[var(--background)] border border-[var(--border)] text-xs flex flex-col gap-2 mt-2">
               <div className="flex justify-between text-[var(--muted)]">
-                <span>Subtotal</span>
-                <span className="font-semibold text-[var(--foreground)]">{formatMoney(subtotal, currencySymbol)}</span>
+                <span>Items Subtotal</span>
+                <span className="font-semibold text-[var(--foreground)]">{formatMoney(originalSubtotal, currencySymbol)}</span>
               </div>
+
+              {/* Applied Offers line-by-line */}
+              {cartPricing?.appliedOffers && cartPricing.appliedOffers.length > 0 && (
+                <div className="flex flex-col gap-1 py-1 border-y border-dashed border-[var(--border)]">
+                  {cartPricing.appliedOffers.map(({ offer, totalSavings }) => (
+                    <div key={offer.id} className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="inline-flex items-center gap-1 truncate max-w-[240px]">
+                        <Tag className="w-3 h-3 flex-shrink-0" />
+                        <span className="truncate">{offer.title}</span>
+                      </span>
+                      <span>-{formatMoney(totalSavings, currencySymbol)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {totalSavings > 0 && (
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                  <span>Total Offer Savings</span>
+                  <span>-{formatMoney(totalSavings, currencySymbol)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between text-[var(--muted)]">
                 <span>Estimated Tax ({(taxRate * 100).toFixed(0)}%)</span>
                 <span className="font-semibold text-[var(--foreground)]">{formatMoney(tax, currencySymbol)}</span>
               </div>
+
               <div className="flex justify-between text-base font-extrabold pt-2 border-t border-dashed border-[var(--border)] text-[var(--foreground)]">
                 <span>Total</span>
                 <span style={{ color: 'var(--primary)' }}>{formatMoney(total, currencySymbol)}</span>

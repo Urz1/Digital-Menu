@@ -11,6 +11,7 @@ export interface CartItem {
 
 export type DietaryFilter = 
   | 'all'
+  | 'onOffer'
   | 'chefsPick'
   | 'vegetarian'
   | 'vegan'

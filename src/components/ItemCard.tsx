@@ -2,12 +2,15 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { MenuItem } from '@/types/database';
+import { MenuItem, DishReviewStats } from '@/types/database';
+import { ItemPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { Heart, Plus } from 'lucide-react';
+import { Heart, Plus, Tag, Clock, Star } from 'lucide-react';
 
 interface ItemCardProps {
   item: MenuItem;
+  pricingResult?: ItemPricingResult;
+  reviewStats?: DishReviewStats;
   currencySymbol?: string;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
@@ -19,6 +22,8 @@ interface ItemCardProps {
 
 export function ItemCard({
   item,
+  pricingResult,
+  reviewStats,
   currencySymbol = '$',
   isFavorite,
   onToggleFavorite,
@@ -35,6 +40,11 @@ export function ItemCard({
     if ((e.target as HTMLElement).closest('.action-prevent-modal')) return;
     onOpenDetails(item);
   };
+
+  const hasOffer = pricingResult?.hasOffer ?? false;
+  const originalPrice = pricingResult?.originalPrice ?? item.price;
+  const finalPrice = pricingResult?.finalPrice ?? item.price;
+  const savings = pricingResult?.savings ?? 0;
 
   return (
     <article
@@ -77,9 +87,29 @@ export function ItemCard({
       {/* Content Column */}
       <div className="flex-1 flex flex-col justify-between min-w-0">
         <div>
-          {/* Badges (Chef's Pick / Sold Out) */}
+          {/* Badges (Offer / Chef's Pick / Sold Out / Urgency) */}
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-            {item.is_chefs_pick && (
+            {hasOffer && (
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white inline-flex items-center gap-1 shadow-xs"
+                style={{ backgroundColor: 'var(--primary)' }}
+              >
+                <Tag className="w-2.5 h-2.5" />
+                <span>{pricingResult?.badgeText || 'Offer'}</span>
+              </span>
+            )}
+            {hasOffer && savings > 0 && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
+                Save {formatMoney(savings, currencySymbol)}
+              </span>
+            )}
+            {pricingResult?.urgencyText && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 inline-flex items-center gap-0.5">
+                <Clock className="w-2.5 h-2.5" />
+                <span>{pricingResult.urgencyText}</span>
+              </span>
+            )}
+            {item.is_chefs_pick && !hasOffer && (
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
                 ⭐ Chef Pick
               </span>
@@ -87,6 +117,14 @@ export function ItemCard({
             {!item.is_available && (
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
                 Sold Out
+              </span>
+            )}
+            {/* 3-Review Threshold: Show rating & count ONLY when review count >= 3 */}
+            {reviewStats?.is_threshold_met && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 inline-flex items-center gap-0.5">
+                <Star className="w-2.5 h-2.5 fill-current text-amber-500" />
+                <span>{reviewStats.average_rating.toFixed(1)}</span>
+                <span className="text-[9px] opacity-75 font-normal">({reviewStats.review_count})</span>
               </span>
             )}
           </div>
@@ -126,9 +164,22 @@ export function ItemCard({
 
         {/* Bottom Price & Quick Add */}
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-[var(--border)]">
-          <span className="font-extrabold text-base" style={{ color: 'var(--primary)' }}>
-            {formatMoney(item.price, currencySymbol)}
-          </span>
+          <div className="flex items-baseline gap-1.5">
+            {hasOffer ? (
+              <>
+                <span className="font-extrabold text-base" style={{ color: 'var(--primary)' }}>
+                  {formatMoney(finalPrice, currencySymbol)}
+                </span>
+                <span className="text-xs text-[var(--muted)] line-through">
+                  {formatMoney(originalPrice, currencySymbol)}
+                </span>
+              </>
+            ) : (
+              <span className="font-extrabold text-base" style={{ color: 'var(--primary)' }}>
+                {formatMoney(item.price, currencySymbol)}
+              </span>
+            )}
+          </div>
 
           <button
             disabled={!item.is_available}
@@ -141,7 +192,7 @@ export function ItemCard({
                 onQuickAdd(item);
               }
             }}
-            className="action-prevent-modal w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform"
+            className="action-prevent-modal w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform active:scale-90"
             style={{ backgroundColor: item.is_available ? 'var(--primary)' : undefined }}
             aria-label={`Add ${displayName} to order`}
           >

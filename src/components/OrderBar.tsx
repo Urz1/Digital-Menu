@@ -7,6 +7,7 @@ import { ShoppingBag, ChevronRight } from 'lucide-react';
 interface OrderBarProps {
   totalItems: number;
   subtotal: number;
+  totalSavings?: number;
   currencySymbol?: string;
   onOpenOrderSheet: () => void;
 }
@@ -14,6 +15,7 @@ interface OrderBarProps {
 export function OrderBar({
   totalItems,
   subtotal,
+  totalSavings = 0,
   currencySymbol = '$',
   onOpenOrderSheet,
 }: OrderBarProps) {
@@ -38,6 +40,11 @@ export function OrderBar({
           <span className="font-extrabold text-base tracking-tight">
             {formatMoney(subtotal, currencySymbol)}
           </span>
+          {totalSavings > 0 && (
+            <span className="inline-block bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              Saved {formatMoney(totalSavings, currencySymbol)}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider">

@@ -16,6 +16,7 @@ interface FilterBarProps {
 
 const FILTER_OPTIONS: { id: DietaryFilter; label: string }[] = [
   { id: 'all', label: 'All' },
+  { id: 'onOffer', label: '🏷️ On Offer' },
   { id: 'chefsPick', label: '⭐ Chef Picks' },
   { id: 'vegetarian', label: '🌱 Vegetarian' },
   { id: 'vegan', label: '🌿 Vegan' },

@@ -1,0 +1,360 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import { MenuItem } from '@/types/database';
+import { validateReviewPhoto } from '@/lib/review-engine';
+import { triggerHaptic } from '@/lib/utils';
+import { X, Star, Camera, Check, AlertCircle } from 'lucide-react';
+
+interface ReviewModalProps {
+  isOpen: boolean;
+  item: MenuItem | null;
+  tableNumber?: string;
+  availableTags?: string[];
+  onClose: () => void;
+  onSubmitReview: (data: {
+    item_id: string;
+    rating: number;
+    tags: string[];
+    comment?: string;
+    photo_url?: string;
+    honeypot?: string;
+    submissionDurationMs: number;
+  }) => Promise<{ success: boolean; error?: string }>;
+}
+
+const DEFAULT_TAGS = [
+  'Great portion',
+  'Would order again',
+  'Fresh ingredients',
+  'Crispy texture',
+  'Perfect spice',
+  'Too salty',
+  'Could be hotter',
+  'Needs more seasoning',
+];
+
+export function ReviewModal({
+  isOpen,
+  item,
+  availableTags = DEFAULT_TAGS,
+  onClose,
+  onSubmitReview,
+}: ReviewModalProps) {
+  const [rating, setRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [comment, setComment] = useState<string>('');
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  const formOpenedAtRef = useRef<number>(Date.now());
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setRating(5);
+      setHoverRating(0);
+      setSelectedTags([]);
+      setComment('');
+      setPhotoPreview(null);
+      setPhotoError(null);
+      setHoneypot('');
+      setSubmitError(null);
+      setIsSuccess(false);
+      formOpenedAtRef.current = Date.now();
+    }
+  }, [isOpen, item]);
+
+  if (!isOpen || !item) return null;
+
+  const toggleTag = (tag: string) => {
+    triggerHaptic(8);
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhotoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate photo
+    const validation = validateReviewPhoto({ type: file.type, size: file.size });
+    if (!validation.isValid) {
+      setPhotoError(validation.error || 'Invalid photo');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+    setIsSubmitting(true);
+    triggerHaptic(15);
+
+    const duration = Date.now() - formOpenedAtRef.current;
+
+    const res = await onSubmitReview({
+      item_id: item.id,
+      rating,
+      tags: selectedTags,
+      comment: comment.trim() || undefined,
+      photo_url: photoPreview || undefined,
+      honeypot,
+      submissionDurationMs: duration,
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success) {
+      triggerHaptic(25);
+      setIsSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } else {
+      setSubmitError(res.error || 'Failed to submit review. Please try again.');
+    }
+  };
+
+  const starLabels = ['', 'Needs Improvement', 'Fair', 'Good', 'Very Good', 'Exceptional!'];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 transition-opacity"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg bg-[#16181E] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 overflow-y-auto max-h-[90vh] shadow-2xl relative text-white animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 transition-colors"
+          aria-label="Close"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        {isSuccess ? (
+          /* FRIENDLY THANK-YOU STATE (No upsell, no redirect) */
+          <div className="py-12 text-center flex flex-col items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mb-3">
+              <Check className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Thank you for your review!</h3>
+            <p className="text-xs text-neutral-400 mt-1 max-w-xs">
+              Your honest feedback helps our culinary team and fellow diners at Addis.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-6 h-10 px-8 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          /* REVIEW SUBMISSION FORM (< 15 seconds) */
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
+                Quick Dish Review
+              </span>
+              <h2 className="text-lg font-bold text-white font-brand mt-0.5 truncate">
+                {item.name}
+              </h2>
+              <p className="text-[11px] text-neutral-400">
+                Fast, honest feedback in under 15 seconds. No account required.
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {submitError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                <span>{submitError}</span>
+              </div>
+            )}
+
+            {/* 1-5 Star Tap Rating */}
+            <div className="flex flex-col items-center py-2 bg-white/[0.03] rounded-2xl border border-white/5">
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const active = (hoverRating || rating) >= star;
+                  return (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic(12);
+                        setRating(star);
+                      }}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+                      aria-label={`${star} star rating`}
+                    >
+                      <Star
+                        className={`w-7 h-7 transition-colors ${
+                          active
+                            ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
+                            : 'text-neutral-600'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="text-xs font-semibold text-amber-300 mt-1">
+                {starLabels[hoverRating || rating]}
+              </span>
+            </div>
+
+            {/* Quick Tags Chips */}
+            <div>
+              <span className="text-xs font-bold text-neutral-300 block mb-1.5">
+                Quick Tags <span className="text-neutral-500 font-normal">(Optional, tap to select)</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {availableTags.map((tag) => {
+                  const isSelected = selectedTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={`h-7 px-3 rounded-full text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-amber-500 text-black font-bold shadow-xs'
+                          : 'bg-white/5 border border-white/10 text-neutral-300 hover:bg-white/10'
+                      }`}
+                    >
+                      {isSelected ? `✓ ${tag}` : tag}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Short Comment */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs font-bold text-neutral-300">
+                  Comment <span className="text-neutral-500 font-normal">(Optional)</span>
+                </span>
+                <span className="text-[10px] text-neutral-500">{comment.length}/280</span>
+              </div>
+              <textarea
+                value={comment}
+                maxLength={280}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="What made this dish memorable? (Keep it honest and helpful)"
+                className="w-full h-18 p-2.5 rounded-xl border border-white/10 bg-white/[0.02] text-xs text-white placeholder-neutral-500 resize-none outline-none focus:border-amber-400"
+              />
+            </div>
+
+            {/* Photo Upload (Optional) */}
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-neutral-300">
+                  Dish Photo <span className="text-neutral-500 font-normal">(Optional, max 4MB)</span>
+                </span>
+                {photoPreview && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoPreview(null);
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                    className="text-[11px] text-red-400 hover:underline"
+                  >
+                    Remove Photo
+                  </button>
+                )}
+              </div>
+
+              {photoPreview ? (
+                <div className="mt-2 relative w-24 h-24 rounded-xl overflow-hidden border border-amber-500/40">
+                  <Image
+                    src={photoPreview}
+                    alt="Review preview"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="mt-1.5 flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handlePhotoSelect}
+                    id="review-photo-input"
+                  />
+                  <label
+                    htmlFor="review-photo-input"
+                    className="h-9 px-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-medium text-neutral-300 flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <Camera className="w-3.5 h-3.5 text-neutral-400" />
+                    <span>Upload a Photo</span>
+                  </label>
+                  <span className="text-[11px] text-neutral-500">JPG, PNG, or WEBP</span>
+                </div>
+              )}
+
+              {photoError && (
+                <p className="text-[11px] text-red-400 mt-1">{photoError}</p>
+              )}
+            </div>
+
+            {/* Invisible Honeypot Field for Bot Prevention */}
+            <input
+              type="text"
+              name="website_url"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              className="opacity-0 absolute -z-10 w-0 h-0 pointer-events-none"
+            />
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-11 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-98 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span>Posting Review...</span>
+                ) : (
+                  <span>Submit Honest Review</span>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}

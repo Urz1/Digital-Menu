@@ -1,7 +1,14 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getRestaurantBySlug, getMenuCategories, getMenuItems } from '@/lib/data-provider';
+import {
+  getRestaurantBySlug,
+  getMenuCategories,
+  getMenuItems,
+  getOffers,
+  getDishReviews,
+  getReviewSettings,
+} from '@/lib/data-provider';
 import { ThemeManager } from '@/components/ThemeManager';
 import { ClientMenuContainer } from '@/components/ClientMenuContainer';
 
@@ -63,9 +70,12 @@ export default async function RestaurantMenuPage({ params, searchParams }: PageP
     notFound();
   }
 
-  const [categories, items] = await Promise.all([
+  const [categories, items, offers, reviews, reviewSettings] = await Promise.all([
     getMenuCategories(restaurant.id),
     getMenuItems(restaurant.id),
+    getOffers(restaurant.id),
+    getDishReviews(restaurant.id),
+    getReviewSettings(restaurant.id),
   ]);
 
   // Schema.org Structured Data for Google Search
@@ -116,6 +126,9 @@ export default async function RestaurantMenuPage({ params, searchParams }: PageP
           restaurant={restaurant}
           categories={categories}
           initialItems={items}
+          initialOffers={offers}
+          initialReviews={reviews}
+          initialReviewSettings={reviewSettings}
           initialTable={table}
         />
       </ThemeManager>

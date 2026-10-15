@@ -89,3 +89,50 @@ button:active {
 .animate-toast {
   animation: toastSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.relative {
+  position: relative !important;
+}
+
+nextjs-portal,
+[data-nextjs-dev-tools-button],
+#nextjs-dev-tools-button {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Accessibility: Respect user reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:active {
+    transform: none !important;
+  }
+}
+
+/* Accessible keyboard focus states */
+:focus-visible {
+  outline: 2px solid var(--primary, #E8590C) !important;
+  outline-offset: 2px !important;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
