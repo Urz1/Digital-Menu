@@ -51,10 +51,11 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
   // Base URL
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://digitalmenu.app';
   const getTargetUrl = (tableNum?: number) => {
+    const slugPrefix = restaurant.slug === 'addis' ? '' : `/${restaurant.slug}`;
     if (targetType === 'main' || tableNum === undefined) {
-      return `${baseUrl}/${restaurant.slug}`;
+      return `${baseUrl}${slugPrefix || '/'}`;
     }
-    return `${baseUrl}/${restaurant.slug}?table=${tableNum}`;
+    return `${baseUrl}${slugPrefix}/?table=${tableNum}`.replace('//?', '/?');
   };
 
   const currentQrUrl = getTargetUrl(singleTableNumber);

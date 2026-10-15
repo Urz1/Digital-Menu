@@ -36,7 +36,8 @@ import {
 } from '@/lib/pricing-engine';
 import { calculateDishReviewStats } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
-import { ArrowUp, Share2, QrCode, Info, Sparkles, Tag, Clock, X, WifiOff } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowUp, Share2, QrCode, Info, Sparkles, Tag, Clock, X, WifiOff, Lock } from 'lucide-react';
 
 interface ClientMenuContainerProps {
   restaurant: Restaurant;
@@ -877,6 +878,15 @@ export function ClientMenuContainer({
             <Info className="w-3.5 h-3.5" />
             <span>Allergen Guide</span>
           </button>
+        </div>
+        <div className="pt-3 border-t border-[var(--border)]/50 mt-1 flex justify-center">
+          <Link
+            href="/admin"
+            className="text-[11px] text-[var(--muted)]/60 hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-[var(--border)]/30"
+          >
+            <Lock className="w-3 h-3 opacity-70" />
+            <span>Staff & Owner Portal</span>
+          </Link>
         </div>
       </footer>
 
