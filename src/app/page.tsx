@@ -12,6 +12,8 @@ import {
 import { ThemeManager } from '@/components/ThemeManager';
 import { ClientMenuContainer } from '@/components/ClientMenuContainer';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   searchParams: Promise<{ table?: string }>;
 }

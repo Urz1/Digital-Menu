@@ -100,14 +100,15 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     // Search for newly created dish
     const searchInput = page.locator('[data-testid="menu-search-input"]');
     await searchInput.fill('Crispy Truffle Fries');
-    await expect(page.locator('text=Crispy Truffle Fries')).toBeVisible();
-    await expect(page.locator('text=12.50')).toBeVisible();
+    await expect(page.locator('text=Crispy Truffle Fries').first()).toBeVisible();
+    await expect(page.locator('text=12.50').first()).toBeVisible();
   });
 
   test('3. Availability Management: One-tap "Sold Out Today" toggle with instant visual feedback', async ({ page }) => {
     // Switch to Menu
     const menuBtn = page.locator('[data-testid="admin-nav-menu"]:visible').first();
     await menuBtn.click({ force: true });
+    await page.waitForTimeout(400);
 
     // Locate the first sold out toggle
     const firstToggle = page.locator('button[data-testid^="sold-out-toggle-"]').first();

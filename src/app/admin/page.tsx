@@ -41,6 +41,8 @@ import {
   restoreMenuVersion,
   getDishReviews,
   getOffers,
+  getMenuItems,
+  getMenuCategories,
 } from '@/lib/data-provider';
 import { AdminSidebar, AdminSection } from '@/components/admin/AdminSidebar';
 import { subscribeSync } from '@/lib/sync-channel';
@@ -146,6 +148,8 @@ export default function AdminDashboardPage() {
 
   // Poll / fetch live data & listen to real-time events
   useEffect(() => {
+    getMenuItems(restaurant.id).then(setMenuItems);
+    getMenuCategories(restaurant.id).then(setCategories);
     getLiveOrders(restaurant.id).then(setOrders);
     getLiveServiceRequests(restaurant.id).then(setServiceRequests);
     getDishReviews(restaurant.id).then(setReviews);
@@ -223,6 +227,17 @@ export default function AdminDashboardPage() {
   // Item Mutations
   const handleSaveItem = async (itemData: Partial<MenuItem>): Promise<MenuItem> => {
     triggerAutosave();
+    // Optimistically update local state immediately
+    setMenuItems((prev) => {
+      const idx = prev.findIndex((i) => i.id === itemData.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = { ...copy[idx], ...itemData } as MenuItem;
+        return copy;
+      }
+      return prev;
+    });
+
     const saved = await saveMenuItem(itemData);
     setMenuItems((prev) => {
       const idx = prev.findIndex((i) => i.id === saved.id);

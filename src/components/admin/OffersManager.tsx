@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Restaurant, MenuItem, Category, Offer, OfferTemplateType, OfferStatus, OfferStackingRule, UserRole } from '@/types/database';
-import { getOffers, saveOffer, togglePauseOffer, deleteOffer } from '@/lib/data-provider';
+import { getOffers, saveOffer, togglePauseOffer, deleteOffer, MOCK_OFFERS_ADDIS } from '@/lib/data-provider';
 import {
   evaluateOfferSchedule,
   evaluateItemPricing,
@@ -195,8 +195,8 @@ export function OffersManager({
   userRole,
 }: OffersManagerProps) {
   const isStaff = userRole === 'staff';
-  const [offersList, setOffersList] = useState<Offer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [offersList, setOffersList] = useState<Offer[]>(MOCK_OFFERS_ADDIS);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Wizard state
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -235,7 +235,11 @@ export function OffersManager({
   // Load offers on mount
   useEffect(() => {
     getOffers(restaurant.id).then((data) => {
-      setOffersList(data);
+      setOffersList((prev) => {
+        const dataIds = new Set(data.map((d) => d.id));
+        const localCreated = prev.filter((p) => !dataIds.has(p.id) && p.id.startsWith('off-'));
+        return [...localCreated, ...data];
+      });
       setIsLoading(false);
     });
   }, [restaurant.id]);

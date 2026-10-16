@@ -1888,7 +1888,10 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
         .eq('restaurant_id', restaurantId)
         .order('sort_order', { ascending: true });
 
-      if (!error && data && data.length > 0) return data as MenuItem[];
+      if (!error && data && data.length > 0) {
+        inMemoryItems = data as MenuItem[];
+        return inMemoryItems;
+      }
     } catch {
       // Fallback below
     }
@@ -2051,6 +2054,10 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
 let inMemoryOffers: Offer[] = [...MOCK_OFFERS_ADDIS];
 
 export async function getOffers(restaurantId: string): Promise<Offer[]> {
+  const fallbackList = inMemoryOffers.filter(
+    (o) => o.restaurant_id === restaurantId || restaurantId === MOCK_RESTAURANT_ADDIS.id
+  );
+
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
@@ -2060,15 +2067,35 @@ export async function getOffers(restaurantId: string): Promise<Offer[]> {
         .eq('restaurant_id', restaurantId)
         .order('priority', { ascending: false });
 
-      if (!error && data && data.length > 0) return data as Offer[];
+      if (!error && data && data.length > 0) {
+        const mapped = data.map((d: any) => ({
+          ...d,
+          status: d.status || (d.is_active ? 'live' : 'paused'),
+          is_paused: d.is_paused ?? !d.is_active,
+          show_top_banner: d.show_top_banner ?? true,
+          template_type: d.template_type || d.offer_type || 'percentage_off',
+          scope_type: d.scope_type || (d.target_category_ids?.length ? 'categories' : d.target_item_ids?.length ? 'items' : 'all'),
+          category_ids: d.category_ids || d.target_category_ids || ['cat-woodfired'],
+          item_ids: d.item_ids || d.target_item_ids || [],
+          timezone: d.timezone || 'Africa/Addis_Ababa',
+          days_of_week: d.days_of_week || [0, 1, 2, 3, 4, 5, 6],
+          start_time: d.start_time || '00:00',
+          end_time: d.end_time || '23:59',
+          honest_urgency_hours: d.honest_urgency_hours ?? 2,
+          banner_text: d.banner_text || `🌿 ${d.title}`,
+          banner_link_text: d.banner_link_text || 'See offer',
+          stacking_rule: d.stacking_rule || 'best_discount',
+        })) as Offer[];
+
+        const dbIds = new Set(mapped.map((o) => o.id));
+        return [...mapped, ...fallbackList.filter((o) => !dbIds.has(o.id))];
+      }
     } catch {
       // Fallback
     }
   }
 
-  return inMemoryOffers.filter(
-    (o) => o.restaurant_id === restaurantId || restaurantId === MOCK_RESTAURANT_ADDIS.id
-  );
+  return fallbackList;
 }
 
 export async function saveOffer(offer: Partial<Offer> & { restaurant_id: string }): Promise<Offer> {
@@ -2397,6 +2424,11 @@ export async function getDishReviews(
   restaurantId: string,
   itemId?: string
 ): Promise<DishReview[]> {
+  let list = inMemoryReviews.filter((r) => r.restaurant_id === restaurantId);
+  if (itemId) {
+    list = list.filter((r) => r.item_id === itemId);
+  }
+
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
@@ -2411,17 +2443,17 @@ export async function getDishReviews(
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
-        return data as DishReview[];
+        const dbIds = new Set(data.map((r: any) => r.id));
+        const combined = [...(data as DishReview[]), ...list.filter((r) => !dbIds.has(r.id))];
+        return combined.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
       }
     } catch {
       // Fallback below
     }
   }
 
-  let list = inMemoryReviews.filter((r) => r.restaurant_id === restaurantId);
-  if (itemId) {
-    list = list.filter((r) => r.item_id === itemId);
-  }
   return [...list].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
@@ -2771,9 +2803,34 @@ export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuIte
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
-      await supabase.from('items').upsert(savedItem);
-    } catch {
-      // Handled
+      const dbPayload = {
+        id: savedItem.id,
+        restaurant_id: savedItem.restaurant_id,
+        category_id: savedItem.category_id,
+        name: savedItem.name,
+        name_am: savedItem.name_am || null,
+        name_so: savedItem.name_so || null,
+        name_es: savedItem.name_es || null,
+        description: savedItem.description || null,
+        description_am: savedItem.description_am || null,
+        description_so: savedItem.description_so || null,
+        description_es: savedItem.description_es || null,
+        price: savedItem.price,
+        image_url: savedItem.image_url,
+        tags: savedItem.tags || [],
+        allergens: savedItem.allergens || [],
+        spice_level: savedItem.spice_level ?? 0,
+        is_available: savedItem.is_available ?? true,
+        is_chefs_pick: savedItem.is_chefs_pick ?? false,
+        sort_order: savedItem.sort_order ?? 0,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase.from('items').upsert(dbPayload);
+      if (error) {
+        console.error('Supabase items.upsert failed:', error.message);
+      }
+    } catch (err) {
+      console.error('Supabase items.upsert exception:', err);
     }
   }
 
@@ -2832,6 +2889,24 @@ export async function bulkUpdateItems(
     }
     return item;
   });
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      const cleanUpdates: Record<string, any> = {
+        updated_at: new Date().toISOString(),
+      };
+      if (updates.is_available !== undefined) cleanUpdates.is_available = updates.is_available;
+      if (updates.price !== undefined) cleanUpdates.price = updates.price;
+      if (updates.is_chefs_pick !== undefined) cleanUpdates.is_chefs_pick = updates.is_chefs_pick;
+      if (updates.image_url !== undefined) cleanUpdates.image_url = updates.image_url;
+
+      await supabase.from('items').update(cleanUpdates).in('id', itemIds);
+    } catch {
+      // Handled
+    }
+  }
+
   return inMemoryItems.filter((i) => targetSet.has(i.id));
 }
 

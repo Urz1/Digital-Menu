@@ -12,6 +12,7 @@ interface GlobalErrorProps {
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
+    console.error('[GlobalError caught in browser]:', error?.message, error?.stack);
     captureException(error, {
       extra: { digest: error.digest },
     });

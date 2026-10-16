@@ -460,7 +460,7 @@ export function evaluateCartPricing(
         const item = context.menuItemsMap.get(offer.free_item_id)!;
         freeItemAwarded = {
           item,
-          reason: `Free gift for spending over ${context.currencySymbol || 'ETB'} ${offer.min_order_amount.toFixed(2)}`,
+          reason: `Free gift for spending over ${context.currencySymbol || 'ETB'} ${(offer.min_order_amount ?? 0).toFixed(2)}`,
         };
         appliedOfferMap.set(offer.id, {
           offer,

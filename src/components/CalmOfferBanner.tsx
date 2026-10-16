@@ -25,7 +25,7 @@ export function CalmOfferBanner({ activeOffer, onSeeOffer }: CalmOfferBannerProp
     }
   }, [activeOffer]);
 
-  if (!activeOffer || isDismissed || !activeOffer.show_top_banner) {
+  if (!activeOffer || isDismissed || activeOffer.show_top_banner === false) {
     return null;
   }
 
