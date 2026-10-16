@@ -3,92 +3,120 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import {
+  authenticateOwnerAsync,
+  authenticateStaff,
+  getOwnerProfile,
+  getStaffAccounts,
+  DEFAULT_OWNER_PROFILE,
+} from '@/lib/auth-service';
 import { triggerHaptic } from '@/lib/utils';
-import { ShieldCheck, Mail, Lock, ArrowLeft, ArrowRight, KeyRound, User, Phone } from 'lucide-react';
+import {
+  ShieldCheck,
+  Mail,
+  Lock,
+  ArrowLeft,
+  ArrowRight,
+  KeyRound,
+  User,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  HelpCircle,
+} from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<'owner' | 'staff'>('owner');
 
   // Owner form state
-  const [ownerIdentifier, setOwnerIdentifier] = useState('');
+  const [ownerIdentifier, setOwnerIdentifier] = useState('owner@addiscafeteria.com');
   const [ownerPassword, setOwnerPassword] = useState('');
+  const [showOwnerPassword, setShowOwnerPassword] = useState(false);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoverySent, setRecoverySent] = useState(false);
 
   // Staff form state
-  const [staffUsername, setStaffUsername] = useState('');
-  const [staffPin, setStaffPin] = useState('');
+  const [staffUsername, setStaffUsername] = useState('staff_selam');
+  const [staffPassword, setStaffPassword] = useState('');
+  const [showStaffPassword, setShowStaffPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // ---------------------------------------------------------------------------
+  // OWNER AUTHENTICATION
+  // ---------------------------------------------------------------------------
   const handleOwnerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     triggerHaptic(10);
     setIsLoading(true);
     setErrorMsg(null);
+    setSuccessMsg(null);
 
     try {
-      const supabase = createClient();
-      if (ownerIdentifier.includes('@')) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: ownerIdentifier,
-          password: ownerPassword,
-        });
+      const result = await authenticateOwnerAsync(ownerIdentifier, ownerPassword);
 
-        if (error) {
-          if (ownerIdentifier.includes('owner') || ownerIdentifier.includes('admin') || ownerPassword === 'demo1234') {
-            router.push('/admin');
-            return;
-          }
-          setErrorMsg(error.message);
-        } else {
-          router.push('/admin');
-        }
-      } else {
-        // Phone / demo fallback
-        router.push('/admin');
-      }
-    } catch {
-      router.push('/admin');
-    } finally {
       setIsLoading(false);
+      if (!result.success) {
+        triggerHaptic(20);
+        setErrorMsg(result.error || 'Incorrect owner password. Access denied.');
+        return;
+      }
+
+      setSuccessMsg('Owner authenticated successfully. Loading dashboard...');
+      setTimeout(() => {
+        router.push('/admin');
+      }, 350);
+    } catch {
+      setIsLoading(false);
+      setErrorMsg('Authentication error. Please check your credentials and try again.');
     }
   };
 
+  // ---------------------------------------------------------------------------
+  // STAFF AUTHENTICATION
+  // ---------------------------------------------------------------------------
   const handleStaffLogin = (e: React.FormEvent) => {
     e.preventDefault();
     triggerHaptic(10);
     setIsLoading(true);
     setErrorMsg(null);
+    setSuccessMsg(null);
 
-    if (staffPin.length !== 4) {
-      setErrorMsg('Staff PIN must be exactly 4 digits');
-      setIsLoading(false);
-      return;
-    }
+    const result = authenticateStaff(staffUsername, staffPassword);
 
-    // Direct staff authentication
     setTimeout(() => {
       setIsLoading(false);
-      router.push('/admin');
-    }, 400);
+      if (!result.success) {
+        triggerHaptic(20);
+        setErrorMsg(result.error || 'Incorrect staff password / PIN. Access denied.');
+        return;
+      }
+
+      setSuccessMsg(`Welcome, ${result.session?.name}! Loading staff console...`);
+      setTimeout(() => {
+        router.push('/admin');
+      }, 350);
+    }, 300);
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  // ---------------------------------------------------------------------------
+  // FORGOT PASSWORD RECOVERY (OWNER ONLY)
+  // ---------------------------------------------------------------------------
+  const handleForgotPassword = (e: React.FormEvent) => {
     e.preventDefault();
     triggerHaptic(10);
     if (!recoveryEmail) return;
 
-    try {
-      const supabase = createClient();
-      await supabase.auth.resetPasswordForEmail(recoveryEmail);
+    const currentOwner = getOwnerProfile();
+    if (recoveryEmail.toLowerCase().trim() === currentOwner.email.toLowerCase().trim()) {
       setRecoverySent(true);
-    } catch {
-      setRecoverySent(true);
+    } else {
+      setErrorMsg('No owner account registered with this email address.');
     }
   };
 
@@ -111,11 +139,11 @@ export default function AdminLoginPage() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Restaurant Portal</h1>
           <p className="text-xs text-neutral-400 mt-1">
-            Choose whether to sign in as the Restaurant Owner or Service Staff
+            Secure authentication for Restaurant Owner and Service Staff
           </p>
         </div>
 
-        {/* Role Tabs */}
+        {/* Role Tabs: Owner vs Staff */}
         <div className="flex p-1 rounded-2xl bg-white/[0.04] border border-white/10 mb-6">
           <button
             type="button"
@@ -123,8 +151,9 @@ export default function AdminLoginPage() {
               triggerHaptic(8);
               setTab('owner');
               setErrorMsg(null);
+              setSuccessMsg(null);
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               tab === 'owner'
                 ? 'bg-amber-500 text-black shadow-md'
                 : 'text-neutral-400 hover:text-white'
@@ -138,38 +167,52 @@ export default function AdminLoginPage() {
               triggerHaptic(8);
               setTab('staff');
               setErrorMsg(null);
+              setSuccessMsg(null);
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               tab === 'staff'
                 ? 'bg-amber-500 text-black shadow-md'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
-            Staff Quick PIN
+            Staff Portal
           </button>
         </div>
 
+        {/* Error Alert */}
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
-            {errorMsg}
+          <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+            <span>{errorMsg}</span>
           </div>
         )}
 
-        {/* 1. OWNER LOGIN FORM */}
+        {/* Success Alert */}
+        {successMsg && (
+          <div className="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+            <span>{successMsg}</span>
+          </div>
+        )}
+
+        {/* =========================================================================
+            1. OWNER LOGIN FORM (Email/Phone + Password)
+           ========================================================================= */}
         {tab === 'owner' && !isForgotOpen && (
           <form onSubmit={handleOwnerLogin} className="flex flex-col gap-4">
             <div>
               <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
-                Owner Email or Phone
+                Owner Email or Phone Number
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   required
+                  data-testid="owner-identifier-input"
                   value={ownerIdentifier}
                   onChange={(e) => setOwnerIdentifier(e.target.value)}
-                  placeholder="owner@addis.com or +251911..."
+                  placeholder="owner@addiscafeteria.com or +251..."
                   className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
@@ -178,7 +221,7 @@ export default function AdminLoginPage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-neutral-300">
-                  Password
+                  Owner Password
                 </label>
                 <button
                   type="button"
@@ -186,7 +229,7 @@ export default function AdminLoginPage() {
                     setIsForgotOpen(true);
                     setRecoveryEmail(ownerIdentifier.includes('@') ? ownerIdentifier : '');
                   }}
-                  className="text-[11px] text-amber-400/90 hover:underline"
+                  className="text-[11px] text-amber-400/90 hover:underline cursor-pointer"
                 >
                   Forgot password?
                 </button>
@@ -194,61 +237,83 @@ export default function AdminLoginPage() {
               <div className="relative">
                 <Lock className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
                 <input
-                  type="password"
+                  type={showOwnerPassword ? 'text' : 'password'}
                   required
+                  data-testid="owner-password-input"
                   value={ownerPassword}
                   onChange={(e) => setOwnerPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowOwnerPassword(!showOwnerPassword)}
+                  className="absolute right-3.5 top-3.5 text-neutral-400 hover:text-white"
+                  aria-label={showOwnerPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showOwnerPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-60 cursor-pointer"
+              disabled={isLoading || !ownerPassword}
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer"
             >
-              <span>{isLoading ? 'Signing In...' : 'Sign In as Owner'}</span>
+              <span>{isLoading ? 'Authenticating...' : 'Sign In as Owner'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            {/* Quick Demo Fill */}
-            <div className="mt-4 pt-4 border-t border-white/10 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setOwnerIdentifier('owner@addis.com');
-                  setOwnerPassword('demo1234');
-                }}
-                className="text-[11px] text-amber-400/80 hover:text-amber-300"
-              >
-                Auto-fill Demo Owner Credentials
-              </button>
+            {/* Initial Seeded Hint Box */}
+            <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-neutral-300">
+              <div className="font-bold text-amber-400 text-[11px] mb-1 flex items-center gap-1">
+                <span>🔑 Default Initial Owner Credentials:</span>
+              </div>
+              <div className="text-[11px] font-mono space-y-0.5 text-neutral-300">
+                <div>Email: <strong className="text-white">owner@addiscafeteria.com</strong></div>
+                <div>Password: <strong className="text-white">Owner@2026</strong></div>
+              </div>
+              <p className="text-[10px] text-neutral-400 mt-1.5">
+                You can change your password and email at any time inside Settings!
+              </p>
             </div>
           </form>
         )}
 
-        {/* 1.1 OWNER FORGOT PASSWORD VIEW */}
+        {/* =========================================================================
+            1.1 OWNER FORGOT PASSWORD VIEW
+           ========================================================================= */}
         {tab === 'owner' && isForgotOpen && (
-          <form onSubmit={handleForgotPassword} className="flex flex-col gap-4">
+          <form onSubmit={handleForgotPassword} className="flex flex-col gap-4 animate-in fade-in">
             <h3 className="text-sm font-bold text-white">Reset Owner Password</h3>
             <p className="text-xs text-neutral-400">
-              Enter your registered email address and we will dispatch a secure reset link.
+              Enter your registered owner email address to receive password recovery instructions.
             </p>
 
             {recoverySent ? (
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center">
-                <div className="text-sm font-bold text-emerald-400 mb-1">Reset Link Dispatched</div>
+                <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+                <div className="text-sm font-bold text-emerald-400 mb-1">Recovery Dispatched</div>
                 <p className="text-xs text-neutral-300">
-                  Please check your inbox at <strong>{recoveryEmail}</strong>.
+                  Password instructions sent to <strong>{recoveryEmail}</strong>.
                 </p>
+                <div className="mt-3 p-2 rounded-lg bg-black/30 text-[11px] font-mono text-amber-300">
+                  Current password: {DEFAULT_OWNER_PROFILE.password}
+                </div>
                 <button
                   type="button"
-                  onClick={() => setIsForgotOpen(false)}
-                  className="mt-3 text-xs text-amber-400 underline font-semibold"
+                  onClick={() => {
+                    setIsForgotOpen(false);
+                    setRecoverySent(false);
+                  }}
+                  className="mt-4 text-xs text-amber-400 underline font-semibold block mx-auto cursor-pointer"
                 >
-                  Return to sign in
+                  Return to Sign In
                 </button>
               </div>
             ) : (
@@ -260,7 +325,7 @@ export default function AdminLoginPage() {
                     required
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
-                    placeholder="owner@addis.com"
+                    placeholder="owner@addiscafeteria.com"
                     className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500"
                   />
                 </div>
@@ -269,15 +334,15 @@ export default function AdminLoginPage() {
                   <button
                     type="button"
                     onClick={() => setIsForgotOpen(false)}
-                    className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold hover:bg-white/10"
+                    className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold hover:bg-white/10 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 h-10 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400"
+                    className="flex-1 h-10 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 cursor-pointer"
                   >
-                    Send Reset Link
+                    Send Recovery
                   </button>
                 </div>
               </>
@@ -285,21 +350,24 @@ export default function AdminLoginPage() {
           </form>
         )}
 
-        {/* 2. STAFF QUICK PIN LOGIN FORM */}
+        {/* =========================================================================
+            2. STAFF LOGIN FORM (Username/Phone + Password/PIN)
+           ========================================================================= */}
         {tab === 'staff' && (
           <form onSubmit={handleStaffLogin} className="flex flex-col gap-4">
             <div>
               <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
-                Staff Username or Phone
+                Staff Username or Phone Number
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   required
+                  data-testid="staff-username-input"
                   value={staffUsername}
                   onChange={(e) => setStaffUsername(e.target.value)}
-                  placeholder="e.g. tigist or 0911..."
+                  placeholder="e.g. staff_selam or +251..."
                   className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
                 />
               </div>
@@ -307,46 +375,59 @@ export default function AdminLoginPage() {
 
             <div>
               <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
-                4-Digit Staff PIN
+                Staff Password / PIN
               </label>
               <div className="relative">
                 <KeyRound className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
                 <input
-                  type="password"
-                  maxLength={4}
+                  type={showStaffPassword ? 'text' : 'password'}
                   required
-                  value={staffPin}
-                  onChange={(e) => setStaffPin(e.target.value.replace(/\D/g, ''))}
-                  placeholder="••••"
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-base font-mono tracking-widest text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  data-testid="staff-password-input"
+                  value={staffPassword}
+                  onChange={(e) => setStaffPassword(e.target.value)}
+                  placeholder="Enter staff password or PIN"
+                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowStaffPassword(!showStaffPassword)}
+                  className="absolute right-3.5 top-3.5 text-neutral-400 hover:text-white"
+                  aria-label={showStaffPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showStaffPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
-              <p className="text-[11px] text-neutral-400 mt-1">
-                PINs are created and reset by the restaurant owner in Settings.
+              <p className="text-[11px] text-neutral-400 mt-1.5 flex items-center gap-1">
+                <HelpCircle className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                <span>Forgot your staff password? Contact your restaurant owner to reset it.</span>
               </p>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading || staffPin.length !== 4}
-              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-60 cursor-pointer"
+              disabled={isLoading || !staffPassword}
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer"
             >
-              <span>{isLoading ? 'Verifying PIN...' : 'Open Staff Console'}</span>
+              <span>{isLoading ? 'Verifying Credentials...' : 'Open Staff Console'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            {/* Quick Demo Fill */}
-            <div className="mt-4 pt-4 border-t border-white/10 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setStaffUsername('tigist');
-                  setStaffPin('4821');
-                }}
-                className="text-[11px] text-amber-400/80 hover:text-amber-300"
-              >
-                Auto-fill Demo Staff Credentials (PIN: 4821)
-              </button>
+            {/* Initial Seeded Staff Hint */}
+            <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-neutral-300">
+              <div className="font-bold text-amber-400 text-[11px] mb-1">
+                🔑 Initial Seeded Staff Accounts:
+              </div>
+              <div className="text-[11px] font-mono space-y-1 text-neutral-300">
+                <div>• Username: <strong className="text-white">staff_selam</strong> | PIN: <strong className="text-white">1234</strong></div>
+                <div>• Username: <strong className="text-white">staff_yonas</strong> | PIN: <strong className="text-white">5678</strong></div>
+              </div>
+              <p className="text-[10px] text-neutral-400 mt-1.5">
+                Staff accounts are provisioned and passwords managed exclusively by the owner.
+              </p>
             </div>
           </form>
         )}

@@ -1,9 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Restaurant, StaffAccount } from '@/types/database';
 import { triggerHaptic } from '@/lib/utils';
+import {
+  getOwnerProfile,
+  updateOwnerProfile,
+  changeOwnerPassword,
+  getStaffAccounts,
+  createStaffAccount,
+  updateStaffPassword,
+  toggleStaffActive,
+  deleteStaffAccount,
+  OwnerProfile,
+} from '@/lib/auth-service';
 import {
   Settings,
   QrCode,
@@ -22,6 +33,13 @@ import {
   Coins,
   Receipt,
   Check,
+  User,
+  Mail,
+  Phone,
+  Lock,
+  Eye,
+  EyeOff,
+  Edit2,
 } from 'lucide-react';
 
 interface SettingsSectionProps {
@@ -54,31 +72,37 @@ export function SettingsSection({
   const [wifiSsid, setWifiSsid] = useState(restaurant.wifi_config?.ssid || 'Addis-Guest');
   const [wifiPassword, setWifiPassword] = useState(restaurant.wifi_config?.password || '');
 
+  // Owner Account & Security State
+  const [ownerProfile, setOwnerProfile] = useState<OwnerProfile>(() => getOwnerProfile());
+  const [ownerName, setOwnerName] = useState(ownerProfile.name);
+  const [ownerEmail, setOwnerEmail] = useState(ownerProfile.email);
+  const [ownerPhone, setOwnerPhone] = useState(ownerProfile.phone);
+
+  const [currentOwnerPassword, setCurrentOwnerPassword] = useState('');
+  const [newOwnerPassword, setNewOwnerPassword] = useState('');
+  const [confirmOwnerPassword, setConfirmOwnerPassword] = useState('');
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [isChangingOwnerPassword, setIsChangingOwnerPassword] = useState(false);
+
   // Staff Management State
-  const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>([
-    {
-      id: 'staff-1',
-      restaurant_id: restaurant.id,
-      name: 'Tigist Haile',
-      username: 'tigist',
-      pin_code: '4821',
-      role: 'staff',
-      is_active: true,
-    },
-    {
-      id: 'staff-2',
-      restaurant_id: restaurant.id,
-      name: 'Dawit Bekele',
-      username: 'dawit',
-      pin_code: '1974',
-      role: 'staff',
-      is_active: true,
-    },
-  ]);
+  const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>(() => getStaffAccounts());
   const [isAddingStaff, setIsAddingStaff] = useState(false);
   const [newStaffName, setNewStaffName] = useState('');
   const [newStaffUsername, setNewStaffUsername] = useState('');
   const [newStaffPin, setNewStaffPin] = useState('');
+  const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
+  const [editingStaffPin, setEditingStaffPin] = useState('');
+
+  // Sync auth state on client mount
+  useEffect(() => {
+    const prof = getOwnerProfile();
+    setOwnerProfile(prof);
+    setOwnerName(prof.name);
+    setOwnerEmail(prof.email);
+    setOwnerPhone(prof.phone);
+    setStaffAccounts(getStaffAccounts());
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,6 +127,42 @@ export function SettingsSection({
     onShowToast('Restaurant settings and tax configuration saved.', 'success');
   };
 
+  // Owner Actions
+  const handleSaveOwnerProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerHaptic(10);
+    const updated = updateOwnerProfile({
+      name: ownerName.trim(),
+      email: ownerEmail.trim(),
+      phone: ownerPhone.trim(),
+    });
+    setOwnerProfile(updated);
+    onShowToast('Owner profile details updated successfully!', 'success');
+  };
+
+  const handleChangeOwnerPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerHaptic(12);
+
+    if (newOwnerPassword !== confirmOwnerPassword) {
+      onShowToast('New password and confirmation do not match.', 'error');
+      return;
+    }
+
+    const result = changeOwnerPassword(currentOwnerPassword, newOwnerPassword);
+    if (!result.success) {
+      onShowToast(result.error || 'Failed to update owner password.', 'error');
+      return;
+    }
+
+    setOwnerProfile(getOwnerProfile());
+    setCurrentOwnerPassword('');
+    setNewOwnerPassword('');
+    setConfirmOwnerPassword('');
+    setIsChangingOwnerPassword(false);
+    onShowToast('Owner password changed successfully!', 'success');
+  };
+
   // Staff Actions
   const handleAddStaff = (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,45 +170,60 @@ export function SettingsSection({
       onShowToast('Please fill all staff fields.', 'error');
       return;
     }
-    if (newStaffPin.trim().length !== 4 || isNaN(Number(newStaffPin))) {
-      onShowToast('PIN code must be exactly 4 digits.', 'error');
-      return;
-    }
 
-    const newStaff: StaffAccount = {
-      id: `staff-${Date.now()}`,
-      restaurant_id: restaurant.id,
-      name: newStaffName.trim(),
-      username: newStaffUsername.trim().toLowerCase(),
-      pin_code: newStaffPin.trim(),
-      role: 'staff',
-      is_active: true,
-    };
+    const created = createStaffAccount({
+      name: newStaffName,
+      username: newStaffUsername,
+      passwordOrPin: newStaffPin,
+      restaurantId: restaurant.id,
+    });
 
-    setStaffAccounts((prev) => [...prev, newStaff]);
+    setStaffAccounts(getStaffAccounts());
     setNewStaffName('');
     setNewStaffUsername('');
     setNewStaffPin('');
     setIsAddingStaff(false);
     triggerHaptic(12);
-    onShowToast(`Staff account created for ${newStaff.name} (PIN: ${newStaff.pin_code})`, 'success');
+    onShowToast(`Staff account created for ${created.name} (Password/PIN: ${created.pin_code})`, 'success');
+  };
+
+  const handleUpdateStaffPin = (staffId: string) => {
+    if (!editingStaffPin.trim()) {
+      onShowToast('Please enter a new password or PIN.', 'error');
+      return;
+    }
+    const res = updateStaffPassword(staffId, editingStaffPin);
+    if (res.success) {
+      setStaffAccounts(getStaffAccounts());
+      setEditingStaffId(null);
+      setEditingStaffPin('');
+      triggerHaptic(10);
+      onShowToast('Staff password updated successfully!', 'success');
+    } else {
+      onShowToast(res.error || 'Failed to update staff password.', 'error');
+    }
   };
 
   const handleResetPin = (staffId: string) => {
     triggerHaptic(12);
     const randomPin = Math.floor(1000 + Math.random() * 9000).toString();
-    setStaffAccounts((prev) =>
-      prev.map((s) => (s.id === staffId ? { ...s, pin_code: randomPin } : s))
-    );
+    updateStaffPassword(staffId, randomPin);
+    setStaffAccounts(getStaffAccounts());
     const staff = staffAccounts.find((s) => s.id === staffId);
-    onShowToast(`New PIN for ${staff?.name}: ${randomPin}`, 'info');
+    onShowToast(`New PIN generated for ${staff?.name}: ${randomPin}`, 'info');
   };
 
   const handleToggleStaffActive = (staffId: string) => {
     triggerHaptic(8);
-    setStaffAccounts((prev) =>
-      prev.map((s) => (s.id === staffId ? { ...s, is_active: !s.is_active } : s))
-    );
+    const updated = toggleStaffActive(staffId);
+    setStaffAccounts(updated);
+  };
+
+  const handleDeleteStaff = (staffId: string) => {
+    triggerHaptic(10);
+    const updated = deleteStaffAccount(staffId);
+    setStaffAccounts(updated);
+    onShowToast('Staff account removed.', 'info');
   };
 
   // Tenant Data Export (JSON dump)
@@ -294,6 +369,205 @@ export function SettingsSection({
 
         {/* RIGHT COLUMN: OPERATIONS, TAX MODE, CURRENCY & STAFF (7 Cols) */}
         <div className="lg:col-span-7 flex flex-col gap-6">
+          {/* OWNER ACCOUNT & PASSWORD SECURITY (Master Credentials) */}
+          <div className="p-6 rounded-2xl bg-[#12141C] border border-amber-500/20 space-y-5 shadow-lg shadow-black/40">
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>Restaurant Owner Account & Security</span>
+                </h3>
+                <p className="text-[11px] text-neutral-400 mt-0.5">
+                  Master administrative account with complete control. Seeded initially and customizable anytime.
+                </p>
+              </div>
+              <div className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold">
+                Owner Role
+              </div>
+            </div>
+
+            {/* Owner Details Form */}
+            <form onSubmit={handleSaveOwnerProfile} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Owner Full Name
+                  </label>
+                  <div className="relative">
+                    <User className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={ownerName}
+                      onChange={(e) => setOwnerName(e.target.value)}
+                      placeholder="Owner Name"
+                      className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Login Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-3" />
+                    <input
+                      type="email"
+                      value={ownerEmail}
+                      onChange={(e) => setOwnerEmail(e.target.value)}
+                      placeholder="owner@restaurant.com"
+                      className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Login Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={ownerPhone}
+                      onChange={(e) => setOwnerPhone(e.target.value)}
+                      placeholder="+251 911 223 344"
+                      className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-colors border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Update Profile Info</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Change Password Section */}
+            <div className="pt-4 border-t border-white/5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Owner Password</span>
+                </div>
+                {!isChangingOwnerPassword && (
+                  <button
+                    type="button"
+                    onClick={() => setIsChangingOwnerPassword(true)}
+                    className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>Change Owner Password</span>
+                  </button>
+                )}
+              </div>
+
+              {isChangingOwnerPassword ? (
+                <form onSubmit={handleChangeOwnerPassword} className="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3 animate-in fade-in">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                        Current Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showCurrentPass ? 'text' : 'password'}
+                          value={currentOwnerPassword}
+                          onChange={(e) => setCurrentOwnerPassword(e.target.value)}
+                          placeholder="Current password"
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 pr-8"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPass(!showCurrentPass)}
+                          className="absolute right-2.5 top-2.5 text-neutral-400 hover:text-white"
+                        >
+                          {showCurrentPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                        New Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewPass ? 'text' : 'password'}
+                          value={newOwnerPassword}
+                          onChange={(e) => setNewOwnerPassword(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 pr-8"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPass(!showNewPass)}
+                          className="absolute right-2.5 top-2.5 text-neutral-400 hover:text-white"
+                        >
+                          {showNewPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmOwnerPassword}
+                        onChange={(e) => setConfirmOwnerPassword(e.target.value)}
+                        placeholder="Re-type new password"
+                        className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChangingOwnerPassword(false);
+                        setCurrentOwnerPassword('');
+                        setNewOwnerPassword('');
+                        setConfirmOwnerPassword('');
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-xs font-semibold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold cursor-pointer"
+                    >
+                      Save New Password
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs text-neutral-400">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm tracking-widest text-neutral-300">••••••••••••</span>
+                    <span>(Password Protected)</span>
+                  </div>
+                  <span className="text-[11px] text-emerald-400 font-semibold">Active & Encrypted</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <form onSubmit={handleSave} className="p-6 rounded-2xl bg-[#12141C] border border-white/5 space-y-5">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -593,50 +867,103 @@ export function SettingsSection({
               {staffAccounts.map((staff) => (
                 <div
                   key={staff.id}
-                  className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between"
+                  className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col gap-2.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
-                      {staff.name.charAt(0)}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+                        {staff.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white flex items-center gap-2">
+                          <span>{staff.name}</span>
+                          <span className="text-[10px] font-normal text-neutral-400">
+                            (@{staff.username})
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-neutral-400 font-mono mt-0.5 flex items-center gap-2">
+                          <span>Password/PIN: <strong className="text-neutral-300">••••</strong></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${staff.is_active ? 'bg-emerald-500' : 'bg-neutral-600'}`} />
+                          <span>{staff.is_active ? 'Active' : 'Inactive'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-white flex items-center gap-2">
-                        <span>{staff.name}</span>
-                        <span className="text-[10px] font-normal text-neutral-400">
-                          (@{staff.username})
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-neutral-400 font-mono mt-0.5 flex items-center gap-2">
-                        <span>PIN: **** (Set)</span>
-                        <span className={`w-1.5 h-1.5 rounded-full ${staff.is_active ? 'bg-emerald-500' : 'bg-neutral-600'}`} />
-                        <span>{staff.is_active ? 'Active' : 'Inactive'}</span>
-                      </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic(8);
+                          if (editingStaffId === staff.id) {
+                            setEditingStaffId(null);
+                          } else {
+                            setEditingStaffId(staff.id);
+                            setEditingStaffPin('');
+                          }
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-[11px] font-semibold flex items-center gap-1 border border-white/10 transition-colors cursor-pointer"
+                        title="Change staff password"
+                      >
+                        <KeyRound className="w-3 h-3 text-amber-400" />
+                        <span>{editingStaffId === staff.id ? 'Close' : 'Set Password'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResetPin(staff.id)}
+                        className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-[11px] font-semibold flex items-center gap-1 border border-white/10 transition-colors cursor-pointer"
+                        title="1-tap PIN reset"
+                      >
+                        <RefreshCw className="w-3 h-3 text-amber-400" />
+                        <span>Reset</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStaffActive(staff.id)}
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer ${
+                          staff.is_active
+                            ? 'bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20'
+                            : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20'
+                        }`}
+                      >
+                        {staff.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteStaff(staff.id)}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/20 text-neutral-400 hover:text-rose-300 border border-white/5 transition-colors cursor-pointer"
+                        title="Delete staff account"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleResetPin(staff.id)}
-                      className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-[11px] font-semibold flex items-center gap-1 border border-white/10 transition-colors cursor-pointer"
-                      title="1-tap PIN reset"
-                    >
-                      <RefreshCw className="w-3 h-3 text-amber-400" />
-                      <span>Reset PIN</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStaffActive(staff.id)}
-                      className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer ${
-                        staff.is_active
-                          ? 'bg-rose-500/10 text-rose-300 border-rose-500/20 hover:bg-rose-500/20'
-                          : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20'
-                      }`}
-                    >
-                      {staff.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
-                  </div>
+                  {/* Inline Staff Password Editing */}
+                  {editingStaffId === staff.id && (
+                    <div className="pt-2 border-t border-white/5 flex items-center gap-2 animate-in fade-in">
+                      <div className="relative flex-1">
+                        <KeyRound className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-2.5" />
+                        <input
+                          type="text"
+                          value={editingStaffPin}
+                          onChange={(e) => setEditingStaffPin(e.target.value)}
+                          placeholder="Enter new password or PIN for this staff member"
+                          className="w-full pl-8 pr-3 py-1.5 bg-black/40 border border-amber-500/30 rounded-lg text-white text-xs font-mono focus:outline-none focus:border-amber-500"
+                          autoFocus
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateStaffPin(staff.id)}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold cursor-pointer"
+                      >
+                        Save Password
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

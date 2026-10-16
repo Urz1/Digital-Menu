@@ -15,12 +15,16 @@ import {
   QrCode,
   MoreHorizontal,
   X,
+  LogOut,
 } from 'lucide-react';
+import { AdminAuthSession } from '@/lib/auth-service';
 
 interface AdminBottomNavProps {
   activeSection: AdminSection;
   onSelectSection: (section: AdminSection) => void;
   userRole: UserRole;
+  session?: AdminAuthSession | null;
+  onSignOut?: () => void;
   badgeCounts: {
     requests: number;
     reviewsAttention: number;
@@ -32,6 +36,8 @@ export function AdminBottomNav({
   activeSection,
   onSelectSection,
   userRole,
+  session,
+  onSignOut,
   badgeCounts,
 }: AdminBottomNavProps) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -104,6 +110,7 @@ export function AdminBottomNav({
         {/* More Button if overflow exists */}
         {overflowItems.length > 0 && (
           <button
+            data-testid="mobile-bottom-more-btn"
             onClick={() => {
               triggerHaptic(8);
               setIsMoreOpen(true);
@@ -161,6 +168,25 @@ export function AdminBottomNav({
                 );
               })}
             </div>
+
+            {/* Mobile Sign Out Button */}
+            {onSignOut && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  data-testid="mobile-signout-btn"
+                  onClick={() => {
+                    setIsMoreOpen(false);
+                    triggerHaptic(10);
+                    onSignOut();
+                  }}
+                  className="w-full h-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 hover:bg-rose-500/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out ({session?.identifier || userRole})</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

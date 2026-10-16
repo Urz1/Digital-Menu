@@ -90,7 +90,7 @@ test.describe('Stage 4: Dish Reviews System - End to End Flow', () => {
     await expect(page.locator('h1:has-text("Addis Cafeteria")')).toBeVisible();
 
     // Switch to Dish Reviews tab
-    const reviewsTab = page.locator('button:has-text("Dish Reviews")');
+    const reviewsTab = page.locator('[data-testid="admin-nav-reviews"]:visible').first();
     await expect(reviewsTab).toBeVisible();
     await reviewsTab.click({ force: true });
 
@@ -108,10 +108,16 @@ test.describe('Stage 4: Dish Reviews System - End to End Flow', () => {
     await expect(page.locator('text=Check out cheap crypto telegram')).toBeVisible();
     await expect(page.locator('text=Reported by guests as spam advertisement')).toBeVisible();
 
-    // Test STAFF PERMISSION: Switch to Staff Mode
-    const staffModeBtn = page.locator('button:has-text("Staff Mode")');
-    await staffModeBtn.scrollIntoViewIfNeeded();
-    await staffModeBtn.click({ force: true });
+    // Test STAFF PERMISSION: Sign in as Staff
+    await page.goto('/admin/login');
+    await page.locator('button:has-text("Staff Portal")').click();
+    await page.locator('input[placeholder*="staff_selam"]').fill('staff_selam');
+    await page.locator('input[placeholder="Enter staff password or PIN"]').fill('1234');
+    await page.locator('button:has-text("Open Staff Console")').click();
+    await expect(page).toHaveURL(/.*\/admin/);
+    await expect(page.locator('[data-testid="role-badge"]')).toContainText('staff Mode');
+    await page.locator('[data-testid="admin-nav-reviews"]:visible').first().click({ force: true });
+    await page.locator('button:has-text("Needs Attention")').click({ force: true });
     await expect(page.locator('text=Only owners can remove')).toBeVisible();
     await expect(page.locator('button:has-text("Remove Review")')).toBeHidden();
 
@@ -122,20 +128,29 @@ test.describe('Stage 4: Dish Reviews System - End to End Flow', () => {
 
     // Suggested starters appear
     await expect(page.locator('text=Quick Polite Starters')).toBeVisible();
-    const starterChip = page.locator('button:has-text("Thank you for your kind words")').first();
-    await starterChip.scrollIntoViewIfNeeded();
-    await starterChip.click({ force: true });
+    const replyTextarea = page.locator('textarea[placeholder*="Write your public response"]');
+    await expect(replyTextarea).toBeVisible();
+    await replyTextarea.fill('Thank you for letting us know. Our kitchen team has reviewed this note.');
 
     // Staff posts reply
     const postReplyBtn = page.locator('button:has-text("Post Public Reply")');
-    await postReplyBtn.scrollIntoViewIfNeeded();
-    await postReplyBtn.click({ force: true });
+    await expect(postReplyBtn).toBeVisible();
+    await postReplyBtn.click();
     await expect(page.locator('text=Public Response')).toBeVisible();
 
-    // Test OWNER PERMISSION: Switch back to Owner Mode
-    const ownerModeBtn = page.locator('button:has-text("Owner Mode")');
-    await ownerModeBtn.scrollIntoViewIfNeeded();
-    await ownerModeBtn.click({ force: true });
+    // Test OWNER PERMISSION: Sign back in as Owner
+    await page.goto('/admin/login');
+    const ownerTab = page.locator('button:has-text("Owner Portal")');
+    if (await ownerTab.isVisible()) {
+      await ownerTab.click();
+    }
+    await page.locator('[data-testid="owner-identifier-input"]').fill('owner@addiscafeteria.com');
+    await page.locator('[data-testid="owner-password-input"]').fill('Owner@2026');
+    await page.locator('button:has-text("Sign In as Owner")').click();
+    await expect(page).toHaveURL(/.*\/admin/);
+    await expect(page.locator('[data-testid="role-badge"]')).toContainText('owner Mode');
+    await page.locator('[data-testid="admin-nav-reviews"]:visible').first().click({ force: true });
+    await page.locator('button:has-text("Needs Attention")').click({ force: true });
 
     // Owner can remove review with required reason
     const removeBtn = page.locator('button:has-text("Remove Review")').first();

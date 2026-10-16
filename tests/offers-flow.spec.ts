@@ -7,7 +7,7 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await expect(page.locator('h1:has-text("Addis Cafeteria")')).toBeVisible();
 
     // Switch to Offers & Deals tab
-    const offersTab = page.locator('button:has-text("Offers & Deals")');
+    const offersTab = page.locator('[data-testid="admin-nav-offers"]:visible').first();
     await expect(offersTab).toBeVisible();
     await offersTab.click();
 
@@ -16,7 +16,7 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await expect(page.locator('text=Offer Views')).toBeVisible();
 
     // Click "Create Offer" button (under 90s flow)
-    const createBtn = page.locator('button:has-text("Create Offer")');
+    const createBtn = page.locator('[data-testid="manager-create-offer-btn"]').or(page.locator('button:has-text("Create Offer")')).first();
     await expect(createBtn).toBeVisible();
     await createBtn.click();
 
@@ -138,13 +138,17 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await page.goto('/admin');
     await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
 
-    // Switch to Staff Mode
-    const staffModeBtn = page.locator('[data-testid="role-btn-staff"]').or(page.locator('button:has-text("Staff Mode")'));
-    await staffModeBtn.click();
+    // Sign in as Staff
+    await page.goto('/admin/login');
+    await page.locator('button:has-text("Staff Portal")').click();
+    await page.locator('input[placeholder*="staff_selam"]').fill('staff_selam');
+    await page.locator('input[placeholder="Enter staff password or PIN"]').fill('1234');
+    await page.locator('button:has-text("Open Staff Console")').click();
+    await expect(page).toHaveURL(/.*\/admin/);
     await expect(page.locator('[data-testid="role-badge"]')).toContainText('staff Mode');
 
     // Navigate to Offers tab
-    const offersNav = page.locator('[data-testid="admin-nav-offers"]').or(page.locator('[role="button"]:has-text("Offers & Deals")')).or(page.locator('button:has-text("Offers & Deals")')).first();
+    const offersNav = page.locator('[data-testid="admin-nav-offers"]:visible').first();
     await offersNav.click();
 
     // Verify "Create Offer" button is NOT present in Staff mode

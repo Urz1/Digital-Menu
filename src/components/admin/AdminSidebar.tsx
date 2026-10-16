@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Restaurant, UserRole } from '@/types/database';
+import { AdminAuthSession } from '@/lib/auth-service';
 import { triggerHaptic } from '@/lib/utils';
 import {
   Home,
@@ -16,6 +17,9 @@ import {
   ExternalLink,
   HelpCircle,
   Sparkles,
+  LogOut,
+  Shield,
+  User,
 } from 'lucide-react';
 
 export type AdminSection =
@@ -34,7 +38,9 @@ interface AdminSidebarProps {
   activeSection: AdminSection;
   onSelectSection: (section: AdminSection) => void;
   userRole: UserRole;
-  onRoleChange: (role: UserRole) => void;
+  onRoleChange?: (role: UserRole) => void;
+  session?: AdminAuthSession | null;
+  onSignOut?: () => void;
   badgeCounts: {
     requests: number;
     reviewsAttention: number;
@@ -55,6 +61,8 @@ export function AdminSidebar({
   onSelectSection,
   userRole,
   onRoleChange,
+  session,
+  onSignOut,
   badgeCounts,
   onboardingProgress,
   onOpenOnboarding,
@@ -220,27 +228,38 @@ export function AdminSidebar({
           </div>
         )}
 
-        {/* Role Switcher Pill (Owner vs Staff Only) */}
-        <div className="p-1 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-[11px]">
-          {(['owner', 'staff'] as const).map((r) => (
+        {/* Authenticated Account Info & Sign Out */}
+        <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+              userRole === 'owner' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+            }`}>
+              {userRole === 'owner' ? <Shield className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-white truncate">
+                {session?.name || (userRole === 'owner' ? 'Restaurant Owner' : 'Staff Member')}
+              </div>
+              <div className="text-[10px] text-neutral-400 truncate font-mono">
+                {session?.identifier || (userRole === 'owner' ? 'owner@addiscafeteria.com' : 'staff')}
+              </div>
+            </div>
+          </div>
+
+          {onSignOut && (
             <button
-              key={r}
+              type="button"
+              data-testid="sidebar-signout-btn"
               onClick={() => {
                 triggerHaptic(10);
-                onRoleChange(r);
-                if (r === 'staff' && activeSection !== 'menu' && activeSection !== 'reviews') {
-                  onSelectSection('menu');
-                }
+                onSignOut();
               }}
-              className={`flex-1 py-1 rounded-lg font-bold capitalize transition-all ${
-                userRole === r
-                  ? 'bg-amber-500 text-black shadow-xs'
-                  : 'text-neutral-400 hover:text-white'
-              }`}
+              className="w-full h-8 rounded-xl bg-white/5 hover:bg-rose-500/15 border border-white/10 hover:border-rose-500/30 text-[11px] font-semibold text-neutral-300 hover:text-rose-300 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              {r}
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
             </button>
-          ))}
+          )}
         </div>
 
         {/* Quick Links & Help */}

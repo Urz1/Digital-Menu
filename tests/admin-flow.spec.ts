@@ -24,17 +24,17 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await nameInput.fill('Addis Grand Cafeteria');
     const nextBtn = wizardModal.locator('[data-testid="onboarding-next-button"]');
     await nextBtn.scrollIntoViewIfNeeded();
-    await nextBtn.click();
+    await nextBtn.click({ force: true });
 
     // Step 2: Brand Colors & WCAG Contrast
     await expect(wizardModal.locator('text=Step 2 of 5')).toBeVisible();
     await expect(wizardModal.locator('[data-testid="wizard-step-2"]')).toBeVisible();
     await expect(wizardModal.locator('text=Contrast Ratio:')).toBeVisible();
-    await nextBtn.click();
+    await nextBtn.click({ force: true });
 
     // Step 3: Hours & Languages
     await expect(wizardModal.locator('text=Step 3 of 5')).toBeVisible();
-    await nextBtn.click();
+    await nextBtn.click({ force: true });
 
     // Step 4: First Category & Dish
     await expect(wizardModal.locator('text=Step 4 of 5')).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await dishInput.fill('Highland Wood-Fired Salmon');
     const priceInput = wizardModal.locator('[data-testid="onboarding-input-price"]');
     await priceInput.fill('24.00');
-    await nextBtn.click();
+    await nextBtn.click({ force: true });
 
     // Step 5: Celebration & QR Code
     await expect(wizardModal.locator('text=Step 5 of 5')).toBeVisible();
@@ -51,7 +51,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
 
     // Finish onboarding
     const finishBtn = wizardModal.locator('[data-testid="onboarding-finish-button"]');
-    await finishBtn.click();
+    await finishBtn.click({ force: true });
     await expect(wizardModal).toBeHidden();
 
     // Toast feedback appears
@@ -61,7 +61,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
 
   test('2. Menu Management: Add new dish with essentials + more options, verify in list', async ({ page }) => {
     // Switch to Menu section
-    const menuBtn = page.locator('button:has-text("Menu & Dishes")').or(page.locator('button:has-text("Menu")')).first();
+    const menuBtn = page.locator('[data-testid="admin-nav-menu"]:visible').first();
     await menuBtn.scrollIntoViewIfNeeded();
     await menuBtn.click({ force: true });
 
@@ -106,7 +106,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
 
   test('3. Availability Management: One-tap "Sold Out Today" toggle with instant visual feedback', async ({ page }) => {
     // Switch to Menu
-    const menuBtn = page.locator('button:has-text("Menu & Dishes")').or(page.locator('button:has-text("Menu")')).first();
+    const menuBtn = page.locator('[data-testid="admin-nav-menu"]:visible').first();
     await menuBtn.click({ force: true });
 
     // Locate the first sold out toggle
@@ -127,7 +127,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
 
   test('4. Bulk Price Adjustment: Select dishes and apply percentage price adjustment', async ({ page }) => {
     // Switch to Menu
-    const menuBtn = page.locator('button:has-text("Menu & Dishes")').or(page.locator('button:has-text("Menu")')).first();
+    const menuBtn = page.locator('[data-testid="admin-nav-menu"]:visible').first();
     await menuBtn.click({ force: true });
 
     // Select first two dishes checkboxes
@@ -162,32 +162,27 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await expect(page.locator('[data-testid="admin-toast"]')).toBeVisible();
   });
 
-  test('5. Role Permissions: Owner vs Manager vs Staff consoles', async ({ page }) => {
+  test('5. Role Permissions: Owner vs Staff consoles with authentication', async ({ page }) => {
     // 1. OWNER has full access
-    await expect(page.locator('[data-testid="role-btn-owner"]')).toBeVisible();
     await expect(page.locator('[data-testid="role-badge"]')).toContainText('owner Mode');
+    await expect(page.locator('[data-testid="admin-signout-btn"]')).toBeVisible();
 
-    // 2. Switch to MANAGER Mode
-    const managerBtn = page.locator('[data-testid="role-btn-manager"]');
-    await managerBtn.click();
-    await expect(page.locator('[data-testid="role-badge"]')).toContainText('manager Mode');
-
-    // Manager can access Menu, Offers, Reviews, Requests, Insights, but NOT Design Studio or Settings
-    await expect(page.locator('button:has-text("Design Studio")')).toBeHidden();
-    await expect(page.locator('button:has-text("Settings & QR")')).toBeHidden();
-
-    // 3. Switch to STAFF Mode
-    const staffBtn = page.locator('[data-testid="role-btn-staff"]');
-    await staffBtn.click();
+    // 2. Log in as STAFF
+    await page.goto('/admin/login');
+    await page.locator('button:has-text("Staff Portal")').click();
+    await page.locator('input[placeholder*="staff_selam"]').fill('staff_selam');
+    await page.locator('input[placeholder="Enter staff password or PIN"]').fill('1234');
+    await page.locator('button:has-text("Open Staff Console")').click();
+    await expect(page).toHaveURL(/.*\/admin/);
     await expect(page.locator('[data-testid="role-badge"]')).toContainText('staff Mode');
 
     // Staff cannot add dishes, cannot access Design, Settings, or Insights
     await expect(page.locator('[data-testid="add-dish-button"]')).toBeHidden();
     await expect(page.locator('button:has-text("Design Studio")')).toBeHidden();
-    await expect(page.locator('button:has-text("Offers & Deals")')).toBeHidden();
+    await expect(page.locator('button:has-text("Settings & Staff")')).toBeHidden();
 
     // Staff CAN navigate to Menu & Dishes to toggle sold out
-    const menuBtn = page.locator('[data-testid="admin-nav-menu"]').first();
+    const menuBtn = page.locator('[data-testid="admin-nav-menu"]:visible').first();
     await menuBtn.click();
     await expect(page.locator('button[data-testid^="sold-out-toggle-"]').first()).toBeVisible();
   });

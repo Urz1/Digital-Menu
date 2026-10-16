@@ -8,20 +8,23 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:3005',
+    baseURL: 'http://127.0.0.1:3005',
     trace: 'on-first-retry',
     viewport: { width: 412, height: 915 }, // Mobile-first viewport
   },
   webServer: {
-    command: 'WATCHPACK_POLLING=true npx next dev --webpack -p 3005',
-    url: 'http://localhost:3005',
+    command: 'npx next start -H 127.0.0.1 -p 3005',
+    url: 'http://127.0.0.1:3005',
     reuseExistingServer: true,
-    timeout: 120 * 1000,
+    timeout: 30 * 1000,
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Pixel 7'] },
+      use: {
+        ...devices['Pixel 7'],
+        userAgent: `${devices['Pixel 7'].userAgent} Playwright`,
+      },
     },
   ],
 });

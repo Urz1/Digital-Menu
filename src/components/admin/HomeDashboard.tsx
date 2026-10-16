@@ -366,12 +366,11 @@ export function HomeDashboard({
         </div>
       </section>
 
-      {/* Onboarding Next Steps Checklist (if not 100% complete) */}
-      {completedCount < totalCount && (
-        <section
-          aria-labelledby="checklist-heading"
-          className="p-5 md:p-6 rounded-2xl bg-[#12141C] border border-amber-500/20 shadow-md"
-        >
+      {/* Onboarding Next Steps Checklist */}
+      <section
+        aria-labelledby="checklist-heading"
+        className="p-5 md:p-6 rounded-2xl bg-[#12141C] border border-amber-500/20 shadow-md"
+      >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
@@ -443,7 +442,6 @@ export function HomeDashboard({
             ))}
           </div>
         </section>
-      )}
 
       {/* Two-Column Details: Recent Reviews & Active Running Offers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

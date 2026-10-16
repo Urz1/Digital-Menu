@@ -565,6 +565,7 @@ export function OffersManager({
 
         {!isStaff ? (
           <button
+            data-testid="manager-create-offer-btn"
             onClick={handleStartCreateOffer}
             className="px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-950/30 transition-transform active:scale-95"
           >

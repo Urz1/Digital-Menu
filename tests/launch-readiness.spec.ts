@@ -134,7 +134,13 @@ test.describe('STAGE 6: Launch Readiness & QR Studio Suite', () => {
     // Navigate to Admin Settings
     await page.goto('/admin');
     await page.waitForLoadState('networkidle');
-    await page.getByRole('button', { name: /Settings/i }).click();
+    const settingsBtn = page.locator('aside [data-testid="admin-nav-settings"]').or(page.locator('button:has-text("Settings & Staff")'));
+    if (await settingsBtn.first().isVisible().catch(() => false)) {
+      await settingsBtn.first().click();
+    } else {
+      await page.getByTestId('mobile-bottom-more-btn').click();
+      await page.locator('button:has-text("Settings & Staff"):visible').click();
+    }
 
     // Verify Privacy & Data Compliance section in Settings
     await expect(page.getByText('Data Privacy & Tenant Ownership')).toBeVisible();
