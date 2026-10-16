@@ -1890,11 +1890,28 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
 
       if (!error && data && data.length > 0) {
         inMemoryItems = data as MenuItem[];
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('digital_menu_items_cache', JSON.stringify(inMemoryItems));
+          } catch {}
+        }
         return inMemoryItems;
       }
     } catch {
       // Fallback below
     }
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = localStorage.getItem('digital_menu_items_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          inMemoryItems = parsed;
+        }
+      }
+    } catch {}
   }
 
   return inMemoryItems;
@@ -2799,6 +2816,12 @@ export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuIte
 
   // Broadcast update immediately to customer menu view across tabs/windows
   broadcastSync({ type: 'ITEM_UPDATED', item: savedItem });
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('digital_menu_items_cache', JSON.stringify(inMemoryItems));
+    } catch {}
+  }
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {

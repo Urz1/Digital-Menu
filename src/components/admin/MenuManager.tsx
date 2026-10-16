@@ -961,6 +961,7 @@ export function MenuManager({
                           type="file"
                           accept="image/*"
                           capture="environment"
+                          data-testid="dish-camera-input"
                           className="hidden"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
@@ -983,6 +984,7 @@ export function MenuManager({
                         <input
                           type="file"
                           accept="image/*"
+                          data-testid="dish-gallery-input"
                           className="hidden"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];

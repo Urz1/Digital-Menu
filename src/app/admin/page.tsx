@@ -97,7 +97,18 @@ export default function AdminDashboardPage() {
 
   // Core Data State
   const [restaurant, setRestaurant] = useState<Restaurant>(MOCK_RESTAURANT_ADDIS);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(MOCK_ITEMS_ADDIS);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('digital_menu_items_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return MOCK_ITEMS_ADDIS;
+  });
   const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES_ADDIS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
@@ -148,7 +159,14 @@ export default function AdminDashboardPage() {
 
   // Poll / fetch live data & listen to real-time events
   useEffect(() => {
-    getMenuItems(restaurant.id).then(setMenuItems);
+    getMenuItems(restaurant.id).then((items) => {
+      setMenuItems(items);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('digital_menu_items_cache', JSON.stringify(items));
+        } catch {}
+      }
+    });
     getMenuCategories(restaurant.id).then(setCategories);
     getLiveOrders(restaurant.id).then(setOrders);
     getLiveServiceRequests(restaurant.id).then(setServiceRequests);
@@ -241,12 +259,15 @@ export default function AdminDashboardPage() {
     const saved = await saveMenuItem(itemData);
     setMenuItems((prev) => {
       const idx = prev.findIndex((i) => i.id === saved.id);
-      if (idx >= 0) {
-        const copy = [...prev];
-        copy[idx] = saved;
-        return copy;
+      const updated = idx >= 0
+        ? prev.map((item) => (item.id === saved.id ? saved : item))
+        : [saved, ...prev];
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('digital_menu_items_cache', JSON.stringify(updated));
+        } catch {}
       }
-      return [saved, ...prev];
+      return updated;
     });
     return saved;
   };
