@@ -121,6 +121,9 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await expect(page.locator('[data-testid="admin-toast"]')).toBeVisible();
     if (initialText.includes('Available')) {
       await expect(firstToggle).toContainText('Sold Out Today');
+      // Toggle back to Available to prevent polluting subsequent tests
+      await firstToggle.click({ force: true });
+      await expect(firstToggle).toContainText('Available');
     } else {
       await expect(firstToggle).toContainText('Available');
     }
@@ -132,11 +135,12 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await menuBtn.click({ force: true });
 
     // Select first two dishes checkboxes
-    const checkboxes = page.locator('input[type="checkbox"]');
+    const checkboxes = page.locator('[data-testid="dish-select-checkbox"]');
+    await checkboxes.first().waitFor();
     const count = await checkboxes.count();
-    if (count > 2) {
+    if (count >= 2) {
+      await checkboxes.nth(0).check({ force: true });
       await checkboxes.nth(1).check({ force: true });
-      await checkboxes.nth(2).check({ force: true });
     }
 
     // Bulk action bar should be visible

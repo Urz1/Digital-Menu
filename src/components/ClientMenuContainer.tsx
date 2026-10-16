@@ -65,10 +65,10 @@ export function ClientMenuContainer({
   const [items, setItems] = useState<MenuItem[]>(initialItems);
 
   // Offers state (updated in real-time via Supabase Realtime)
-  const [offers, setOffers] = useState<Offer[]>(initialOffers || MOCK_OFFERS_ADDIS);
+  const [offers, setOffers] = useState<Offer[]>(initialOffers || []);
 
   // Reviews & Settings state
-  const [reviews, setReviews] = useState<DishReview[]>(initialReviews || MOCK_REVIEWS_ADDIS);
+  const [reviews, setReviews] = useState<DishReview[]>(initialReviews || []);
   const [reviewSettings] = useState<RestaurantReviewSettings>(
     initialReviewSettings || DEFAULT_REVIEW_SETTINGS_ADDIS
   );

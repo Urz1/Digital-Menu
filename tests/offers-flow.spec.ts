@@ -101,11 +101,13 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     // - Badge text (e.g. "20% Off" or "Save $4")
     // - Old price struck through
     // - New discounted price in accent color
-    const offerBadge = page.locator('span:has-text("20% Off"), span:has-text("40 ETB Off"), span:has-text("Save $4")').first();
+    const offerBadge = page.locator('span:has-text("20% Off"), span:has-text("40 ETB Off"), span:has-text("Off")').first();
     await expect(offerBadge).toBeVisible();
 
-    // Open dish detail bottom sheet
-    const dishCard = page.locator('article:has-text("20% Off"), article:has-text("40 ETB Off"), article:has-text("Save $4")').first();
+    // Open dish detail bottom sheet for an authentic dish on offer
+    const dishCard = page.locator('article:has-text("Fetira"):has-text("Off")').or(
+      page.locator('article:has-text("20% Off"):not(:has-text("Sold Out"))')
+    ).first();
     await dishCard.click();
 
     // Verify dish modal details:

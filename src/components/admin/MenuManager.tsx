@@ -600,6 +600,7 @@ export function MenuManager({
                   {!isStaff && (
                     <input
                       type="checkbox"
+                      data-testid="dish-select-checkbox"
                       checked={isSelected}
                       onChange={() => handleToggleSelectItem(item.id)}
                       className="w-4 h-4 rounded bg-white/10 border-white/20 text-amber-500 cursor-pointer"

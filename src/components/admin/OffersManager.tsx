@@ -195,7 +195,7 @@ export function OffersManager({
   userRole,
 }: OffersManagerProps) {
   const isStaff = userRole === 'staff';
-  const [offersList, setOffersList] = useState<Offer[]>(MOCK_OFFERS_ADDIS);
+  const [offersList, setOffersList] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Wizard state

@@ -107,13 +107,13 @@ export default function AdminDashboardPage() {
         }
       } catch {}
     }
-    return MOCK_ITEMS_ADDIS;
+    return [];
   });
-  const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES_ADDIS);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
-  const [reviews, setReviews] = useState<DishReview[]>(MOCK_REVIEWS_ADDIS);
-  const [offers, setOffers] = useState<Offer[]>(MOCK_OFFERS_ADDIS);
+  const [reviews, setReviews] = useState<DishReview[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [scheduledMenus, setScheduledMenus] = useState<ScheduledMenu[]>(MOCK_SCHEDULED_MENUS_ADDIS);
   const [menuVersions, setMenuVersions] = useState<MenuVersion[]>(MOCK_MENU_VERSIONS_ADDIS);
 
