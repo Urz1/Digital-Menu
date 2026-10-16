@@ -31,7 +31,8 @@ export type AdminSection =
   | 'qr'
   | 'design'
   | 'insights'
-  | 'settings';
+  | 'settings'
+  | 'profile';
 
 interface AdminSidebarProps {
   restaurant: Restaurant;
@@ -105,6 +106,12 @@ export function AdminSidebar({
       icon: Star,
       badge: badgeCounts.reviewsAttention > 0 ? badgeCounts.reviewsAttention : undefined,
       badgeColor: 'bg-rose-500/20 text-rose-300',
+      allowedRoles: ['owner', 'manager', 'staff'],
+    },
+    {
+      id: 'profile',
+      label: 'My Profile',
+      icon: User,
       allowedRoles: ['owner', 'manager', 'staff'],
     },
     {
@@ -230,21 +237,29 @@ export function AdminSidebar({
 
         {/* Authenticated Account Info & Sign Out */}
         <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col gap-2">
-          <div className="flex items-center gap-2 min-w-0">
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic(8);
+              onSelectSection('profile');
+            }}
+            className="flex items-center gap-2 min-w-0 text-left hover:opacity-80 transition-opacity cursor-pointer group"
+            title="Manage My Profile & Password"
+          >
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
               userRole === 'owner' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
             }`}>
               {userRole === 'owner' ? <Shield className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-white truncate">
+              <div className="text-xs font-bold text-white truncate group-hover:text-amber-400 transition-colors">
                 {session?.name || (userRole === 'owner' ? 'Restaurant Owner' : 'Staff Member')}
               </div>
               <div className="text-[10px] text-neutral-400 truncate font-mono">
                 {session?.identifier || (userRole === 'owner' ? 'owner@addiscafeteria.com' : 'staff')}
               </div>
             </div>
-          </div>
+          </button>
 
           {onSignOut && (
             <button

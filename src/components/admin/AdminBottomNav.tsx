@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   X,
   LogOut,
+  User,
 } from 'lucide-react';
 import { AdminAuthSession } from '@/lib/auth-service';
 
@@ -51,6 +52,7 @@ export function AdminBottomNav({
       { id: 'menu', label: 'Sold Out', icon: UtensilsCrossed },
       { id: 'offers', label: 'Offers', icon: Tag, badge: badgeCounts.activeOffers },
       { id: 'reviews', label: 'Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
+      { id: 'profile', label: 'My Profile', icon: User },
     ];
   } else {
     // Owner
@@ -61,6 +63,7 @@ export function AdminBottomNav({
       { id: 'reviews', label: 'Reviews', icon: Star, badge: badgeCounts.reviewsAttention },
     ];
     overflowItems = [
+      { id: 'profile', label: 'My Profile', icon: User },
       { id: 'qr', label: 'QR Studio', icon: QrCode },
       { id: 'design', label: 'Design Studio', icon: Palette },
       { id: 'insights', label: 'Insights & Matrix', icon: BarChart3 },

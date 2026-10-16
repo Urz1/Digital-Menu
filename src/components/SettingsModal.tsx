@@ -3,12 +3,13 @@
 import React from 'react';
 import { triggerHaptic } from '@/lib/utils';
 import { X, Sun, Moon, Monitor } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  locale: string;
-  onLocaleChange: (loc: string) => void;
+  locale: Language | string;
+  onLocaleChange: (loc: Language) => void;
   tableNumber: string;
   onTableNumberChange: (table: string) => void;
   wifiInfo: { ssid: string; password?: string };
@@ -17,13 +18,16 @@ interface SettingsModalProps {
 export function SettingsModal({
   isOpen,
   onClose,
-  locale,
+  locale = 'en',
   onLocaleChange,
   tableNumber,
   onTableNumberChange,
   wifiInfo,
 }: SettingsModalProps) {
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const setMode = (mode: 'light' | 'dark' | 'auto') => {
     triggerHaptic(10);
@@ -81,105 +85,147 @@ export function SettingsModal({
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">Display & Preferences</h2>
-          <p className="text-xs text-[var(--muted)] mt-0.5">Customize your digital dining view.</p>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.settingsTitle}</h2>
+          <p className="text-xs text-[var(--muted)] mt-0.5">{t.settingsDesc}</p>
         </div>
 
-        {/* Language Selection */}
+        {/* Language Selection: English, Amharic, Somali */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Language / Idioma</label>
-          <div className="flex gap-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+            {t.languageLabel}
+          </label>
+          <div className="grid grid-cols-3 gap-2">
             <button
+              type="button"
+              data-testid="lang-btn-en"
               onClick={() => {
                 triggerHaptic(10);
                 onLocaleChange('en');
               }}
-              className={`flex-1 h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                locale === 'en'
-                  ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.1)] text-[var(--foreground)]'
-                  : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted)]'
+              className={`h-11 rounded-xl border text-xs font-bold flex flex-col items-center justify-center transition-colors cursor-pointer ${
+                currentLocale === 'en'
+                  ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.12)] text-[var(--foreground)] ring-1 ring-[var(--primary)]'
+                  : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]'
               }`}
             >
-              <span>🇺🇸</span>
-              <span>English</span>
+              <span className="text-base">🇺🇸</span>
+              <span className="text-[11px] font-semibold">English</span>
             </button>
 
             <button
+              type="button"
+              data-testid="lang-btn-am"
               onClick={() => {
                 triggerHaptic(10);
-                onLocaleChange('es');
+                onLocaleChange('am');
               }}
-              className={`flex-1 h-10 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                locale === 'es'
-                  ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.1)] text-[var(--foreground)]'
-                  : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted)]'
+              className={`h-11 rounded-xl border text-xs font-bold flex flex-col items-center justify-center transition-colors cursor-pointer ${
+                currentLocale === 'am'
+                  ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.12)] text-[var(--foreground)] ring-1 ring-[var(--primary)]'
+                  : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]'
               }`}
             >
-              <span>🇪🇸</span>
-              <span>Español</span>
+              <span className="text-base">🇪🇹</span>
+              <span className="text-[11px] font-semibold">አማርኛ</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="lang-btn-so"
+              onClick={() => {
+                triggerHaptic(10);
+                onLocaleChange('so');
+              }}
+              className={`h-11 rounded-xl border text-xs font-bold flex flex-col items-center justify-center transition-colors cursor-pointer ${
+                currentLocale === 'so'
+                  ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.12)] text-[var(--foreground)] ring-1 ring-[var(--primary)]'
+                  : 'border-[var(--border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              <span className="text-base">🇸🇴</span>
+              <span className="text-[11px] font-semibold">Soomaali</span>
             </button>
           </div>
         </div>
 
         {/* Color Mode */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Appearance</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+            {t.appearanceLabel}
+          </label>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => setMode('light')}
-              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)]"
+              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
             >
               <Sun className="w-3.5 h-3.5" />
-              <span>Light</span>
+              <span>{t.lightMode}</span>
             </button>
             <button
+              type="button"
               onClick={() => setMode('dark')}
-              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)]"
+              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
             >
               <Moon className="w-3.5 h-3.5" />
-              <span>Dark</span>
+              <span>{t.darkMode}</span>
             </button>
             <button
+              type="button"
               onClick={() => setMode('auto')}
-              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)]"
+              className="flex-1 h-9 rounded-xl border border-[var(--border)] bg-[var(--background)] text-xs font-semibold flex items-center justify-center gap-1 text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
             >
               <Monitor className="w-3.5 h-3.5" />
-              <span>Auto</span>
+              <span>{t.autoMode}</span>
             </button>
           </div>
         </div>
 
         {/* Ready-made Atmosphere Themes */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Themes</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">
+            {t.themesLabel}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
+              type="button"
               onClick={() => setTheme('modern-minimal')}
               className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-left hover:border-[var(--primary)] transition-colors"
             >
               <div className="w-full h-3 rounded bg-gradient-to-r from-amber-500 to-neutral-800 mb-1.5" />
-              <span className="text-xs font-bold text-[var(--foreground)] block">Modern Minimal</span>
+              <span className="text-xs font-bold text-[var(--foreground)] block">
+                {t.themeModernMinimal}
+              </span>
             </button>
             <button
+              type="button"
               onClick={() => setTheme('classic-elegance')}
               className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-left hover:border-[var(--primary)] transition-colors"
             >
               <div className="w-full h-3 rounded bg-gradient-to-r from-amber-700 to-amber-200 mb-1.5" />
-              <span className="text-xs font-bold text-[var(--foreground)] block">Classic Elegance</span>
+              <span className="text-xs font-bold text-[var(--foreground)] block">
+                {t.themeClassicElegance}
+              </span>
             </button>
             <button
+              type="button"
               onClick={() => setTheme('bold-dark')}
               className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-left hover:border-[var(--primary)] transition-colors"
             >
               <div className="w-full h-3 rounded bg-gradient-to-r from-rose-500 to-neutral-950 mb-1.5" />
-              <span className="text-xs font-bold text-[var(--foreground)] block">Bold Dark</span>
+              <span className="text-xs font-bold text-[var(--foreground)] block">
+                {t.themeBoldDark}
+              </span>
             </button>
             <button
+              type="button"
               onClick={() => setTheme('warm-rustic')}
               className="p-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-left hover:border-[var(--primary)] transition-colors"
             >
               <div className="w-full h-3 rounded bg-gradient-to-r from-orange-700 to-emerald-800 mb-1.5" />
-              <span className="text-xs font-bold text-[var(--foreground)] block">Warm Rustic</span>
+              <span className="text-xs font-bold text-[var(--foreground)] block">
+                {t.themeWarmRustic}
+              </span>
             </button>
           </div>
         </div>
@@ -187,7 +233,7 @@ export function SettingsModal({
         {/* Dining Table & WiFi */}
         <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs flex flex-col gap-2">
           <div className="flex justify-between items-center">
-            <span className="text-[var(--muted)] font-semibold">Table Number:</span>
+            <span className="text-[var(--muted)] font-semibold">{t.tableNumberLabel}:</span>
             <input
               type="text"
               value={tableNumber}
@@ -196,7 +242,7 @@ export function SettingsModal({
             />
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[var(--muted)] font-semibold">Guest WiFi:</span>
+            <span className="text-[var(--muted)] font-semibold">{t.guestWifiLabel}:</span>
             <span className="font-bold text-[var(--foreground)]">
               {wifiInfo.ssid} {wifiInfo.password ? `(${wifiInfo.password})` : ''}
             </span>

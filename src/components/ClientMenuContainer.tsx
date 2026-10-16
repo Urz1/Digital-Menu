@@ -786,15 +786,15 @@ export function ClientMenuContainer({
             </span>
             <h3 className="text-base font-bold text-[var(--foreground)]">
               {activeFilter === 'onOffer' || activeCategoryId === 'offers'
-                ? 'No active offers right now'
+                ? (TRANSLATIONS[locale]?.noActiveOffers || 'No active offers right now')
                 : activeFilter === 'favorites'
-                ? 'No favorites saved yet'
-                : 'No matching dishes found'}
+                ? (TRANSLATIONS[locale]?.noFavoritesSaved || 'No favorites saved yet')
+                : (TRANSLATIONS[locale]?.noMatchingDishes || 'No matching dishes found')}
             </h3>
             <p className="text-xs mt-1">
               {activeFilter === 'onOffer'
-                ? 'Check back soon for upcoming happy hours and chef specials'
-                : 'Try adjusting your search or clearing your active filters'}
+                ? (TRANSLATIONS[locale]?.noActiveOffersHint || 'Check back soon for upcoming happy hours and chef specials')
+                : (TRANSLATIONS[locale]?.adjustFilterHint || 'Try adjusting your search or clearing your active filters')}
             </p>
             <button
               onClick={() => {
@@ -805,7 +805,7 @@ export function ClientMenuContainer({
               className="mt-4 px-5 py-2 rounded-full text-xs font-bold text-white shadow-sm"
               style={{ backgroundColor: 'var(--primary)' }}
             >
-              Reset Filters
+              {TRANSLATIONS[locale]?.resetFilters || 'Reset Filters'}
             </button>
           </div>
         ) : activeFilter !== 'all' || activeCategoryId === 'offers' || searchQuery.trim().length > 0 ? (
@@ -820,8 +820,8 @@ export function ClientMenuContainer({
                 )}
                 <h2 className="text-base font-bold text-[var(--foreground)] font-brand">
                   {activeFilter === 'onOffer' || activeCategoryId === 'offers'
-                    ? `Dishes on Offer (${filteredItems.length})`
-                    : `Results (${filteredItems.length})`}
+                    ? `${TRANSLATIONS[locale]?.dishesOnOfferCount || 'Dishes on Offer'} (${filteredItems.length})`
+                    : `${TRANSLATIONS[locale]?.resultsCount || 'Results'} (${filteredItems.length})`}
                 </h2>
               </div>
 
@@ -994,7 +994,7 @@ export function ClientMenuContainer({
         <div className="flex justify-center gap-4 text-xs font-semibold" style={{ color: 'var(--primary)' }}>
           <button onClick={() => setIsQrModalOpen(true)} className="inline-flex items-center gap-1">
             <QrCode className="w-3.5 h-3.5" />
-            <span>Table QR</span>
+            <span>{TRANSLATIONS[locale]?.tableQr || 'Table QR'}</span>
           </button>
           <button
             onClick={() => {
@@ -1011,11 +1011,11 @@ export function ClientMenuContainer({
             className="inline-flex items-center gap-1"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>Share Menu</span>
+            <span>{TRANSLATIONS[locale]?.shareMenu || 'Share Menu'}</span>
           </button>
           <button onClick={() => setIsLegendModalOpen(true)} className="inline-flex items-center gap-1">
             <Info className="w-3.5 h-3.5" />
-            <span>Allergen Guide</span>
+            <span>{TRANSLATIONS[locale]?.allergenGuide || 'Allergen Guide'}</span>
           </button>
         </div>
         <div className="pt-3 border-t border-[var(--border)]/50 mt-1 flex justify-center">
@@ -1024,7 +1024,7 @@ export function ClientMenuContainer({
             className="text-[11px] text-[var(--muted)]/60 hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-[var(--border)]/30"
           >
             <Lock className="w-3 h-3 opacity-70" />
-            <span>Staff & Owner Portal</span>
+            <span>{TRANSLATIONS[locale]?.staffOwnerPortal || 'Staff & Owner Portal'}</span>
           </Link>
         </div>
       </footer>
@@ -1058,6 +1058,7 @@ export function ClientMenuContainer({
         isOpen={isReviewModalOpen}
         item={reviewModalItem}
         availableTags={reviewSettings.available_tags}
+        locale={locale}
         onClose={() => {
           setIsReviewModalOpen(false);
           setReviewModalItem(null);
@@ -1088,6 +1089,7 @@ export function ClientMenuContainer({
         restaurantName={restaurant.name}
         currencySymbol={restaurant.currency || 'ETB'}
         taxRate={restaurant.tax_rate}
+        locale={locale}
       />
 
       <ServiceAssistanceModal
@@ -1095,6 +1097,7 @@ export function ClientMenuContainer({
         onClose={() => setIsServiceModalOpen(false)}
         tableNumber={tableNumber}
         onRequestService={handleRequestService}
+        locale={locale}
       />
 
       <SettingsModal
@@ -1110,6 +1113,7 @@ export function ClientMenuContainer({
       <AllergenLegendModal
         isOpen={isLegendModalOpen}
         onClose={() => setIsLegendModalOpen(false)}
+        locale={locale}
       />
 
       <QrModal
@@ -1117,6 +1121,7 @@ export function ClientMenuContainer({
         onClose={() => setIsQrModalOpen(false)}
         restaurantName={restaurant.name}
         tableNumber={tableNumber}
+        locale={locale}
       />
 
       {/* Category Directory Modal / Drawer */}

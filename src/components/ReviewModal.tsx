@@ -6,12 +6,14 @@ import { MenuItem } from '@/types/database';
 import { validateReviewPhoto } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
 import { X, Star, Camera, Check, AlertCircle } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ReviewModalProps {
   isOpen: boolean;
   item: MenuItem | null;
   tableNumber?: string;
   availableTags?: string[];
+  locale?: Language | string;
   onClose: () => void;
   onSubmitReview: (data: {
     item_id: string;
@@ -24,24 +26,18 @@ interface ReviewModalProps {
   }) => Promise<{ success: boolean; error?: string }>;
 }
 
-const DEFAULT_TAGS = [
-  'Great portion',
-  'Would order again',
-  'Fresh ingredients',
-  'Crispy texture',
-  'Perfect spice',
-  'Too salty',
-  'Could be hotter',
-  'Needs more seasoning',
-];
-
 export function ReviewModal({
   isOpen,
   item,
-  availableTags = DEFAULT_TAGS,
+  availableTags,
+  locale = 'en',
   onClose,
   onSubmitReview,
 }: ReviewModalProps) {
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
+  const tagsToUse = availableTags && availableTags.length > 0 ? availableTags : t.defaultReviewTags;
+
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -133,7 +129,7 @@ export function ReviewModal({
     }
   };
 
-  const starLabels = ['', 'Needs Improvement', 'Fair', 'Good', 'Very Good', 'Exceptional!'];
+  const starLabels = t.starRatingLabels;
 
   return (
     <div
@@ -161,15 +157,15 @@ export function ReviewModal({
             <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mb-3">
               <Check className="w-7 h-7" />
             </div>
-            <h3 className="text-xl font-bold text-white">Thank you for your review!</h3>
+            <h3 className="text-xl font-bold text-white">{t.thankYouReviewTitle}</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-xs">
-              Your honest feedback helps our culinary team and fellow diners at Addis.
+              {t.thankYouReviewDesc}
             </p>
             <button
               onClick={onClose}
               className="mt-6 h-10 px-8 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
             >
-              Done
+              {t.done}
             </button>
           </div>
         ) : (
@@ -177,13 +173,13 @@ export function ReviewModal({
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
-                Quick Dish Review
+                {t.reviewModalTitle}
               </span>
               <h2 className="text-lg font-bold text-white font-brand mt-0.5 truncate">
                 {item.name}
               </h2>
               <p className="text-[11px] text-neutral-400">
-                Fast, honest feedback in under 15 seconds. No account required.
+                {t.reviewModalSubtitle}
               </p>
             </div>
 
@@ -232,10 +228,10 @@ export function ReviewModal({
             {/* Quick Tags Chips */}
             <div>
               <span className="text-xs font-bold text-neutral-300 block mb-1.5">
-                Quick Tags <span className="text-neutral-500 font-normal">(Optional, tap to select)</span>
+                {t.quickTagsTitle} <span className="text-neutral-500 font-normal">{t.quickTagsOptional}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {availableTags.map((tag) => {
+                {tagsToUse.map((tag) => {
                   const isSelected = selectedTags.includes(tag);
                   return (
                     <button
@@ -259,7 +255,7 @@ export function ReviewModal({
             <div>
               <div className="flex justify-between items-center mb-1">
                 <span className="text-xs font-bold text-neutral-300">
-                  Comment <span className="text-neutral-500 font-normal">(Optional)</span>
+                  {t.commentLabel} <span className="text-neutral-500 font-normal">{t.commentOptional}</span>
                 </span>
                 <span className="text-[10px] text-neutral-500">{comment.length}/280</span>
               </div>
@@ -267,7 +263,7 @@ export function ReviewModal({
                 value={comment}
                 maxLength={280}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="What made this dish memorable? (Keep it honest and helpful)"
+                placeholder={t.commentPlaceholder}
                 className="w-full h-18 p-2.5 rounded-xl border border-white/10 bg-white/[0.02] text-xs text-white placeholder-neutral-500 resize-none outline-none focus:border-amber-400"
               />
             </div>
@@ -276,7 +272,7 @@ export function ReviewModal({
             <div>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-neutral-300">
-                  Dish Photo <span className="text-neutral-500 font-normal">(Optional, max 4MB)</span>
+                  {t.dishPhotoLabel} <span className="text-neutral-500 font-normal">{t.dishPhotoOptional}</span>
                 </span>
                 {photoPreview && (
                   <button
@@ -287,7 +283,7 @@ export function ReviewModal({
                     }}
                     className="text-[11px] text-red-400 hover:underline"
                   >
-                    Remove Photo
+                    {t.removePhoto}
                   </button>
                 )}
               </div>
@@ -316,7 +312,7 @@ export function ReviewModal({
                     className="h-9 px-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-medium text-neutral-300 flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <Camera className="w-3.5 h-3.5 text-neutral-400" />
-                    <span>Upload a Photo</span>
+                    <span>{t.uploadPhoto}</span>
                   </label>
                   <span className="text-[11px] text-neutral-500">JPG, PNG, or WEBP</span>
                 </div>
@@ -346,9 +342,9 @@ export function ReviewModal({
                 className="w-full h-11 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-98 disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  <span>Posting Review...</span>
+                  <span>{t.submittingReview}</span>
                 ) : (
-                  <span>Submit Honest Review</span>
+                  <span>{t.submitReview}</span>
                 )}
               </button>
             </div>

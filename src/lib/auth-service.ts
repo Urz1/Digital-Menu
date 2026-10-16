@@ -88,6 +88,16 @@ export function updateOwnerProfile(
   if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEY_OWNER, JSON.stringify(updated));
   }
+
+  const currentSession = getCurrentSession();
+  if (currentSession && currentSession.role === 'owner') {
+    setAuthSession({
+      ...currentSession,
+      name: updated.name,
+      identifier: updated.email,
+    });
+  }
+
   return updated;
 }
 
@@ -167,6 +177,72 @@ export function updateStaffPassword(
   if (staffIdx === -1) return { success: false, error: 'Staff account not found' };
 
   accounts[staffIdx].pin_code = newPasswordOrPin.trim();
+  saveStaffAccounts([...accounts]);
+  return { success: true };
+}
+
+export function getStaffProfile(staffId: string): StaffAccount | null {
+  const accounts = getStaffAccounts();
+  return accounts.find((s) => s.id === staffId) || null;
+}
+
+export function updateStaffProfile(
+  staffId: string,
+  updates: Partial<Pick<StaffAccount, 'name' | 'username' | 'phone' | 'email'>>
+): { success: boolean; staff?: StaffAccount; error?: string } {
+  const accounts = getStaffAccounts();
+  const staffIdx = accounts.findIndex((s) => s.id === staffId);
+  if (staffIdx === -1) return { success: false, error: 'Staff account not found' };
+
+  if (updates.username) {
+    const cleanUsername = updates.username.trim().toLowerCase().replace(/\s+/g, '_');
+    const existing = accounts.find((s) => s.username.toLowerCase() === cleanUsername && s.id !== staffId);
+    if (existing) {
+      return { success: false, error: 'This username is already taken by another staff member.' };
+    }
+    updates.username = cleanUsername;
+  }
+
+  const updatedStaff: StaffAccount = {
+    ...accounts[staffIdx],
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
+
+  accounts[staffIdx] = updatedStaff;
+  saveStaffAccounts([...accounts]);
+
+  const currentSession = getCurrentSession();
+  if (currentSession && currentSession.userId === staffId) {
+    setAuthSession({
+      ...currentSession,
+      name: updatedStaff.name,
+      identifier: updatedStaff.username,
+    });
+  }
+
+  return { success: true, staff: updatedStaff };
+}
+
+export function changeStaffPassword(
+  staffId: string,
+  currentPin: string,
+  newPin: string
+): { success: boolean; error?: string } {
+  const accounts = getStaffAccounts();
+  const staffIdx = accounts.findIndex((s) => s.id === staffId);
+  if (staffIdx === -1) return { success: false, error: 'Staff account not found' };
+
+  if (accounts[staffIdx].pin_code !== currentPin.trim()) {
+    return { success: false, error: 'Current password / PIN is incorrect' };
+  }
+
+  if (!newPin || newPin.trim().length < 4) {
+    return { success: false, error: 'New PIN/password must be at least 4 characters long' };
+  }
+
+  accounts[staffIdx].pin_code = newPin.trim();
+  accounts[staffIdx].updated_at = new Date().toISOString();
   saveStaffAccounts([...accounts]);
   return { success: true };
 }

@@ -4,18 +4,23 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { triggerHaptic } from '@/lib/utils';
 import { X, Copy, Check } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface QrModalProps {
   isOpen: boolean;
   onClose: () => void;
   restaurantName: string;
   tableNumber: string;
+  locale?: Language | string;
 }
 
-export function QrModal({ isOpen, onClose, restaurantName, tableNumber }: QrModalProps) {
+export function QrModal({ isOpen, onClose, restaurantName, tableNumber, locale = 'en' }: QrModalProps) {
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentUrl)}&color=1a1a1a&bgcolor=ffffff`;
@@ -53,9 +58,9 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber }: QrModa
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">Table QR Code</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.tableQrTitle}</h2>
           <p className="text-xs text-[var(--muted)] mt-1">
-            Scan with any camera to instantly load the digital menu for {restaurantName} ({tableNumber}).
+            {t.tableQrDesc} {restaurantName} ({tableNumber}).
           </p>
         </div>
 
@@ -79,12 +84,12 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber }: QrModa
           {copied ? (
             <>
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>Link Copied!</span>
+              <span>{t.linkCopied}</span>
             </>
           ) : (
             <>
               <Copy className="w-4 h-4" />
-              <span>Copy Direct Menu Link</span>
+              <span>{t.copyMenuLink}</span>
             </>
           )}
         </button>
@@ -92,3 +97,4 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber }: QrModa
     </div>
   );
 }
+

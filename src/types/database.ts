@@ -87,7 +87,10 @@ export interface StaffAccount {
   pin_code: string; // 4-digit PIN or password
   role: 'staff';
   is_active: boolean;
+  phone?: string;
+  email?: string;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface Category {

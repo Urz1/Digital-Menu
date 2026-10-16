@@ -250,10 +250,10 @@ export function ItemDetailModal({
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
                   <h4 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
-                    Goes well with
+                    {t.goesWellWith}
                   </h4>
                 </div>
-                <span className="text-[10px] text-[var(--muted)] font-medium">Authentic Pairing</span>
+                <span className="text-[10px] text-[var(--muted)] font-medium">{t.authenticPairing}</span>
               </div>
 
               <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
@@ -296,7 +296,7 @@ export function ItemDetailModal({
                         style={{ backgroundColor: 'var(--primary)' }}
                         title={`Add ${rec.item.name}`}
                       >
-                        + Add
+                        {t.addPairingBtn}
                       </button>
                     </div>
                   </div>
@@ -308,14 +308,14 @@ export function ItemDetailModal({
           {/* Meta Box (Spice, Dietary, Allergens) */}
           <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs flex flex-col gap-2">
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-[var(--muted)]">Spice Level:</span>
+              <span className="font-semibold text-[var(--muted)]">{t.spiceLevel}:</span>
               <span className="font-bold text-[var(--foreground)]">
-                {item.spice_level === 0 ? 'None' : '🌶️'.repeat(item.spice_level) + ` (Level ${item.spice_level})`}
+                {item.spice_level === 0 ? t.spiceNone : '🌶️'.repeat(item.spice_level) + ` (Level ${item.spice_level})`}
               </span>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-[var(--muted)]">Dietary:</span>
+              <span className="font-semibold text-[var(--muted)]">{t.dietary}:</span>
               <span className="font-bold text-[var(--foreground)] uppercase">
                 {item.tags?.filter((t) => t !== 'chefsPick').join(', ') || 'Standard'}
               </span>
@@ -323,7 +323,7 @@ export function ItemDetailModal({
 
             {item.allergens && item.allergens.length > 0 && (
               <div>
-                <span className="font-semibold text-[var(--muted)] block mb-1">Contains Allergens:</span>
+                <span className="font-semibold text-[var(--muted)] block mb-1">{t.containsAllergens}:</span>
                 <div className="flex flex-wrap gap-1.5">
                   {item.allergens.map((allg) => (
                     <span
@@ -341,7 +341,7 @@ export function ItemDetailModal({
           {/* Add-ons & Customizations */}
           {item.options && item.options.length > 0 && (
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-bold text-[var(--foreground)]">Customizations & Add-ons</h3>
+              <h3 className="text-sm font-bold text-[var(--foreground)]">{t.customizations}</h3>
               <div className="flex flex-col gap-2">
                 {item.options.map((opt) => {
                   const isChecked = selectedOptions.some((o) => o.id === opt.id);
@@ -380,9 +380,9 @@ export function ItemDetailModal({
               <div>
                 <h3 className="text-sm font-bold text-[var(--foreground)] flex items-center gap-1.5">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span>Guest Reviews</span>
+                  <span>{t.guestReviews}</span>
                 </h3>
-                <p className="text-[11px] text-[var(--muted)]">Honest feedback from recent diners</p>
+                <p className="text-[11px] text-[var(--muted)]">{t.guestReviewsSubtitle}</p>
               </div>
 
               {onOpenReviewModal && (
@@ -393,14 +393,14 @@ export function ItemDetailModal({
                   style={{ backgroundColor: 'var(--primary)' }}
                 >
                   <Star className="w-3 h-3 fill-current" />
-                  <span>Rate this dish</span>
+                  <span>{t.rateThisDish}</span>
                 </button>
               )}
             </div>
 
             {dishReviews.length === 0 ? (
               <div className="p-4 rounded-xl bg-[var(--background)] border border-[var(--border)] text-center text-xs text-[var(--muted)]">
-                No reviews yet for this dish. Be the first to share your thoughts!
+                {t.noReviewsYet}
               </div>
             ) : (
               <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
@@ -443,7 +443,7 @@ export function ItemDetailModal({
                             title="Report review"
                           >
                             <Flag className="w-3 h-3" />
-                            <span>Report</span>
+                            <span>{t.reportReview}</span>
                           </button>
                         )}
                       </div>
@@ -451,9 +451,14 @@ export function ItemDetailModal({
                       {/* Inline reporting reason prompt */}
                       {isReportingThis && (
                         <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[11px] text-red-200 flex flex-col gap-1.5 my-1">
-                          <span className="font-semibold text-white">Why are you reporting this review?</span>
+                          <span className="font-semibold text-white">{t.reportSubtitle}</span>
                           <div className="flex flex-wrap gap-1">
-                            {['Abusive language', 'Spam / Promo', 'Personal data', 'Off-topic'].map((reason) => (
+                            {[
+                              t.reportReasonAbuse,
+                              t.reportReasonSpam,
+                              t.reportReasonPii,
+                              t.reportReasonOther,
+                            ].map((reason) => (
                               <button
                                 key={reason}
                                 type="button"

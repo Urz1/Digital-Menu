@@ -3,12 +3,14 @@
 import React from 'react';
 import { triggerHaptic } from '@/lib/utils';
 import { X, Bell, Droplets, Utensils, Receipt } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ServiceAssistanceModalProps {
   isOpen: boolean;
   onClose: () => void;
   tableNumber: string;
   onRequestService: (type: 'waiter' | 'water' | 'cutlery' | 'bill') => void;
+  locale?: Language | string;
 }
 
 export function ServiceAssistanceModal({
@@ -16,8 +18,12 @@ export function ServiceAssistanceModal({
   onClose,
   tableNumber,
   onRequestService,
+  locale = 'en',
 }: ServiceAssistanceModalProps) {
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const handleSelect = (type: 'waiter' | 'water' | 'cutlery' | 'bill') => {
     triggerHaptic(20);
@@ -50,9 +56,9 @@ export function ServiceAssistanceModal({
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">Server Assistance</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.serviceAssistanceTitle}</h2>
           <p className="text-xs text-[var(--muted)] mt-1">
-            Tap a quick request below to alert your server immediately for <strong className="text-[var(--foreground)]">{tableNumber}</strong>.
+            {t.serviceAssistanceDesc} <strong className="text-[var(--foreground)]">{tableNumber}</strong>.
           </p>
         </div>
 
@@ -65,8 +71,8 @@ export function ServiceAssistanceModal({
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">Call Waiter</h4>
-              <p className="text-xs text-[var(--muted)]">Need help with recommendations or questions</p>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">{t.callWaiterTitle}</h4>
+              <p className="text-xs text-[var(--muted)]">{t.callWaiterDesc}</p>
             </div>
           </button>
 
@@ -78,8 +84,8 @@ export function ServiceAssistanceModal({
               <Droplets className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">Request Water Refill</h4>
-              <p className="text-xs text-[var(--muted)]">Sparkling or still water for the table</p>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">{t.requestWaterTitle}</h4>
+              <p className="text-xs text-[var(--muted)]">{t.requestWaterDesc}</p>
             </div>
           </button>
 
@@ -91,8 +97,8 @@ export function ServiceAssistanceModal({
               <Utensils className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">Extra Cutlery / Napkins</h4>
-              <p className="text-xs text-[var(--muted)]">Fresh forks, knives, spoons, or paper napkins</p>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">{t.extraCutleryTitle}</h4>
+              <p className="text-xs text-[var(--muted)]">{t.extraCutleryDesc}</p>
             </div>
           </button>
 
@@ -104,8 +110,8 @@ export function ServiceAssistanceModal({
               <Receipt className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[var(--foreground)]">Request The Bill (Check)</h4>
-              <p className="text-xs text-[var(--muted)]">Server will bring the check for cash or card</p>
+              <h4 className="text-sm font-bold text-[var(--foreground)]">{t.requestBillTitle}</h4>
+              <p className="text-xs text-[var(--muted)]">{t.requestBillDesc}</p>
             </div>
           </button>
         </div>
@@ -113,3 +119,4 @@ export function ServiceAssistanceModal({
     </div>
   );
 }
+

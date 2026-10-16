@@ -150,6 +150,19 @@ export function HelpModal({ isOpen, onClose, activeSection }: HelpModalProps) {
         },
       ],
     },
+    profile: {
+      title: 'Profile & Credentials Tips',
+      tips: [
+        {
+          heading: 'Personal Information',
+          desc: 'Keep your name, phone number, and contact info up to date for smooth communication with customers and dining staff.',
+        },
+        {
+          heading: 'Credential Security',
+          desc: 'Both owners and staff members should change default passwords and PINs upon first login to secure restaurant operations.',
+        },
+      ],
+    },
   };
 
   const current = TIPS[activeSection] || TIPS.home;

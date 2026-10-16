@@ -4,6 +4,7 @@ import React from 'react';
 import { CartItem } from '@/types/menu';
 import { formatMoney } from '@/lib/utils';
 import { X } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ServerCardModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface ServerCardModalProps {
   restaurantName: string;
   currencySymbol?: string;
   taxRate?: number;
+  locale?: Language | string;
 }
 
 export function ServerCardModal({
@@ -21,10 +23,14 @@ export function ServerCardModal({
   cart,
   tableNumber,
   restaurantName,
-  currencySymbol = '$',
-  taxRate = 0.08,
+  currencySymbol = 'ETB',
+  taxRate = 0.15,
+  locale = 'en',
 }: ServerCardModalProps) {
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
@@ -40,7 +46,7 @@ export function ServerCardModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-6 border-b border-neutral-800">
           <span className="text-xs uppercase tracking-widest text-neutral-400 font-bold">
-            {restaurantName} • SERVER SUMMARY
+            {restaurantName} • {t.serverSummaryTitle}
           </span>
           <button
             onClick={onClose}
@@ -54,7 +60,7 @@ export function ServerCardModal({
         {/* Large Table Number Banner */}
         <div className="my-6 p-6 rounded-3xl bg-neutral-900 border border-neutral-800 text-center">
           <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 block mb-1">
-            Dine-In Seating
+            {t.dineInSeating}
           </span>
           <h1 className="text-4xl font-black text-amber-400 tracking-tight">
             {tableNumber.toUpperCase()}
@@ -81,7 +87,7 @@ export function ServerCardModal({
                   )}
                   {entry.notes && (
                     <p className="text-xs text-amber-300 font-medium mt-1">
-                      Note: "{entry.notes}"
+                      {t.noteLabel}: "{entry.notes}"
                     </p>
                   )}
                 </div>
@@ -97,7 +103,7 @@ export function ServerCardModal({
       {/* Total Banner at Bottom */}
       <div className="mt-8 pt-6 border-t border-neutral-800 flex items-baseline justify-between">
         <span className="text-sm text-neutral-400 font-semibold">
-          Total Items: <strong className="text-white">{totalItems}</strong>
+          {t.totalItemsLabel}: <strong className="text-white">{totalItems}</strong>
         </span>
         <span className="text-3xl font-black text-amber-400">
           {formatMoney(total, currencySymbol)}

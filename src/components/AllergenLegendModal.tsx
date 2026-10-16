@@ -2,24 +2,29 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface AllergenLegendModalProps {
   isOpen: boolean;
   onClose: () => void;
+  locale?: Language | string;
 }
 
-const LEGEND_ITEMS = [
-  { icon: '🌱', title: 'Vegetarian (V)', desc: 'Contains no meat, fish, or poultry. May include dairy or eggs.' },
-  { icon: '🌿', title: 'Vegan (VG)', desc: '100% plant-based with zero animal products or byproducts.' },
-  { icon: '🌾', title: 'Gluten-Free (GF)', desc: 'Prepared without wheat or with certified gluten-free grains.' },
-  { icon: '🥩', title: 'Halal Certified', desc: 'Meats sourced exclusively from certified halal suppliers.' },
-  { icon: '🥜', title: 'Nut-Free', desc: 'Formulated without peanuts or tree nuts in preparation.' },
-  { icon: '🌶️', title: 'Spice Indicators', desc: 'Mild (🌶️) • Medium (🌶️🌶️) • Fiery Hot (🌶️🌶️🌶️)' },
-  { icon: '⭐', title: "Chef's Selection", desc: 'Signature culinary highlights recommended by our executive chef.' },
-];
-
-export function AllergenLegendModal({ isOpen, onClose }: AllergenLegendModalProps) {
+export function AllergenLegendModal({ isOpen, onClose, locale = 'en' }: AllergenLegendModalProps) {
   if (!isOpen) return null;
+
+  const currentLocale = (locale as Language) || 'en';
+  const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
+
+  const legendItems = [
+    { icon: '🌱', title: t.vegetarianTitle, desc: t.vegetarianDesc },
+    { icon: '🌿', title: t.veganTitle, desc: t.veganDesc },
+    { icon: '🌾', title: t.glutenFreeTitle, desc: t.glutenFreeDesc },
+    { icon: '🥩', title: t.halalTitle, desc: t.halalDesc },
+    { icon: '🥜', title: t.nutFreeTitle, desc: t.nutFreeDesc },
+    { icon: '🌶️', title: t.spiceIndicatorsTitle, desc: t.spiceIndicatorsDesc },
+    { icon: '⭐', title: t.chefSelectionTitle, desc: t.chefSelectionDesc },
+  ];
 
   return (
     <div
@@ -45,14 +50,14 @@ export function AllergenLegendModal({ isOpen, onClose }: AllergenLegendModalProp
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">Dietary & Allergen Guide</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.legendTitle}</h2>
           <p className="text-xs text-[var(--muted)] mt-0.5">
-            Our kitchen takes cross-contamination and guest wellness seriously.
+            {t.legendDesc}
           </p>
         </div>
 
         <div className="flex flex-col gap-2.5 my-2">
-          {LEGEND_ITEMS.map((item) => (
+          {legendItems.map((item) => (
             <div
               key={item.title}
               className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--background)] border border-[var(--border)]"
@@ -69,3 +74,4 @@ export function AllergenLegendModal({ isOpen, onClose }: AllergenLegendModalProp
     </div>
   );
 }
+

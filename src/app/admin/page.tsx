@@ -54,6 +54,7 @@ import { HelpModal } from '@/components/admin/HelpModal';
 import { OffersManager } from '@/components/admin/OffersManager';
 import { ReviewsManager } from '@/components/admin/ReviewsManager';
 import { QRStudio } from '@/components/admin/QRStudio';
+import { ProfileSection } from '@/components/admin/ProfileSection';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
 import {
   ShoppingBag,
@@ -123,7 +124,12 @@ export default function AdminDashboardPage() {
     setSession(active);
     setUserRole(active.role);
     if (active.role === 'staff') {
-      if (activeSection !== 'menu' && activeSection !== 'offers' && activeSection !== 'reviews') {
+      if (
+        activeSection !== 'menu' &&
+        activeSection !== 'offers' &&
+        activeSection !== 'reviews' &&
+        activeSection !== 'profile'
+      ) {
         setActiveSection('menu');
       }
     }
@@ -818,6 +824,24 @@ export default function AdminDashboardPage() {
             <SettingsSection
               restaurant={restaurant}
               onSaveSettings={handleSaveRestaurantSettings}
+              onShowToast={showToast}
+            />
+          )}
+
+          {/* SECTION 10: PROFESSIONAL PROFILE (Owner & Staff) */}
+          {activeSection === 'profile' && (
+            <ProfileSection
+              restaurant={restaurant}
+              session={session}
+              onUpdateSessionName={(newName, newIdentifier) => {
+                if (session) {
+                  setSession({
+                    ...session,
+                    name: newName,
+                    identifier: newIdentifier,
+                  });
+                }
+              }}
               onShowToast={showToast}
             />
           )}
