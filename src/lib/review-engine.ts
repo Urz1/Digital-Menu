@@ -182,15 +182,15 @@ export function calculateDishReviewStats(
 
 /**
  * Role permissions check:
- * - Staff can reply to reviews and view the inbox.
- * - Only managers/owners can remove reviews.
+ * - Both owner and staff can reply to reviews and view the inbox.
+ * - Only the restaurant owner can remove reviews.
  */
 export function canReplyToReview(userRole: UserRole): boolean {
-  return userRole === 'owner' || userRole === 'manager' || userRole === 'staff';
+  return userRole === 'owner' || userRole === 'staff';
 }
 
 export function canRemoveReview(userRole: UserRole): boolean {
-  return userRole === 'owner' || userRole === 'manager';
+  return userRole === 'owner';
 }
 
 /**

@@ -19,6 +19,7 @@ import { SettingsModal } from './SettingsModal';
 import { AllergenLegendModal } from './AllergenLegendModal';
 import { QrModal } from './QrModal';
 import { createClient } from '@/lib/supabase/client';
+import { subscribeSync } from '@/lib/sync-channel';
 import {
   createServiceRequest,
   recordOfferInteraction,
@@ -258,10 +259,46 @@ export function ClientMenuContainer({
   }, [categories, activeFilter, searchQuery]);
 
   // ---------------------------------------------------------------------------
+  // INSTANT MULTI-TAB & PLATFORM-WIDE SYNCHRONIZATION
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const unsubscribe = subscribeSync((event) => {
+      if (event.type === 'ITEM_UPDATED') {
+        setItems((prev) =>
+          prev.map((item) => (item.id === event.item.id ? { ...item, ...event.item } : item))
+        );
+      } else if (event.type === 'ITEM_DELETED') {
+        setItems((prev) => prev.filter((item) => item.id !== event.itemId));
+      } else if (event.type === 'OFFER_UPDATED') {
+        setOffers((prev) => {
+          const idx = prev.findIndex((o) => o.id === event.offer.id);
+          if (idx >= 0) {
+            const copy = [...prev];
+            copy[idx] = event.offer;
+            return copy;
+          }
+          return [event.offer, ...prev];
+        });
+      } else if (event.type === 'REVIEW_SUBMITTED') {
+        setReviews((prev) => {
+          if (prev.some((r) => r.id === event.review.id)) return prev;
+          return [event.review, ...prev];
+        });
+      } else if (event.type === 'REVIEW_UPDATED') {
+        setReviews((prev) =>
+          prev.map((r) => (r.id === event.review.id ? { ...r, ...event.review } : r))
+        );
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // ---------------------------------------------------------------------------
   // SUPABASE REALTIME: STREAM ITEMS & OFFERS INSTANTLY
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://demo.supabase.co') {
       return;
     }
 

@@ -90,7 +90,7 @@ export function AdminSidebar({
       icon: UtensilsCrossed,
       badge: badgeCounts.totalDishes,
       badgeColor: 'bg-white/10 text-neutral-300',
-      allowedRoles: ['owner', 'manager', 'staff'],
+      allowedRoles: ['owner', 'staff'],
     },
     {
       id: 'offers',
@@ -98,7 +98,7 @@ export function AdminSidebar({
       icon: Tag,
       badge: badgeCounts.activeOffers > 0 ? `${badgeCounts.activeOffers} Live` : undefined,
       badgeColor: 'bg-amber-500/20 text-amber-300',
-      allowedRoles: ['owner', 'manager', 'staff'],
+      allowedRoles: ['owner', 'staff'],
     },
     {
       id: 'reviews',
@@ -106,19 +106,19 @@ export function AdminSidebar({
       icon: Star,
       badge: badgeCounts.reviewsAttention > 0 ? badgeCounts.reviewsAttention : undefined,
       badgeColor: 'bg-rose-500/20 text-rose-300',
-      allowedRoles: ['owner', 'manager', 'staff'],
+      allowedRoles: ['owner', 'staff'],
     },
     {
       id: 'profile',
       label: 'My Profile',
       icon: User,
-      allowedRoles: ['owner', 'manager', 'staff'],
+      allowedRoles: ['owner', 'staff'],
     },
     {
       id: 'qr',
       label: 'QR Studio',
       icon: QrCode,
-      allowedRoles: ['owner', 'manager'],
+      allowedRoles: ['owner'],
     },
     {
       id: 'design',
@@ -130,7 +130,7 @@ export function AdminSidebar({
       id: 'insights',
       label: 'Insights & Matrix',
       icon: BarChart3,
-      allowedRoles: ['owner', 'manager'],
+      allowedRoles: ['owner'],
     },
     {
       id: 'settings',
@@ -161,7 +161,7 @@ export function AdminSidebar({
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span className="text-[11px] text-neutral-400 capitalize font-medium">
-                {userRole === 'owner' ? 'Owner Portal' : userRole === 'manager' ? 'Manager Portal' : 'Staff Portal'}
+                {userRole === 'owner' ? 'Owner Portal' : 'Staff Portal'}
               </span>
             </div>
           </div>

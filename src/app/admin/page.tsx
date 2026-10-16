@@ -43,6 +43,7 @@ import {
   getOffers,
 } from '@/lib/data-provider';
 import { AdminSidebar, AdminSection } from '@/components/admin/AdminSidebar';
+import { subscribeSync } from '@/lib/sync-channel';
 import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
 import { HomeDashboard } from '@/components/admin/HomeDashboard';
 import { OnboardingWizardModal } from '@/components/admin/OnboardingWizardModal';
@@ -76,6 +77,9 @@ import {
   Eye,
   Sliders,
   ShieldCheck,
+  Droplets,
+  Utensils,
+  Receipt,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -140,7 +144,7 @@ export default function AdminDashboardPage() {
     setIsHydrated(true);
   }, [router]);
 
-  // Poll / fetch live data
+  // Poll / fetch live data & listen to real-time events
   useEffect(() => {
     getLiveOrders(restaurant.id).then(setOrders);
     getLiveServiceRequests(restaurant.id).then(setServiceRequests);
@@ -149,12 +153,31 @@ export default function AdminDashboardPage() {
     getScheduledMenus(restaurant.id).then(setScheduledMenus);
     getMenuVersions(restaurant.id).then(setMenuVersions);
 
+    // Subscribe to cross-tab sync so reviews and menu updates reflect immediately
+    const unsubscribe = subscribeSync((event) => {
+      if (event.type === 'REVIEW_SUBMITTED') {
+        setReviews((prev) => {
+          if (prev.some((r) => r.id === event.review.id)) return prev;
+          return [event.review, ...prev];
+        });
+        showToast(`New feedback received from Table ${event.review.table_number || 'Guest'}!`, 'info');
+      } else if (event.type === 'ITEM_UPDATED') {
+        setMenuItems((prev) =>
+          prev.map((item) => (item.id === event.item.id ? { ...item, ...event.item } : item))
+        );
+      }
+    });
+
     const interval = setInterval(() => {
       getLiveOrders(restaurant.id).then(setOrders);
       getLiveServiceRequests(restaurant.id).then(setServiceRequests);
+      getDishReviews(restaurant.id).then(setReviews);
     }, 4000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [restaurant.id]);
 
   // Sign Out Handler
@@ -170,11 +193,13 @@ export default function AdminDashboardPage() {
     setUserRole(newRole);
 
     if (newRole === 'staff') {
-      if (activeSection === 'home' || activeSection === 'design' || activeSection === 'settings') {
-        setActiveSection('requests');
-      }
-    } else if (newRole === 'manager') {
-      if (activeSection === 'home' || activeSection === 'design' || activeSection === 'settings') {
+      if (
+        activeSection === 'home' ||
+        activeSection === 'design' ||
+        activeSection === 'insights' ||
+        activeSection === 'qr' ||
+        activeSection === 'settings'
+      ) {
         setActiveSection('menu');
       }
     }
@@ -434,8 +459,6 @@ export default function AdminDashboardPage() {
                   className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
                     userRole === 'owner'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      : userRole === 'manager'
-                      ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                       : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   }`}
                 >
@@ -543,7 +566,7 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 2: MENU & DISHES (Owner, Manager, Staff) */}
+          {/* SECTION 2: MENU & DISHES (Owner, Staff) */}
           {activeSection === 'menu' && (
             <MenuManager
               restaurant={restaurant}
@@ -568,7 +591,7 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 3: OFFERS & DEALS (Owner, Manager, Staff pause/view) */}
+          {/* SECTION 3: OFFERS & DEALS (Owner, Staff pause/view) */}
           {activeSection === 'offers' && (
             <OffersManager
               restaurant={restaurant}
@@ -578,7 +601,7 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 4: DISH REVIEWS (Owner, Manager, Staff replies) */}
+          {/* SECTION 4: DISH REVIEWS (Owner, Staff replies) */}
           {activeSection === 'reviews' && (
             <ReviewsManager
               restaurant={restaurant}
@@ -587,7 +610,7 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 5: KITCHEN & SERVICE REQUESTS (Owner, Manager, Staff) */}
+          {/* SECTION 5: KITCHEN & SERVICE REQUESTS (Owner, Staff) */}
           {activeSection === 'requests' && (
             <div className="flex flex-col gap-6 pb-20">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -745,11 +768,11 @@ export default function AdminDashboardPage() {
                           className="p-4 rounded-xl bg-[#12141C] border border-white/5 flex items-center justify-between gap-4"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg">
-                              {req.request_type === 'water' && '💧'}
-                              {req.request_type === 'cutlery' && '🍽️'}
-                              {req.request_type === 'bill' && '💳'}
-                              {req.request_type === 'waiter' && '🛎️'}
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                              {req.request_type === 'water' && <Droplets className="w-5 h-5 text-sky-400" />}
+                              {req.request_type === 'cutlery' && <Utensils className="w-5 h-5 text-amber-400" />}
+                              {req.request_type === 'bill' && <Receipt className="w-5 h-5 text-emerald-400" />}
+                              {req.request_type === 'waiter' && <Bell className="w-5 h-5 text-rose-400" />}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
@@ -801,8 +824,8 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 7: INSIGHTS & MATRIX (Owner, Manager) */}
-          {activeSection === 'insights' && userRole !== 'staff' && (
+          {/* SECTION 7: INSIGHTS & MATRIX (Owner only) */}
+          {activeSection === 'insights' && userRole === 'owner' && (
             <InsightsSection
               restaurant={restaurant}
               menuItems={menuItems}
@@ -811,8 +834,8 @@ export default function AdminDashboardPage() {
             />
           )}
 
-          {/* SECTION 8: QR STUDIO & TABLE STANDS (Owner, Manager) */}
-          {activeSection === 'qr' && userRole !== 'staff' && (
+          {/* SECTION 8: QR STUDIO & TABLE STANDS (Owner only) */}
+          {activeSection === 'qr' && userRole === 'owner' && (
             <QRStudio
               restaurant={restaurant}
               onShowToast={showToast}

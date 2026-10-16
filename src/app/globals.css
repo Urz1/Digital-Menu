@@ -125,3 +125,81 @@ nextjs-portal,
   border-width: 0;
 }
 
+/* =============================================================================
+   STANDARD PRINT STYLESHEET (Clean isolated stand cards / table tents only)
+   ============================================================================= */
+@media print {
+  /* Hide all admin chrome, navigations, sidebars, headers, footers, buttons, and tools */
+  header,
+  nav,
+  aside,
+  footer,
+  button,
+  input,
+  select,
+  textarea,
+  [data-testid="admin-sidebar"],
+  [data-testid="admin-bottom-nav"],
+  [data-testid="admin-toast"],
+  [data-testid="role-badge"],
+  .no-print,
+  .hide-on-print,
+  .screen-only-admin {
+    display: none !important;
+  }
+
+  /* Reset canvas */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Force browsers to print exact background colors and graphics */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Standard print page settings */
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  /* Reset layout containers */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: #ffffff !important;
+  }
+
+  /* Standard table tent stand card container */
+  .print-only-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 10mm auto !important;
+    width: 110mm !important;
+    min-height: 155mm !important;
+    padding: 10mm !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 3px solid #111827 !important;
+    border-radius: 24px !important;
+    text-align: center !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+}
+
+

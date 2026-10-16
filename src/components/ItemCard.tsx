@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MenuItem, DishReviewStats } from '@/types/database';
 import { ItemPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { Heart, Plus, Tag, Clock, Star } from 'lucide-react';
+import { Heart, Plus, Tag, Clock, Star, ChefHat } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ItemCardProps {
@@ -116,7 +116,7 @@ export function ItemCard({
                 <span>{pricingResult?.badgeText || t.specialOffer}</span>
               </span>
             )}
-            {hasOffer && savings > 0 && (
+            {hasOffer && savings > 0 && !pricingResult?.badgeText?.toLowerCase().includes('off') && !pricingResult?.badgeText?.includes(String(Math.round(savings))) && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300">
                 {t.saveAmount} {formatMoney(savings, currencySymbol)}
               </span>
@@ -128,8 +128,9 @@ export function ItemCard({
               </span>
             )}
             {item.is_chefs_pick && !hasOffer && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
-                ⭐ {t.chefsPick}
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 inline-flex items-center gap-1">
+                <ChefHat className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                <span>{t.chefsPick}</span>
               </span>
             )}
             {!item.is_available && (

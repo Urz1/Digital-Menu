@@ -123,7 +123,7 @@ export default async function RestaurantPrivacyPage({ params }: PrivacyPageProps
           <div className="space-y-2 pt-4">
             <h2 className="text-sm font-bold text-white">4. Data Deletion and Inquiries</h2>
             <p>
-              Restaurant managers periodically purge historical table sessions and service calls. For questions about your privacy at {restaurant.name}, speak directly with your server or manager on duty.
+              Restaurant staff and owners periodically purge historical table sessions and service calls. For questions about your privacy at {restaurant.name}, speak directly with your server or the restaurant owner.
             </p>
           </div>
         </section>

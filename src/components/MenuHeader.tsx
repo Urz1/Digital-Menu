@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Restaurant } from '@/types/database';
-import { Search, Heart, Settings, Wifi, Info, Globe } from 'lucide-react';
+import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Sparkles } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { triggerHaptic } from '@/lib/utils';
 
@@ -141,20 +141,21 @@ export function MenuHeader({
       {/* Announcement banner if available */}
       {restaurant.announcement && (
         <div
-          className="mx-3.5 mb-2 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between"
+          className="mx-3.5 mb-2 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
           style={{
             backgroundColor: 'rgba(var(--primary-rgb), 0.12)',
             color: 'var(--primary)',
           }}
         >
-          <span className="truncate">{restaurant.announcement}</span>
+          <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="truncate">{restaurant.announcement.replace(/^[^\w\s\u1200-\u137F\u00C0-\u024F]+\s*/, '')}</span>
         </div>
       )}
 
       {/* Table & Quick Info Strip */}
       <div className="flex items-center justify-between px-3.5 py-1.5 border-t border-[var(--border)] text-xs text-[var(--muted)]">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] font-semibold text-[var(--foreground)] text-[11px]">
-          <span>📍</span>
+          <MapPin className="w-3 h-3 text-amber-500 flex-shrink-0" />
           <span>{tableNumber}</span>
         </div>
 

@@ -307,7 +307,7 @@ export function MenuManager({
           </p>
         </div>
 
-        {/* Primary Controls (Only for Owner & Manager) */}
+        {/* Primary Controls (Only for Owner) */}
         {!isStaff && (
           <div className="flex items-center gap-2.5 flex-wrap">
             <button
@@ -751,7 +751,7 @@ export function MenuManager({
                     <span>{item.is_available ? 'Available' : 'Sold Out Today'}</span>
                   </button>
 
-                  {/* Edit & More menu for Owner/Manager */}
+                  {/* Edit & More menu for Owner */}
                   {!isStaff && (
                     <div className="flex items-center gap-1">
                       <button

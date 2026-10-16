@@ -263,10 +263,12 @@ export function SettingsSection({
   };
 
   const qrUrl = `/${restaurant.slug}?table=${encodeURIComponent(selectedTable.replace('Table ', ''))}`;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(qrUrl)}&color=000000&bgcolor=FFFFFF&margin=1`;
 
   return (
-    <div className="flex flex-col gap-8 pb-20 max-w-7xl mx-auto w-full">
-      {/* Header */}
+    <>
+      <div className="flex flex-col gap-8 pb-20 max-w-7xl mx-auto w-full screen-only-admin">
+        {/* Header */}
       <div>
         <div className="flex items-center gap-2.5">
           <h2 className="text-xl font-bold text-white">Settings & Operations</h2>
@@ -323,10 +325,13 @@ export function SettingsSection({
               <p className="text-[11px] text-neutral-500 mt-0.5">Scan to view menu & order</p>
 
               {/* QR Visual */}
-              <div className="my-4 p-3 bg-neutral-100 rounded-2xl border border-neutral-200">
-                <div className="w-40 h-40 bg-neutral-900 rounded-xl flex items-center justify-center">
-                  <QrCode className="w-32 h-32 text-white" />
-                </div>
+              <div className="my-4 p-3 bg-white rounded-2xl border-2 border-neutral-200 shadow-xs">
+                {/* eslint-disable-next-js/no-img-element */}
+                <img
+                  src={qrImageUrl}
+                  alt={`QR code for ${selectedTable}`}
+                  className="w-40 h-40 block mx-auto rounded-lg"
+                />
               </div>
 
               <div className="px-4 py-1.5 rounded-full bg-neutral-100 font-mono text-xs font-bold text-neutral-800">
@@ -1016,5 +1021,47 @@ export function SettingsSection({
         </div>
       </div>
     </div>
+
+    {/* =======================================================================
+        PRINT ONLY TABLE STAND CARD (standard A6 / Table Tent dimensions)
+       ======================================================================= */}
+    <div className="hidden print:flex print-only-card">
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-white text-2xl mb-2"
+        style={{ backgroundColor: restaurant.theme_config.primaryColor || '#E8590C' }}
+      >
+        {restaurant.logo_letter || 'A'}
+      </div>
+      <h1 className="text-2xl font-black text-black tracking-tight">{restaurant.name}</h1>
+      <p className="text-xs text-neutral-600 mt-1 mb-2">{restaurant.tagline || 'Scan to view menu & order'}</p>
+
+      <div className="px-5 py-1.5 rounded-full bg-black text-white font-mono text-sm font-extrabold uppercase tracking-wider my-2">
+        {selectedTable}
+      </div>
+
+      <div className="my-3 p-4 bg-white border-4 border-black rounded-3xl">
+        {/* eslint-disable-next-js/no-img-element */}
+        <img
+          src={qrImageUrl}
+          alt={`Print QR Code for ${selectedTable}`}
+          className="w-52 h-52 block mx-auto"
+        />
+      </div>
+
+      <p className="text-xs font-semibold text-neutral-700 max-w-xs mb-3">
+        Point phone camera at the QR code to open our contactless menu. No app download needed.
+      </p>
+
+      {wifiSsid && (
+        <div className="pt-3 border-t-2 border-neutral-200 w-full text-xs font-mono text-neutral-700">
+          Wi-Fi: <strong>{wifiSsid}</strong> {wifiPassword ? `• Pass: ${wifiPassword}` : ''}
+        </div>
+      )}
+
+      <div className="mt-4 text-[10px] text-neutral-400 font-mono uppercase tracking-widest">
+        Powered by Digital Menu • /{restaurant.slug}
+      </div>
+    </div>
+  </>
   );
 }

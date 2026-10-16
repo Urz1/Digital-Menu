@@ -181,7 +181,7 @@ export function ReviewsManager({
     }
   };
 
-  // Handle Remove (Managers / Owners only)
+  // Handle Remove (Owners only)
   const handleConfirmRemoval = async () => {
     if (!removalReview) return;
     setRemovalError(null);
@@ -613,7 +613,7 @@ export function ReviewsManager({
                         </button>
                       ) : (
                         <span
-                          title="Only managers and owners can remove reviews"
+                          title="Only owners can remove reviews"
                           className="text-[11px] text-neutral-500 italic"
                         >
                           Only owners can remove

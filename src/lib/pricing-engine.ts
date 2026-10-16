@@ -366,9 +366,15 @@ export function evaluateItemPricing(
   maxSavings = Math.min(item.price, Number(maxSavings.toFixed(2)));
   const finalPrice = Math.max(0, Number((item.price - maxSavings).toFixed(2)));
 
-  const badgeText = bestOffer.badge_text || (bestOffer.discount_type === 'percentage' 
-    ? `${bestOffer.discount_value}% Off` 
-    : `Save $${maxSavings.toFixed(2)}`);
+  const currency = context.currencySymbol || '$';
+  let badgeText = bestOffer.badge_text;
+  if (!badgeText) {
+    badgeText = bestOffer.discount_type === 'percentage' 
+      ? `${bestOffer.discount_value}% Off` 
+      : `Save ${currency}${currency === '$' ? '' : ' '}${maxSavings.toFixed(0)}`;
+  } else if (context.currencySymbol && context.currencySymbol !== '$') {
+    badgeText = badgeText.replace(/\$\s*/g, `${context.currencySymbol} `).trim();
+  }
 
   return {
     itemId: item.id,

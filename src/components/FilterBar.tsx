@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DietaryFilter, SortOrder } from '@/types/menu';
 import { triggerHaptic } from '@/lib/utils';
-import { LayoutGrid, List, ArrowUpDown, Check, X } from 'lucide-react';
+import { LayoutGrid, List, ArrowUpDown, Check, X, Sparkles, ArrowDownNarrowWide, ArrowUpNarrowWide, ArrowDownAZ } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface FilterBarProps {
@@ -40,29 +40,29 @@ export function FilterBar({
     { id: 'spicy', label: t.filterSpicy },
   ];
 
-  const SORT_OPTIONS: { id: SortOrder; label: string; icon: string; desc: string }[] = [
+  const SORT_OPTIONS: { id: SortOrder; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
     {
       id: 'featured',
       label: t.sortFeatured,
-      icon: '⭐',
+      icon: Sparkles,
       desc: 'Popular and chef-recommended dishes first',
     },
     {
       id: 'price-asc',
       label: t.sortPriceAsc,
-      icon: '💵',
+      icon: ArrowDownNarrowWide,
       desc: 'Most affordable items first',
     },
     {
       id: 'price-desc',
       label: t.sortPriceDesc,
-      icon: '💎',
+      icon: ArrowUpNarrowWide,
       desc: 'Premium platters and feasts first',
     },
     {
       id: 'name-asc',
       label: t.sortNameAsc,
-      icon: '🔤',
+      icon: ArrowDownAZ,
       desc: 'Alphabetical order from A to Z',
     },
   ];
@@ -186,7 +186,13 @@ export function FilterBar({
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-xl flex-shrink-0">{opt.icon}</span>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'bg-[var(--primary)] text-white shadow-xs'
+                          : 'bg-[var(--card)] text-[var(--muted)] border border-[var(--border)]'
+                      }`}>
+                        <opt.icon className="w-4 h-4" />
+                      </div>
                       <div>
                         <div
                           className={`text-sm font-bold ${

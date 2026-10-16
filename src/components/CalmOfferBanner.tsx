@@ -64,7 +64,7 @@ export function CalmOfferBanner({ activeOffer, onSeeOffer }: CalmOfferBannerProp
         </span>
 
         <p className="truncate text-xs font-medium leading-snug">
-          {displayText}
+          {displayText.replace(/^[^\w\s\u1200-\u137F\u00C0-\u024F]+\s*/, '')}
         </p>
 
         <button

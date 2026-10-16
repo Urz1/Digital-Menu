@@ -99,32 +99,32 @@ const OFFER_TEMPLATES: TemplatePreset[] = [
   {
     id: 'money_off',
     name: 'Money Off',
-    emoji: '💵',
-    tagline: 'Specific dollar saving on signature dishes (e.g. Save $4 on Prime Rib)',
-    defaultTitle: 'Save $4 on Signature Truffle Flatbread',
-    defaultDesc: 'Save $4.00 on our 72-hour sourdough truffle burrata pizza.',
-    defaultBadge: 'Save $4',
+    emoji: '🏷️',
+    tagline: 'Specific money saving on signature dishes (e.g. 40 ETB Off)',
+    defaultTitle: '40 ETB Off Signature Truffle Flatbread',
+    defaultDesc: 'Save 40 ETB on our 72-hour sourdough truffle burrata pizza.',
+    defaultBadge: '40 ETB Off',
     discountType: 'fixed_amount',
-    defaultDiscountValue: 4.0,
+    defaultDiscountValue: 40.0,
     defaultScope: 'items',
     defaultHonestUrgency: 0,
     defaultShowBanner: false,
-    defaultBannerText: '🍕 Save $4 on our Chef Signature Truffle Flatbread.',
+    defaultBannerText: 'Save 40 ETB on our Chef Signature Truffle Flatbread.',
   },
   {
     id: 'combo_deal',
     name: 'Combo Deal',
-    emoji: '🍔',
+    emoji: '🍽️',
     tagline: 'Bundle an entrée and beverage or side for an attractive joint price',
     defaultTitle: 'Wood-Fired Burger & Brew Combo',
-    defaultDesc: 'Order any prime burger and get $3.50 off your accompanying craft drink.',
+    defaultDesc: 'Order any prime burger and get 50 ETB off your accompanying craft drink.',
     defaultBadge: 'Combo Saving',
     discountType: 'fixed_amount',
-    defaultDiscountValue: 3.5,
+    defaultDiscountValue: 50.0,
     defaultScope: 'categories',
     defaultHonestUrgency: 0,
     defaultShowBanner: true,
-    defaultBannerText: '🍔 Burger & Craft Drink Combo: Save $3.50 on your pairing.',
+    defaultBannerText: 'Burger & Craft Drink Combo: Save 50 ETB on your pairing.',
   },
   {
     id: 'bogo',
@@ -143,33 +143,33 @@ const OFFER_TEMPLATES: TemplatePreset[] = [
   },
   {
     id: 'free_item',
-    name: 'Free Item with Order Over $X',
+    name: 'Free Item with Order Threshold',
     emoji: '🎁',
     tagline: 'Gift a complimentary item when dining tables spend over a threshold',
-    defaultTitle: 'Free Single-Origin Espresso Over $30',
-    defaultDesc: 'Complimentary Yirgacheffe espresso automatically added to orders over $30.',
+    defaultTitle: 'Free Single-Origin Espresso Over 500 ETB',
+    defaultDesc: 'Complimentary Yirgacheffe espresso automatically added to orders over 500 ETB.',
     defaultBadge: 'Free Gift',
     discountType: 'free_item',
     defaultDiscountValue: 0,
     defaultScope: 'all',
     defaultHonestUrgency: 0,
     defaultShowBanner: true,
-    defaultBannerText: '🎁 Free artisanal espresso with all table orders over $30.',
+    defaultBannerText: 'Free artisanal espresso with all table orders over 500 ETB.',
   },
   {
     id: 'todays_special',
     name: "Today's Special",
-    emoji: '⭐',
+    emoji: '✨',
     tagline: 'Highlight a fresh daily arrival or special kitchen catch at promotional pricing',
     defaultTitle: "Chef's Catch of the Day Special",
     defaultDesc: 'Pan-roasted wild catch at special daily market price.',
     defaultBadge: "Today's Special",
     discountType: 'fixed_amount',
-    defaultDiscountValue: 5.0,
+    defaultDiscountValue: 50.0,
     defaultScope: 'items',
     defaultHonestUrgency: 2,
     defaultShowBanner: false,
-    defaultBannerText: "⭐ Today's Special: Fresh wild sea bass at $5 off.",
+    defaultBannerText: "Today's Special: Fresh wild sea bass at 50 ETB off.",
   },
   {
     id: 'limited_time',
@@ -565,7 +565,7 @@ export function OffersManager({
 
         {!isStaff ? (
           <button
-            data-testid="manager-create-offer-btn"
+            data-testid="admin-create-offer-btn"
             onClick={handleStartCreateOffer}
             className="px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-950/30 transition-transform active:scale-95"
           >
@@ -904,7 +904,7 @@ export function OffersManager({
                           type="text"
                           value={badgeText}
                           onChange={(e) => setBadgeText(e.target.value)}
-                          placeholder="e.g. 20% Off, Save $4"
+                          placeholder={`e.g. 20% Off, Save 40 ${restaurant.currency}`}
                           className="w-full h-11 px-3.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white outline-none focus:border-amber-500"
                         />
                       </div>
@@ -915,7 +915,7 @@ export function OffersManager({
                             ? 'Discount Percentage (%)'
                             : discountType === 'fixed_amount'
                             ? `Amount Off (${restaurant.currency})`
-                            : 'Order Threshold ($)'}
+                            : `Order Threshold (${restaurant.currency})`}
                         </label>
                         <input
                           type="number"
@@ -1262,7 +1262,7 @@ export function OffersManager({
                           {badgeText || 'Offer'}
                         </span>
                         <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
-                          {discountType === 'percentage' ? `${discountValue}% Off` : `Save $${discountValue}`}
+                          {discountType === 'percentage' ? `${discountValue}% Off` : `Save ${restaurant.currency} ${discountValue}`}
                         </span>
                         <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-neutral-300">
                           {useTimeWindow ? `${startTime} – ${endTime}` : 'All Day'}

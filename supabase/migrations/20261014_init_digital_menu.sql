@@ -265,3 +265,155 @@ INSERT INTO public.restaurants (
     address = EXCLUDED.address,
     announcement = EXCLUDED.announcement;
 
+-- 12. OFFERS & HAPPY HOUR DISCOUNTS TABLE
+CREATE TABLE IF NOT EXISTS public.offers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    restaurant_id UUID NOT NULL REFERENCES public.restaurants(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    badge_text TEXT NOT NULL,
+    badge_color TEXT DEFAULT '#E8590C',
+    description TEXT NOT NULL,
+    offer_type TEXT NOT NULL DEFAULT 'item_discount', -- 'item_discount', 'order_threshold', 'category_discount', 'bogo'
+    discount_type TEXT NOT NULL DEFAULT 'percentage', -- 'percentage', 'fixed_amount'
+    discount_value NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    threshold_amount NUMERIC(10, 2),
+    target_item_ids JSONB DEFAULT '[]'::jsonb,
+    target_category_ids JSONB DEFAULT '[]'::jsonb,
+    reward_item_id TEXT,
+    start_time TEXT,
+    end_time TEXT,
+    days_of_week JSONB DEFAULT '[0,1,2,3,4,5,6]'::jsonb,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    priority INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc', now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_offers_restaurant ON public.offers(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_offers_active ON public.offers(is_active);
+
+-- 13. DISH REVIEWS & DINER FEEDBACK TABLE
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id TEXT PRIMARY KEY,
+    restaurant_id UUID NOT NULL REFERENCES public.restaurants(id) ON DELETE CASCADE,
+    item_id TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    tags JSONB DEFAULT '[]'::jsonb,
+    comment TEXT,
+    photo_url TEXT,
+    session_token TEXT NOT NULL,
+    table_number TEXT,
+    status TEXT NOT NULL DEFAULT 'published', -- 'published', 'reported', 'flagged', 'removed'
+    report_count INTEGER NOT NULL DEFAULT 0,
+    flagged_reason TEXT,
+    owner_reply TEXT,
+    owner_reply_at TIMESTAMPTZ,
+    owner_reply_by TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc', now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc', now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_restaurant ON public.reviews(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_item ON public.reviews(item_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_status ON public.reviews(status);
+CREATE INDEX IF NOT EXISTS idx_reviews_created ON public.reviews(created_at DESC);
+
+-- Enable RLS
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+-- OFFERS POLICIES
+CREATE POLICY "Public can view active offers" ON public.offers
+    FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Owners have full CRUD over offers" ON public.offers
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.staff_users 
+            WHERE staff_users.user_id = auth.uid() 
+            AND staff_users.restaurant_id = offers.restaurant_id 
+            AND staff_users.role = 'owner'
+        )
+    );
+
+CREATE POLICY "Staff can view all offers" ON public.offers
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.staff_users 
+            WHERE staff_users.user_id = auth.uid() 
+            AND staff_users.restaurant_id = offers.restaurant_id
+        )
+    );
+
+-- REVIEWS POLICIES
+CREATE POLICY "Public can view published reviews" ON public.reviews
+    FOR SELECT USING (status = 'published');
+
+CREATE POLICY "Public diners can submit reviews" ON public.reviews
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Staff and owners can view all reviews" ON public.reviews
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.staff_users 
+            WHERE staff_users.user_id = auth.uid() 
+            AND staff_users.restaurant_id = reviews.restaurant_id
+        )
+    );
+
+CREATE POLICY "Staff and owners can reply to reviews" ON public.reviews
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.staff_users 
+            WHERE staff_users.user_id = auth.uid() 
+            AND staff_users.restaurant_id = reviews.restaurant_id
+        )
+    );
+
+-- REALTIME STREAMING FOR OFFERS AND REVIEWS
+ALTER PUBLICATION supabase_realtime ADD TABLE public.offers;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
+
+-- SEED PRODUCTION OFFERS FOR ADDIS CAFETERIA (Strictly in ETB)
+INSERT INTO public.offers (
+    restaurant_id, title, badge_text, badge_color, description, offer_type, discount_type, discount_value, threshold_amount, is_active, priority
+) VALUES 
+(
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    'Afternoon Happy Hour: 20% off all artisan wood-fired pizzas',
+    '20% Off',
+    '#E8590C',
+    'Enjoy 20% off all wood-fired sourdough pizzas baked in our custom clay oven.',
+    'category_discount',
+    'percentage',
+    20.00,
+    NULL,
+    true,
+    10
+),
+(
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    'Addis Sourdough Truffle Burrata Combo (40 ETB Off)',
+    '40 ETB Off',
+    '#D9480F',
+    'Fresh hearth burrata with sourdough bread and spiced Ethiopian honey butter at a special discount.',
+    'item_discount',
+    'fixed_amount',
+    40.00,
+    NULL,
+    true,
+    5
+),
+(
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    'Complimentary Ethiopian Single-Origin Espresso on orders over 500 ETB',
+    'Free Espresso',
+    '#2B8A3E',
+    'Spend 500 ETB or more to receive a complimentary ceremonial Ethiopian roast espresso.',
+    'order_threshold',
+    'fixed_amount',
+    0.00,
+    500.00,
+    true,
+    1
+);
+

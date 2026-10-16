@@ -16,7 +16,7 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await expect(page.locator('text=Offer Views')).toBeVisible();
 
     // Click "Create Offer" button (under 90s flow)
-    const createBtn = page.locator('[data-testid="manager-create-offer-btn"]').or(page.locator('button:has-text("Create Offer")')).first();
+    const createBtn = page.locator('[data-testid="admin-create-offer-btn"]').or(page.locator('button:has-text("Create Offer")')).first();
     await expect(createBtn).toBeVisible();
     await createBtn.click();
 
@@ -101,11 +101,11 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     // - Badge text (e.g. "20% Off" or "Save $4")
     // - Old price struck through
     // - New discounted price in accent color
-    const offerBadge = page.locator('span:has-text("20% Off"), span:has-text("Save $4")').first();
+    const offerBadge = page.locator('span:has-text("20% Off"), span:has-text("40 ETB Off"), span:has-text("Save $4")').first();
     await expect(offerBadge).toBeVisible();
 
     // Open dish detail bottom sheet
-    const dishCard = page.locator('article:has-text("Save $4"), article:has-text("20% Off")').first();
+    const dishCard = page.locator('article:has-text("20% Off"), article:has-text("40 ETB Off"), article:has-text("Save $4")').first();
     await dishCard.click();
 
     // Verify dish modal details:

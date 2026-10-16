@@ -129,11 +129,11 @@ export function InsightsSection({
               {offers[0]?.title || 'Chef Lunch Combo'}
             </h3>
             <p className="text-2xl font-extrabold text-white font-mono mt-1">
-              $640 <span className="text-xs font-normal text-neutral-400">revenue</span>
+              {restaurant.currency} 6,400 <span className="text-xs font-normal text-neutral-400">revenue</span>
             </p>
           </div>
           <div className="mt-3 pt-2.5 border-t border-white/5 text-[11px] text-emerald-400 font-medium">
-            <span>32 redemptions (+$18 basket lift)</span>
+            <span>32 redemptions (+180 {restaurant.currency} basket lift)</span>
           </div>
         </div>
 

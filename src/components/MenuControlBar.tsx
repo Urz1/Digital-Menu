@@ -14,6 +14,20 @@ import {
   Check,
   X,
   Compass,
+  Sparkles,
+  ArrowDownNarrowWide,
+  ArrowUpNarrowWide,
+  ArrowDownAZ,
+  Utensils,
+  ChefHat,
+  Leaf,
+  Sprout,
+  Salad,
+  WheatOff,
+  ShieldCheck,
+  Flame,
+  Tag,
+  Grid,
 } from 'lucide-react';
 
 export interface MenuControlBarProps {
@@ -79,23 +93,23 @@ export function MenuControlBar({
     : 0;
 
   // Filter definitions
-  const FILTER_OPTIONS: { id: DietaryFilter; label: string; icon: string; desc: string }[] = [
-    { id: 'all', label: t.filterAll, icon: '🍽️', desc: 'Show all dishes on the menu' },
-    { id: 'chefsPick', label: t.filterChefsPick.replace(/^⭐\s*/, ''), icon: '⭐', desc: 'Signature dishes recommended by the kitchen' },
-    { id: 'fasting', label: t.filterFasting.replace(/^🥗\s*/, ''), icon: '🥗', desc: 'Ethiopian fasting dishes (meat & dairy free)' },
-    { id: 'vegetarian', label: t.filterVegetarian.replace(/^🌱\s*/, ''), icon: '🌱', desc: 'Dishes prepared without meat or poultry' },
-    { id: 'vegan', label: t.filterVegan.replace(/^🌿\s*/, ''), icon: '🌿', desc: '100% plant-based, no animal ingredients' },
-    { id: 'gluten-free', label: t.filterGlutenFree.replace(/^🌾\s*/, ''), icon: '🌾', desc: 'Prepared without gluten-containing ingredients' },
-    { id: 'halal', label: t.filterHalal.replace(/^🥩\s*/, ''), icon: '🥩', desc: 'Prepared according to Halal standards' },
-    { id: 'spicy', label: t.filterSpicy.replace(/^🌶️\s*/, ''), icon: '🌶️', desc: 'Dishes with chili, awaze, or spicy seasoning' },
+  const FILTER_OPTIONS: { id: DietaryFilter; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
+    { id: 'all', label: t.filterAll, icon: Utensils, desc: 'Show all dishes on the menu' },
+    { id: 'chefsPick', label: t.filterChefsPick, icon: ChefHat, desc: 'Signature dishes recommended by the kitchen' },
+    { id: 'fasting', label: t.filterFasting, icon: Leaf, desc: 'Ethiopian fasting dishes (meat & dairy free)' },
+    { id: 'vegetarian', label: t.filterVegetarian, icon: Sprout, desc: 'Dishes prepared without meat or poultry' },
+    { id: 'vegan', label: t.filterVegan, icon: Salad, desc: '100% plant-based, no animal ingredients' },
+    { id: 'gluten-free', label: t.filterGlutenFree, icon: WheatOff, desc: 'Prepared without gluten-containing ingredients' },
+    { id: 'halal', label: t.filterHalal, icon: ShieldCheck, desc: 'Prepared according to Halal standards' },
+    { id: 'spicy', label: t.filterSpicy, icon: Flame, desc: 'Dishes with chili, awaze, or spicy seasoning' },
   ];
 
   // Sort definitions
-  const SORT_OPTIONS: { id: SortOrder; label: string; icon: string; desc: string }[] = [
-    { id: 'featured', label: t.sortFeatured, icon: '⭐', desc: 'Popular and chef-recommended dishes first' },
-    { id: 'price-asc', label: t.sortPriceAsc, icon: '💵', desc: 'Most affordable items first' },
-    { id: 'price-desc', label: t.sortPriceDesc, icon: '💎', desc: 'Premium platters and feasts first' },
-    { id: 'name-asc', label: t.sortNameAsc, icon: '🔤', desc: 'Alphabetical order from A to Z' },
+  const SORT_OPTIONS: { id: SortOrder; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
+    { id: 'featured', label: t.sortFeatured, icon: Sparkles, desc: 'Popular and chef-recommended dishes first' },
+    { id: 'price-asc', label: t.sortPriceAsc, icon: ArrowDownNarrowWide, desc: 'Most affordable items first' },
+    { id: 'price-desc', label: t.sortPriceDesc, icon: ArrowUpNarrowWide, desc: 'Premium platters and feasts first' },
+    { id: 'name-asc', label: t.sortNameAsc, icon: ArrowDownAZ, desc: 'Alphabetical order from A to Z' },
   ];
 
   const currentSort = SORT_OPTIONS.find((s) => s.id === sortOrder) || SORT_OPTIONS[0];
@@ -125,7 +139,11 @@ export function MenuControlBar({
             aria-label={`${t.browseCategories}: ${activeCategoryName}`}
           >
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-base flex-shrink-0 leading-none">{activeCategoryIcon}</span>
+              {isOffersActive ? (
+                <Tag className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+              ) : (
+                <Grid className="w-3.5 h-3.5 text-[var(--primary)] flex-shrink-0" />
+              )}
               <span className="truncate text-left text-xs text-[var(--foreground)] font-bold">
                 {activeCategoryName}
               </span>
@@ -204,12 +222,12 @@ export function MenuControlBar({
                 triggerHaptic(8);
                 setIsSortSheetOpen(true);
               }}
-              className="h-9 px-2.5 rounded-full bg-[var(--background)] border border-[var(--border)] hover:text-[var(--foreground)] text-[var(--muted)] flex items-center gap-1 text-xs font-bold transition-all active:scale-95 shadow-2xs"
+              className="h-9 px-2.5 rounded-full bg-[var(--background)] border border-[var(--border)] hover:text-[var(--foreground)] text-[var(--muted)] flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-2xs"
               title={`Sort by: ${currentSort.label}`}
               aria-label={`Sort by: ${currentSort.label}`}
             >
               <ArrowUpDown className="w-3.5 h-3.5 text-[var(--primary)]" />
-              <span className="text-xs">{currentSort.icon}</span>
+              <currentSort.icon className="w-3.5 h-3.5 text-[var(--muted)]" />
             </button>
 
             {/* Grid / List Layout Toggle */}
@@ -236,7 +254,7 @@ export function MenuControlBar({
         {isDietaryFilterActive && activeFilterObj && (
           <div className="px-3 pb-2 pt-0.5 flex items-center justify-between text-xs border-t border-[var(--border)]/40 bg-[var(--background)]/60 animate-in fade-in duration-150">
             <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)] font-semibold truncate">
-              <span className="text-sm">{activeFilterObj.icon}</span>
+              <activeFilterObj.icon className="w-3.5 h-3.5 text-[var(--primary)]" />
               <span className="text-[11px] text-[var(--muted)]">Filtered by:</span>
               <span className="font-bold text-[var(--primary)] truncate">{activeFilterObj.label}</span>
             </div>
@@ -309,7 +327,13 @@ export function MenuControlBar({
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl flex-shrink-0">{opt.icon}</span>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'bg-[var(--primary)] text-white shadow-xs'
+                          : 'bg-[var(--card)] text-[var(--muted)] border border-[var(--border)]'
+                      }`}>
+                        <opt.icon className="w-4 h-4" />
+                      </div>
                       <div>
                         <div
                           className={`text-sm font-bold ${
@@ -403,14 +427,20 @@ export function MenuControlBar({
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl flex-shrink-0">{opt.icon}</span>
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'bg-[var(--primary)] text-white shadow-xs'
+                          : 'bg-[var(--card)] text-[var(--muted)] border border-[var(--border)]'
+                      }`}>
+                        <opt.icon className="w-4 h-4" />
+                      </div>
                       <div>
                         <div
                           className={`text-sm font-bold ${
                             isSelected ? 'text-[var(--primary)]' : 'text-[var(--foreground)]'
                           }`}
                         >
-                          {opt.label.replace(/^[^\w\s]+\s*/, '')}
+                          {opt.label}
                         </div>
                         <div className="text-xs text-[var(--muted)] mt-0.5">{opt.desc}</div>
                       </div>

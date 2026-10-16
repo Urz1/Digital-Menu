@@ -204,14 +204,10 @@ test.describe('Stage 4: Dish Reviews Engine - Pure Unit Tests', () => {
     expect(fastBot.reason).toContain('Inhuman submission speed');
   });
 
-  test('7. Role Permissions: Staff can reply, only managers/owners can remove', () => {
+  test('7. Role Permissions: Staff can reply, only owners can remove', () => {
     // Staff role
     expect(canReplyToReview('staff')).toBe(true);
     expect(canRemoveReview('staff')).toBe(false);
-
-    // Manager role
-    expect(canReplyToReview('manager')).toBe(true);
-    expect(canRemoveReview('manager')).toBe(true);
 
     // Owner role
     expect(canReplyToReview('owner')).toBe(true);

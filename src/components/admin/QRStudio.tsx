@@ -174,8 +174,9 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
 
   return (
     <div className="flex flex-col gap-6 pb-20 print:p-0 print:pb-0" data-testid="qr-studio-container">
-      {/* 1. Header & Quick Actions (Hidden during print) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
+      <div className="screen-only-admin flex flex-col gap-6">
+        {/* 1. Header & Quick Actions (Hidden during print) */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-white">QR Studio & Table Stands</h2>
@@ -585,11 +586,12 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
           )}
         </div>
       </div>
+      </div>
 
       {/* ----------------------------------------------------------------------- */}
       {/* 3. PRINT ONLY LAYOUT (@media print) */}
       {/* ----------------------------------------------------------------------- */}
-      <div className="hidden print:block text-black bg-white w-full">
+      <div className="hidden print:block text-black bg-white w-full print-only-card">
         {/* PRINT TABLE TENT */}
         {templateType === 'tent' && (
           <div className="w-[140mm] mx-auto p-8 border-2 border-black rounded-3xl flex flex-col items-center text-center">

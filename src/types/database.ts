@@ -1,4 +1,4 @@
-export type UserRole = 'owner' | 'manager' | 'staff';
+export type UserRole = 'owner' | 'staff';
 
 export interface ThemeConfig {
   primaryColor: string; // e.g. '#E8590C'

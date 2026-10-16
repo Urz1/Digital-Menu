@@ -15,6 +15,7 @@ import {
 import { CreateOrderInput, ServiceRequestInput } from './validators';
 import { createClient } from './supabase/client';
 import { checkReviewContent, validateBotCheck, checkReviewRateLimit, canRemoveReview } from './review-engine';
+import { broadcastSync } from './sync-channel';
 
 // -----------------------------------------------------------------------------
 // DEFAULT PRODUCTION SEED / FALLBACK DATA FOR "ADDIS" & MULTI-TENANT
@@ -1893,7 +1894,7 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
     }
   }
 
-  return MOCK_ITEMS_ADDIS;
+  return inMemoryItems;
 }
 
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
@@ -1996,13 +1997,13 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
     id: 'f2b9d2e3-4567-4890-b123-456789abc02',
     restaurant_id: MOCK_RESTAURANT_ADDIS.id,
     title: 'Addis Sourdough Truffle Burrata Combo',
-    description: 'Save $4.00 when enjoying our signature Truffle Burrata Flatbread.',
-    badge_text: 'Save $4',
+    description: 'Save 40 ETB when enjoying our signature Truffle Burrata Flatbread.',
+    badge_text: '40 ETB Off',
     template_type: 'money_off',
     status: 'live',
     is_paused: false,
     discount_type: 'fixed_amount',
-    discount_value: 4.0,
+    discount_value: 40.0,
     scope_type: 'items',
     item_ids: ['item-burrata'],
     timezone: 'Africa/Addis_Ababa',
@@ -2014,22 +2015,22 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
     views_count: 96,
     taps_count: 28,
     orders_count: 9,
-    total_savings: 36.0,
+    total_savings: 360.0,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
     id: 'f3c0e3f4-5678-4901-c234-56789abc03',
     restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    title: 'Complimentary Single-Origin Espresso over $30',
-    description: 'Free single-origin Yirgacheffe espresso automatically added to orders over $30.',
+    title: 'Complimentary Single-Origin Espresso over 500 ETB',
+    description: 'Free single-origin Yirgacheffe espresso automatically added to orders over 500 ETB.',
     badge_text: 'Free Gift',
     template_type: 'free_item',
     status: 'live',
     is_paused: false,
     discount_type: 'free_item',
     discount_value: 0,
-    min_order_amount: 30.0,
+    min_order_amount: 500.0,
     free_item_id: 'item-espresso',
     scope_type: 'all',
     timezone: 'Africa/Addis_Ababa',
@@ -2396,6 +2397,27 @@ export async function getDishReviews(
   restaurantId: string,
   itemId?: string
 ): Promise<DishReview[]> {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      let query = supabase
+        .from('reviews')
+        .select('*')
+        .eq('restaurant_id', restaurantId);
+
+      if (itemId) {
+        query = query.eq('item_id', itemId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        return data as DishReview[];
+      }
+    } catch {
+      // Fallback below
+    }
+  }
+
   let list = inMemoryReviews.filter((r) => r.restaurant_id === restaurantId);
   if (itemId) {
     list = list.filter((r) => r.item_id === itemId);
@@ -2460,6 +2482,9 @@ export async function submitDishReview(params: {
   };
 
   inMemoryReviews.unshift(newReview);
+
+  // Broadcast feedback immediately across tabs so owner and staff receive it right away
+  broadcastSync({ type: 'REVIEW_SUBMITTED', review: newReview });
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
@@ -2536,6 +2561,8 @@ export async function replyToDishReview(
     created_at: new Date().toISOString(),
   });
 
+  broadcastSync({ type: 'REVIEW_UPDATED', review });
+
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
@@ -2560,13 +2587,13 @@ export async function moderateDishReview(
   action: 'approve' | 'remove',
   reason: string,
   userRole: UserRole,
-  userName: string = 'Manager'
+  userName: string = 'Owner'
 ): Promise<{ success: boolean; error?: string }> {
-  // Enforce role permissions: only owners/managers can remove reviews
+  // Enforce role permissions: only owners can remove reviews
   if (action === 'remove' && !canRemoveReview(userRole)) {
     return {
       success: false,
-      error: 'Permission denied: Only managers and owners can remove reviews.',
+      error: 'Permission denied: Only owners can remove reviews.',
     };
   }
 
@@ -2601,6 +2628,8 @@ export async function moderateDishReview(
     reason,
     created_at: new Date().toISOString(),
   });
+
+  broadcastSync({ type: 'REVIEW_UPDATED', review });
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
@@ -2702,15 +2731,16 @@ let inMemoryRestaurant: Restaurant = { ...MOCK_RESTAURANT_ADDIS };
 
 export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuItem> {
   const existingIdx = inMemoryItems.findIndex((i) => i.id === itemData.id);
+  let savedItem: MenuItem;
 
   if (existingIdx >= 0) {
-    inMemoryItems[existingIdx] = {
+    savedItem = {
       ...inMemoryItems[existingIdx],
       ...itemData,
     } as MenuItem;
-    return inMemoryItems[existingIdx];
+    inMemoryItems[existingIdx] = savedItem;
   } else {
-    const newItem: MenuItem = {
+    savedItem = {
       id: itemData.id || `item-${Date.now()}`,
       restaurant_id: itemData.restaurant_id || MOCK_RESTAURANT_ADDIS.id,
       category_id: itemData.category_id || inMemoryCategories[0]?.id || 'cat-starters',
@@ -2732,9 +2762,22 @@ export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuIte
       sort_order: itemData.sort_order ?? inMemoryItems.length + 1,
       options: itemData.options || [],
     };
-    inMemoryItems.unshift(newItem);
-    return newItem;
+    inMemoryItems.unshift(savedItem);
   }
+
+  // Broadcast update immediately to customer menu view across tabs/windows
+  broadcastSync({ type: 'ITEM_UPDATED', item: savedItem });
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      await supabase.from('items').upsert(savedItem);
+    } catch {
+      // Handled
+    }
+  }
+
+  return savedItem;
 }
 
 export async function duplicateMenuItem(itemId: string): Promise<MenuItem | null> {
@@ -2749,6 +2792,7 @@ export async function duplicateMenuItem(itemId: string): Promise<MenuItem | null
   };
 
   inMemoryItems.unshift(duplicated);
+  broadcastSync({ type: 'ITEM_UPDATED', item: duplicated });
   return duplicated;
 }
 
@@ -2756,11 +2800,22 @@ export async function archiveMenuItem(itemId: string, archived: boolean = true):
   const item = inMemoryItems.find((i) => i.id === itemId);
   if (!item) return false;
   item.is_archived = archived;
+  broadcastSync({ type: 'ITEM_UPDATED', item });
   return true;
 }
 
 export async function deleteMenuItem(itemId: string): Promise<boolean> {
   inMemoryItems = inMemoryItems.filter((i) => i.id !== itemId);
+  broadcastSync({ type: 'ITEM_DELETED', itemId });
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      await supabase.from('items').delete().eq('id', itemId);
+    } catch {
+      // Handled
+    }
+  }
   return true;
 }
 
@@ -2771,7 +2826,9 @@ export async function bulkUpdateItems(
   const targetSet = new Set(itemIds);
   inMemoryItems = inMemoryItems.map((item) => {
     if (targetSet.has(item.id)) {
-      return { ...item, ...updates };
+      const updated = { ...item, ...updates };
+      broadcastSync({ type: 'ITEM_UPDATED', item: updated });
+      return updated;
     }
     return item;
   });

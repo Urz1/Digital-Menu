@@ -9,7 +9,7 @@ import {
   PlusCircle,
   AlertTriangle,
   Tag,
-  DollarSign,
+  Coins,
   QrCode,
   TrendingUp,
   Star,
@@ -207,13 +207,13 @@ export function HomeDashboard({
             className="group p-4 rounded-xl bg-[#14161E] hover:bg-[#1A1D27] border border-white/5 hover:border-blue-500/40 transition-all text-left flex flex-col justify-between gap-3 shadow-sm hover:shadow-md"
           >
             <div className="w-10 h-10 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 text-blue-400 flex items-center justify-center transition-colors">
-              <DollarSign className="w-5 h-5" />
+              <Coins className="w-5 h-5" />
             </div>
             <div>
               <p className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
                 Edit Prices
               </p>
-              <p className="text-[11px] text-neutral-400 mt-0.5">Bulk % or $ change</p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">Bulk % or {restaurant.currency} change</p>
             </div>
           </button>
 
