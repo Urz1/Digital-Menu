@@ -47,7 +47,7 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     // Step 5: Celebration & QR Code
     await expect(wizardModal.locator('text=Step 5 of 5')).toBeVisible();
     await expect(wizardModal.locator('text=Your menu is live and ready!')).toBeVisible();
-    await expect(wizardModal.locator('text=Table 14')).toBeVisible();
+    await expect(wizardModal.locator('text=Table 1')).toBeVisible();
 
     // Finish onboarding
     const finishBtn = wizardModal.locator('[data-testid="onboarding-finish-button"]');
@@ -74,10 +74,11 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
     await expect(formModal).toBeVisible();
 
     // Fill essentials
+    const testDishName = `Truffle Special ${Date.now()}`;
     const nameInput = page.locator('[data-testid="dish-form-name"]');
-    await nameInput.fill('Crispy Truffle Fries');
+    await nameInput.fill(testDishName);
     const priceInput = page.locator('[data-testid="dish-form-price"]');
-    await priceInput.fill('12.50');
+    await priceInput.fill('450.00');
 
     // Expand "More options"
     const moreOptionsBtn = page.locator('[data-testid="toggle-more-options"]');
@@ -99,9 +100,16 @@ test.describe('Stage 5: Admin Experience - End to End Flow', () => {
 
     // Search for newly created dish
     const searchInput = page.locator('[data-testid="menu-search-input"]');
-    await searchInput.fill('Crispy Truffle Fries');
-    await expect(page.locator('text=Crispy Truffle Fries').first()).toBeVisible();
-    await expect(page.locator('text=12.50').first()).toBeVisible();
+    await searchInput.fill(testDishName);
+    await expect(page.locator(`text=${testDishName}`).first()).toBeVisible();
+    await expect(page.locator('text=450 ETB').first()).toBeVisible();
+
+    // Clean up test dish so the live menu remains pure
+    page.on('dialog', (dialog) => dialog.accept());
+    const archiveBtn = page.locator('button[title="Archive dish"]').first();
+    if (await archiveBtn.isVisible()) {
+      await archiveBtn.click();
+    }
   });
 
   test('3. Availability Management: One-tap "Sold Out Today" toggle with instant visual feedback', async ({ page }) => {

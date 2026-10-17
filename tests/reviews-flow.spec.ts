@@ -155,8 +155,8 @@ test.describe('Dish Reviews System - Customer Submission & Owner Management Pari
     await page.goto('/addis?table=Table%2019');
     await expect(page.locator('h1:has-text("Addis Cafeteria")')).toBeVisible();
 
-    // Open Fetira with Honey & Banana
-    const dishCard = page.locator('article:has-text("Fetira with Honey & Banana")').first();
+    // Open Fetira
+    const dishCard = page.locator('article:has-text("Fetira")').first();
     await expect(dishCard).toBeVisible();
     await dishCard.scrollIntoViewIfNeeded();
     await dishCard.click();

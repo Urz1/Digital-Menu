@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Restaurant } from '@/types/database';
-import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Bell } from 'lucide-react';
+import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Bell, UtensilsCrossed } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { triggerHaptic } from '@/lib/utils';
 
@@ -82,7 +82,9 @@ export function MenuHeader({
                     title="View branch location on Google Maps"
                   >
                     <MapPin className="w-3 h-3 text-[var(--primary)] flex-shrink-0" />
-                    <span className="truncate max-w-[100px]">{restaurant.branch_name || 'Main Branch'}</span>
+                    <span className="truncate max-w-[140px] sm:max-w-none">
+                      {restaurant.branch_name ? restaurant.branch_name.split('—')[0].trim() : 'Main Branch'}
+                    </span>
                   </a>
                 </>
               )}
@@ -169,9 +171,9 @@ export function MenuHeader({
 
       {/* Table & Quick Info Strip */}
       <div className="flex items-center justify-between px-3.5 py-1.5 border-t border-[var(--border)] text-xs text-[var(--muted)]">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] font-semibold text-[var(--foreground)] text-[11px]">
-          <MapPin className="w-3 h-3 text-amber-500 flex-shrink-0" />
-          <span>{tableNumber}</span>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] font-bold text-[var(--foreground)] text-[11px] shadow-2xs">
+          <UtensilsCrossed className="w-3 h-3 text-amber-500 flex-shrink-0" />
+          <span>{tableNumber.toLowerCase().includes('table') ? tableNumber : `Table ${tableNumber}`}</span>
         </div>
 
         <div className="flex items-center gap-2">

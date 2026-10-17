@@ -619,7 +619,7 @@ export default function AdminDashboardPage() {
 
             {/* Customer Live Menu Link */}
             <Link
-              href={`/${restaurant.slug}?table=14`}
+              href={`/${restaurant.slug}?table=1`}
               target="_blank"
               className="h-8 w-8 sm:w-auto sm:px-3 rounded-full bg-white/10 hover:bg-white/15 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-white/10 text-neutral-200"
               title="Preview Customer Live Menu"

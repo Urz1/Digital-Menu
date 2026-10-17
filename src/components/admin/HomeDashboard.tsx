@@ -97,7 +97,7 @@ export function HomeDashboard({
           </div>
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <Link
-              href={`/${restaurant.slug}?table=14`}
+              href={`/${restaurant.slug}?table=1`}
               target="_blank"
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
             >

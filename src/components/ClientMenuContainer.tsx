@@ -227,7 +227,7 @@ export function ClientMenuContainer({
 
   // User state
   const [tableNumber, setTableNumber] = useState<string>(
-    initialTable || restaurant.default_table || 'Table 14'
+    initialTable || restaurant.default_table || 'Table 1'
   );
   const [locale, setLocale] = useState<Language>('en');
   const [layout, setLayout] = useState<'list' | 'grid'>(

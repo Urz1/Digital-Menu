@@ -130,7 +130,7 @@ export function MenuControlBar({
               triggerHaptic(8);
               onOpenCategoryDirectory();
             }}
-            className="flex-1 min-w-0 max-w-[210px] sm:max-w-xs h-9 px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
+            className="flex-1 min-w-0 h-9 px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
             title={`${t.browseCategories}: ${activeCategoryName}`}
             aria-label={`${t.browseCategories}: ${activeCategoryName}`}
           >
@@ -152,29 +152,29 @@ export function MenuControlBar({
             <ChevronDown className="w-3.5 h-3.5 text-[var(--muted)] group-hover:text-[var(--primary)] flex-shrink-0 transition-transform" />
           </button>
 
-          {/* Quick "On Offer" Pill (Always directly accessible on the bar) */}
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic(10);
-              if (activeFilter === 'onOffer') {
-                onFilterChange('all');
-                if (activeCategoryId === 'offers') onSelectCategory(categories[0]?.id || '');
-              } else {
-                onFilterChange('onOffer');
-                onSelectCategory('offers');
-              }
-            }}
-            className={`h-9 px-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border flex-shrink-0 active:scale-95 ${
-              isOffersActive
-                ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
-                : 'bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:border-amber-400'
-            }`}
-            title="Dishes on Offer"
-          >
-            <Tag className={`w-3.5 h-3.5 flex-shrink-0 ${isOffersActive ? 'text-white' : 'text-amber-500'}`} />
-            <span className="text-xs font-bold">On Offer</span>
-            {offersCount > 0 && (
+          {/* Quick "On Offer" Pill (Only visible when active offers actually exist) */}
+          {hasActiveOffers && offersCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic(10);
+                if (activeFilter === 'onOffer') {
+                  onFilterChange('all');
+                  if (activeCategoryId === 'offers') onSelectCategory(categories[0]?.id || '');
+                } else {
+                  onFilterChange('onOffer');
+                  onSelectCategory('offers');
+                }
+              }}
+              className={`h-9 px-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border flex-shrink-0 active:scale-95 ${
+                isOffersActive
+                  ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                  : 'bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:border-amber-400'
+              }`}
+              title="Dishes on Offer"
+            >
+              <Tag className={`w-3.5 h-3.5 flex-shrink-0 ${isOffersActive ? 'text-white' : 'text-amber-500'}`} />
+              <span className="text-xs font-bold">On Offer</span>
               <span
                 className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
                   isOffersActive
@@ -184,8 +184,8 @@ export function MenuControlBar({
               >
                 {offersCount}
               </span>
-            )}
-          </button>
+            </button>
+          )}
 
           {/* Right Action Controls: Filter, Sort, Layout */}
           <div className="flex items-center gap-1.5 flex-shrink-0">

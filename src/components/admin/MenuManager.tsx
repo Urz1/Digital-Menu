@@ -1530,6 +1530,15 @@ export function MenuManager({
                     onShowToast('Please provide a dish name.', 'error');
                     return;
                   }
+                  // Prevent duplicate dishes with identical names
+                  const trimmedName = editingItem.name.trim().toLowerCase();
+                  const isDuplicate = menuItems.some(
+                    (i) => i.id !== editingItem.id && i.name.trim().toLowerCase() === trimmedName
+                  );
+                  if (isDuplicate) {
+                    onShowToast(`A dish named "${editingItem.name.trim()}" already exists on your menu.`, 'error');
+                    return;
+                  }
                   triggerHaptic(15);
                   await onSaveItem(editingItem);
                   setIsDishModalOpen(false);
