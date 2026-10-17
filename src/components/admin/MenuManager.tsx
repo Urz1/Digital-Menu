@@ -545,7 +545,7 @@ export function MenuManager({
       </div>
 
       {/* Search, Category Filter, and View Controls */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 rounded-2xl bg-[#12141C] border border-white/5">
+      <div className="sticky top-0 z-20 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 rounded-2xl bg-[#12141C]/95 backdrop-blur-md border border-white/10 shadow-lg">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />

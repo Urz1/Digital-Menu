@@ -144,10 +144,10 @@ export function AdminSidebar({
   const visibleNav = allNavItems.filter((item) => item.allowedRoles.includes(userRole));
 
   return (
-    <aside className="w-64 border-r border-white/10 bg-[#0E1015] hidden md:flex flex-col justify-between p-4 flex-shrink-0 select-none">
-      <div className="flex flex-col gap-5">
+    <aside className="w-64 border-r border-white/10 bg-[#0E1015] hidden md:flex flex-col justify-between p-4 flex-shrink-0 select-none md:h-screen md:sticky md:top-0 md:overflow-y-auto admin-scroll">
+      <div className="flex flex-col gap-5 flex-shrink-0">
         {/* Restaurant Header */}
-        <div className="flex items-center gap-3 px-2 pt-1">
+        <div className="flex items-center gap-3 px-2 pt-1 flex-shrink-0">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-md text-base flex-shrink-0"
             style={{ backgroundColor: restaurant.theme_config.primaryColor || '#E8590C' }}
@@ -209,7 +209,7 @@ export function AdminSidebar({
       </div>
 
       {/* Bottom Area: Onboarding Widget, Role Selector & Links */}
-      <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+      <div className="flex flex-col gap-3 pt-4 border-t border-white/10 flex-shrink-0 mt-auto">
         {/* Onboarding Checklist Widget (if in progress) */}
         {userRole === 'owner' && onboardingProgress && onboardingProgress.completed < onboardingProgress.total && (
           <div

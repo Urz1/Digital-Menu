@@ -476,5 +476,51 @@ nextjs-portal,
   border-color: #FDE68A !important;
 }
 
+/* =============================================================================
+   ADMIN SLEEK SCROLLBARS (For static sidebar and independent content panes)
+   ============================================================================= */
+.admin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.admin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+[data-admin-theme="light"] .admin-scroll {
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+
+[data-admin-theme="light"] .admin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+[data-admin-theme="light"] .admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+/* Admin light mode sticky bars with backdrop-blur */
+[data-admin-theme="light"] .bg-\[\#12141C\]\/95,
+[data-admin-theme="light"] .bg-\[\#12141C\]\/90 {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: #E5E7EB !important;
+}
+
+
 
 
