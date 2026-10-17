@@ -27,6 +27,7 @@ import {
   SUGGESTED_REPLY_STARTERS,
 } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
+import { subscribeSync } from '@/lib/sync-channel';
 import {
   Star,
   MessageSquare,
@@ -50,14 +51,18 @@ interface ReviewsManagerProps {
   restaurant: Restaurant;
   menuItems: MenuItem[];
   userRole: UserRole;
+  initialReviews?: DishReview[];
+  onReviewsChange?: (reviews: DishReview[]) => void;
 }
 
 export function ReviewsManager({
   restaurant,
   menuItems,
   userRole,
+  initialReviews,
+  onReviewsChange,
 }: ReviewsManagerProps) {
-  const [reviews, setReviews] = useState<DishReview[]>([]);
+  const [reviews, setReviews] = useState<DishReview[]>(initialReviews || []);
   const [settings, setSettings] = useState<RestaurantReviewSettings | null>(null);
   const [moderationLogs, setModerationLogs] = useState<ReviewModerationLog[]>([]);
   const [filterTab, setFilterTab] = useState<'all' | 'new' | 'attention' | 'replied' | 'reported'>('all');
@@ -93,13 +98,56 @@ export function ReviewsManager({
       getReviewSettings(restaurant.id),
       getReviewModerationLogs(restaurant.id),
     ]);
-    setReviews(revs);
+    if (revs && revs.length > 0) {
+      setReviews(revs);
+      onReviewsChange?.(revs);
+    }
     setSettings(sets);
     setModerationLogs(logs);
   };
 
   useEffect(() => {
+    if (initialReviews && initialReviews.length > 0) {
+      setReviews(initialReviews);
+    }
+  }, [initialReviews]);
+
+  useEffect(() => {
     loadData();
+
+    // Cross-tab and live sync: any review submitted anywhere immediately appears
+    const unsubscribe = subscribeSync((event) => {
+      if (event.type === 'REVIEW_SUBMITTED') {
+        setReviews((prev) => {
+          if (prev.some((r) => r.id === event.review.id)) return prev;
+          const next = [event.review, ...prev];
+          onReviewsChange?.(next);
+          return next;
+        });
+        showToast(`New feedback received from Table ${event.review.table_number || 'Guest'}!`);
+      } else if (event.type === 'REVIEW_UPDATED') {
+        setReviews((prev) => {
+          const next = prev.map((r) => (r.id === event.review.id ? event.review : r));
+          onReviewsChange?.(next);
+          return next;
+        });
+      }
+    });
+
+    // 4-second live polling to ensure remote updates from other devices appear without refresh
+    const pollInterval = setInterval(() => {
+      getDishReviews(restaurant.id).then((freshRevs) => {
+        if (freshRevs && freshRevs.length > 0) {
+          setReviews(freshRevs);
+          onReviewsChange?.(freshRevs);
+        }
+      });
+    }, 4000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(pollInterval);
+    };
   }, [restaurant.id]);
 
   // Item name lookup map

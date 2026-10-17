@@ -2377,6 +2377,24 @@ export const MOCK_MODERATION_LOGS_ADDIS: ReviewModerationLog[] = [];
 let inMemoryModerationLogs: ReviewModerationLog[] = [];
 
 const STORAGE_KEY_REVIEW_OVERRIDES = 'digital_menu_review_overrides';
+const STORAGE_KEY_REVIEWS = 'digital_menu_reviews_cache';
+
+function getStoredReviews(): DishReview[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_REVIEWS);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistReviews(reviews: DishReview[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(reviews));
+  } catch {}
+}
 
 function getStoredReviewOverrides(): Record<string, Partial<DishReview>> {
   if (typeof window === 'undefined') return {};
@@ -2401,6 +2419,9 @@ export async function getDishReviews(
   restaurantId: string,
   itemId?: string
 ): Promise<DishReview[]> {
+  const overrides = getStoredReviewOverrides();
+  const cached = getStoredReviews();
+
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
@@ -2415,29 +2436,62 @@ export async function getDishReviews(
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (!error && data) {
-        const overrides = getStoredReviewOverrides();
-        inMemoryReviews = (data as DishReview[]).map((r) => {
+        const supabaseRevs = (data as DishReview[]).map((r) => {
           if (overrides[r.id]) {
             return { ...r, ...overrides[r.id] };
           }
           return r;
         });
-        return inMemoryReviews;
+
+        // Merge Supabase reviews with any locally cached reviews so nothing is lost
+        const mergedMap = new Map<string, DishReview>();
+        for (const r of supabaseRevs) {
+          mergedMap.set(r.id, r);
+        }
+        for (const r of cached) {
+          if (!mergedMap.has(r.id) && r.restaurant_id === restaurantId && (!itemId || r.item_id === itemId)) {
+            mergedMap.set(r.id, overrides[r.id] ? { ...r, ...overrides[r.id] } : r);
+          }
+        }
+        for (const r of inMemoryReviews) {
+          if (!mergedMap.has(r.id) && r.restaurant_id === restaurantId && (!itemId || r.item_id === itemId)) {
+            mergedMap.set(r.id, overrides[r.id] ? { ...r, ...overrides[r.id] } : r);
+          }
+        }
+
+        const mergedList = Array.from(mergedMap.values()).sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        if (!itemId) {
+          persistReviews(mergedList);
+          inMemoryReviews = mergedList;
+        }
+
+        return mergedList;
       }
     } catch {
       // Fallback below
     }
   }
 
-  const overrides = getStoredReviewOverrides();
-  let list = inMemoryReviews.map((r) => (overrides[r.id] ? { ...r, ...overrides[r.id] } : r));
-  list = list.filter((r) => r.restaurant_id === restaurantId);
-  if (itemId) {
-    list = list.filter((r) => r.item_id === itemId);
+  // Fallback if Supabase offline or not configured
+  const mergedMap = new Map<string, DishReview>();
+  for (const r of cached) {
+    if (r.restaurant_id === restaurantId && (!itemId || r.item_id === itemId)) {
+      mergedMap.set(r.id, overrides[r.id] ? { ...r, ...overrides[r.id] } : r);
+    }
   }
-  return [...list].sort(
+  for (const r of inMemoryReviews) {
+    if (!mergedMap.has(r.id) && r.restaurant_id === restaurantId && (!itemId || r.item_id === itemId)) {
+      mergedMap.set(r.id, overrides[r.id] ? { ...r, ...overrides[r.id] } : r);
+    }
+  }
+
+  const list = Array.from(mergedMap.values()).sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
+  return list;
 }
 
 export async function submitDishReview(params: {
@@ -2495,6 +2549,8 @@ export async function submitDishReview(params: {
   };
 
   inMemoryReviews.unshift(newReview);
+  const stored = getStoredReviews();
+  persistReviews([newReview, ...stored.filter((r) => r.id !== newReview.id)]);
 
   // Broadcast feedback immediately across tabs so owner and staff receive it right away
   broadcastSync({ type: 'REVIEW_SUBMITTED', review: newReview });
@@ -2502,9 +2558,12 @@ export async function submitDishReview(params: {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
-      await supabase.from('reviews').insert(newReview);
-    } catch {
-      // Handled
+      const { error } = await supabase.from('reviews').insert(newReview);
+      if (error) {
+        console.warn('Supabase review insert warning (cached locally):', error);
+      }
+    } catch (err) {
+      console.warn('Supabase review insert network error (cached locally):', err);
     }
   }
 

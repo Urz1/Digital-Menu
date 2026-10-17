@@ -759,6 +759,8 @@ export default function AdminDashboardPage() {
               restaurant={restaurant}
               menuItems={menuItems}
               userRole={userRole}
+              initialReviews={reviews}
+              onReviewsChange={setReviews}
             />
           )}
 
