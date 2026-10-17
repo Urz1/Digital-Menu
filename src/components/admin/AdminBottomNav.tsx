@@ -158,6 +158,7 @@ export function AdminBottomNav({
                 return (
                   <button
                     key={item.id}
+                    data-testid={`admin-nav-${item.id}`}
                     onClick={() => handleSelect(item.id)}
                     className={`h-12 px-3 rounded-2xl flex items-center gap-2.5 text-xs font-bold border transition-colors ${
                       isActive

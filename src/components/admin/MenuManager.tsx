@@ -35,6 +35,9 @@ import {
   Percent,
   Sliders,
   Eye,
+  EyeOff,
+  ArrowUp,
+  ArrowDown,
   Camera,
   Info,
 } from 'lucide-react';
@@ -53,6 +56,8 @@ interface MenuManagerProps {
   onBulkUpdate: (itemIds: string[], updates: Partial<MenuItem>) => Promise<void>;
   onReorderItems: (reordered: MenuItem[]) => void;
   onSaveCategory: (cat: Partial<Category>) => Promise<Category>;
+  onDeleteCategory?: (categoryId: string) => Promise<void>;
+  onReorderCategories?: (reordered: Category[]) => Promise<void>;
   onSaveScheduledMenu: (menu: ScheduledMenu) => Promise<void>;
   onCreateVersion: (label: string) => Promise<void>;
   onRestoreVersion: (versionId: string) => Promise<void>;
@@ -113,6 +118,8 @@ export function MenuManager({
   onBulkUpdate,
   onReorderItems,
   onSaveCategory,
+  onDeleteCategory,
+  onReorderCategories,
   onSaveScheduledMenu,
   onCreateVersion,
   onRestoreVersion,
@@ -139,6 +146,20 @@ export function MenuManager({
   const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
   const [isSchedulesModalOpen, setIsSchedulesModalOpen] = useState(false);
   const [newVersionLabel, setNewVersionLabel] = useState('');
+
+  // Category Management Modal State
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<Partial<Category> | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
+
+  // Inline Quick Category Creator in Dish Modal
+  const [isInlineCategoryCreatorOpen, setIsInlineCategoryCreatorOpen] = useState(false);
+  const [quickCatName, setQuickCatName] = useState('');
+  const [quickCatAmharic, setQuickCatAmharic] = useState('');
+  const [quickCatIcon, setQuickCatIcon] = useState('🥤');
+  const [quickCatDesc, setQuickCatDesc] = useState('');
 
   // Bulk Price Dialog State
   const [bulkPriceType, setBulkPriceType] = useState<'percentage' | 'fixed_amount'>('percentage');
@@ -327,6 +348,97 @@ export function MenuManager({
     e.target.value = '';
   };
 
+  // Inline Quick Category Creator Handler
+  const handleQuickCreateCategory = async () => {
+    if (!quickCatName.trim()) {
+      onShowToast('Please provide a category name', 'error');
+      return;
+    }
+    setIsSavingCategory(true);
+    try {
+      const newCat = await onSaveCategory({
+        restaurant_id: restaurant.id,
+        name: quickCatName.trim(),
+        name_am: quickCatAmharic.trim() || undefined,
+        icon: quickCatIcon || '🍽️',
+        description: quickCatDesc.trim() || '',
+        sort_order: categories.length + 1,
+        is_active: true,
+      });
+
+      // Automatically select the newly created category in the editing dish
+      if (editingItem) {
+        setEditingItem((prev) => (prev ? { ...prev, category_id: newCat.id } : null));
+      }
+
+      setQuickCatName('');
+      setQuickCatAmharic('');
+      setQuickCatDesc('');
+      setIsInlineCategoryCreatorOpen(false);
+      onShowToast(`Category "${newCat.name}" created and selected!`, 'success');
+    } catch (err) {
+      onShowToast('Failed to create category', 'error');
+    } finally {
+      setIsSavingCategory(false);
+    }
+  };
+
+  // Full Category Management Modal Handlers
+  const handleSaveCategoryModal = async () => {
+    if (!categoryToEdit?.name?.trim()) {
+      onShowToast('Category name is required', 'error');
+      return;
+    }
+    setIsSavingCategory(true);
+    try {
+      await onSaveCategory({
+        ...categoryToEdit,
+        restaurant_id: restaurant.id,
+        name: categoryToEdit.name.trim(),
+        name_am: categoryToEdit.name_am?.trim() || undefined,
+        description: categoryToEdit.description?.trim() || '',
+        icon: categoryToEdit.icon || '🍽️',
+        sort_order: categoryToEdit.sort_order ?? (categories.length + 1),
+        is_active: categoryToEdit.is_active ?? true,
+      });
+      setIsCategoryFormOpen(false);
+      setCategoryToEdit(null);
+      onShowToast('Category saved successfully', 'success');
+    } catch (err) {
+      onShowToast('Failed to save category', 'error');
+    } finally {
+      setIsSavingCategory(false);
+    }
+  };
+
+  const handleDeleteCategoryConfirm = async () => {
+    if (!categoryToDelete) return;
+    setIsSavingCategory(true);
+    try {
+      if (onDeleteCategory) {
+        await onDeleteCategory(categoryToDelete.id);
+      }
+      onShowToast(`Category "${categoryToDelete.name}" deleted. Any existing items reassigned.`, 'info');
+      setCategoryToDelete(null);
+    } catch (err) {
+      onShowToast('Failed to delete category', 'error');
+    } finally {
+      setIsSavingCategory(false);
+    }
+  };
+
+  const handleMoveCategory = async (catIndex: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? catIndex - 1 : catIndex + 1;
+    if (targetIndex < 0 || targetIndex >= categories.length) return;
+    const reordered = [...categories];
+    const [moved] = reordered.splice(catIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+    if (onReorderCategories) {
+      await onReorderCategories(reordered);
+    }
+    onShowToast('Category order updated', 'success');
+  };
+
   return (
     <div className="flex flex-col gap-6 pb-20 max-w-7xl mx-auto w-full">
       {/* Top Action Header */}
@@ -357,6 +469,19 @@ export function MenuManager({
             >
               <History className="w-3.5 h-3.5" />
               <span>Versions</span>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic(10);
+                setIsCategoriesModalOpen(true);
+              }}
+              data-testid="manage-categories-button"
+              className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white text-xs font-semibold transition-colors flex items-center gap-1.5 border border-white/5"
+              title="Manage Menu Categories (Create, Edit, Reorder, Delete)"
+            >
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>Categories ({categories.length})</span>
             </button>
 
             <button
@@ -455,6 +580,31 @@ export function MenuManager({
               </option>
             ))}
           </select>
+
+          {/* Quick Add / Manage Category Button */}
+          {!isStaff && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic(10);
+                setCategoryToEdit({
+                  restaurant_id: restaurant.id,
+                  name: '',
+                  icon: '🥤',
+                  description: '',
+                  is_active: true,
+                });
+                setIsCategoryFormOpen(true);
+                setIsCategoriesModalOpen(true);
+              }}
+              data-testid="add-category-quick-btn"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-amber-400 hover:text-amber-300 border border-white/10 text-xs font-bold transition-colors flex items-center gap-1 shrink-0"
+              title="Create New Category"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">New Category</span>
+            </button>
+          )}
         </div>
 
         {/* Status and Sort Controls */}
@@ -909,22 +1059,108 @@ export function MenuManager({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-neutral-300 mb-1">
-                      Category *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-semibold text-neutral-300">
+                        Category *
+                      </label>
+                      <button
+                        type="button"
+                        data-testid="toggle-inline-category-creator"
+                        onClick={() => setIsInlineCategoryCreatorOpen(!isInlineCategoryCreatorOpen)}
+                        className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>{isInlineCategoryCreatorOpen ? 'Cancel' : '+ New Category'}</span>
+                      </button>
+                    </div>
+
+                    {/* Inline Quick Category Creator Drawer */}
+                    {isInlineCategoryCreatorOpen && (
+                      <div
+                        data-testid="inline-category-creator-drawer"
+                        className="p-3 mb-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2.5 animate-in slide-in-from-top-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider">
+                            Quick Create Category
+                          </span>
+                          <span className="text-[10px] text-neutral-400">Creates & selects instantly</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <input
+                              type="text"
+                              placeholder="Name in English (e.g. Soft Drinks)"
+                              value={quickCatName}
+                              onChange={(e) => setQuickCatName(e.target.value)}
+                              data-testid="quick-cat-name-input"
+                              className="w-full px-2.5 py-1.5 bg-[#12141C] border border-white/10 rounded-lg text-white text-xs placeholder:text-neutral-500 focus:outline-none focus:border-amber-500"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder="Name in Amharic (e.g. ለስላሳ መጠጦች)"
+                              value={quickCatAmharic}
+                              onChange={(e) => setQuickCatAmharic(e.target.value)}
+                              data-testid="quick-cat-amharic-input"
+                              className="w-full px-2.5 py-1.5 bg-[#12141C] border border-white/10 rounded-lg text-white text-xs placeholder:text-neutral-500 focus:outline-none focus:border-amber-500"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Quick Emoji selection */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] text-neutral-400 font-medium">Icon:</span>
+                          {['🥤', '🧃', '☕', '🍔', '🍕', '🥗', '🥩', '🍰', '🍟', '🍲'].map((emoji) => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => setQuickCatIcon(emoji)}
+                              className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition-all ${
+                                quickCatIcon === emoji
+                                  ? 'bg-amber-500/30 border border-amber-400 scale-110 shadow-sm'
+                                  : 'bg-white/5 hover:bg-white/10'
+                              }`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleQuickCreateCategory}
+                          disabled={isSavingCategory || !quickCatName.trim()}
+                          data-testid="quick-save-category-btn"
+                          className="w-full py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>{isSavingCategory ? 'Creating...' : 'Create & Select Category'}</span>
+                        </button>
+                      </div>
+                    )}
+
                     <select
                       data-testid="dish-form-category"
                       value={editingItem.category_id || categories[0]?.id}
-                      onChange={(e) =>
-                        setEditingItem({ ...editingItem, category_id: e.target.value })
-                      }
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW__') {
+                          setIsInlineCategoryCreatorOpen(true);
+                        } else {
+                          setEditingItem({ ...editingItem, category_id: e.target.value });
+                        }
+                      }}
                       className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500"
                     >
                       {categories.map((c) => (
                         <option key={c.id} value={c.id} className="bg-[#12141C]">
-                          {c.icon} {c.name}
+                          {c.icon} {c.name} {c.name_am ? `(${c.name_am})` : ''}
                         </option>
                       ))}
+                      <option value="__NEW__" className="bg-[#12141C] text-amber-400 font-bold">
+                        + Create New Category...
+                      </option>
                     </select>
                   </div>
 
@@ -1548,6 +1784,357 @@ export function MenuManager({
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Management Modal */}
+      {isCategoriesModalOpen && (
+        <div
+          data-testid="categories-manager-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div className="w-full max-w-2xl bg-[#12141C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Menu Categories</h3>
+                  <p className="text-xs text-neutral-400">
+                    Add, edit, reorder, or remove categories across Addis Cafeteria.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsCategoriesModalOpen(false);
+                  setIsCategoryFormOpen(false);
+                  setCategoryToEdit(null);
+                  setCategoryToDelete(null);
+                }}
+                className="text-neutral-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5 flex-1">
+              {/* Form to Add / Edit Category */}
+              {isCategoryFormOpen ? (
+                <div
+                  data-testid="category-form-modal"
+                  className="p-5 rounded-xl bg-white/5 border border-white/10 space-y-4 animate-in slide-in-from-top-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-amber-400">
+                      {categoryToEdit?.id ? 'Edit Category' : 'Create New Category'}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCategoryFormOpen(false);
+                        setCategoryToEdit(null);
+                      }}
+                      className="text-xs text-neutral-400 hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                        Category Name (English) *
+                      </label>
+                      <input
+                        type="text"
+                        data-testid="category-name-input"
+                        value={categoryToEdit?.name || ''}
+                        onChange={(e) =>
+                          setCategoryToEdit({ ...categoryToEdit, name: e.target.value })
+                        }
+                        placeholder="e.g. Fresh Juices & Smoothies"
+                        className="w-full px-3 py-2 bg-[#12141C] border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                        Category Name (Amharic)
+                      </label>
+                      <input
+                        type="text"
+                        data-testid="category-amharic-input"
+                        value={categoryToEdit?.name_am || ''}
+                        onChange={(e) =>
+                          setCategoryToEdit({ ...categoryToEdit, name_am: e.target.value })
+                        }
+                        placeholder="e.g. ትኩስ ጭማቂዎች"
+                        className="w-full px-3 py-2 bg-[#12141C] border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                        Icon / Emoji
+                      </label>
+                      <input
+                        type="text"
+                        data-testid="category-icon-input"
+                        value={categoryToEdit?.icon || '🍽️'}
+                        onChange={(e) =>
+                          setCategoryToEdit({ ...categoryToEdit, icon: e.target.value })
+                        }
+                        className="w-full px-3 py-2 bg-[#12141C] border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 text-center text-lg"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                        Quick Preset Icons
+                      </label>
+                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                        {['🥤', '🧃', '☕', '🍔', '🍕', '🥗', '🥩', '🍰', '🍟', '🍲', '🍳', '🥘', '🍹', '🍩'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() =>
+                              setCategoryToEdit({ ...categoryToEdit, icon: emoji })
+                            }
+                            className={`w-7 h-7 rounded-lg text-sm flex items-center justify-center transition-all ${
+                              categoryToEdit?.icon === emoji
+                                ? 'bg-amber-500/30 border border-amber-400 scale-110'
+                                : 'bg-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                      Description (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={categoryToEdit?.description || ''}
+                      onChange={(e) =>
+                        setCategoryToEdit({ ...categoryToEdit, description: e.target.value })
+                      }
+                      placeholder="Short highlight for this category..."
+                      className="w-full px-3 py-2 bg-[#12141C] border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-neutral-300">
+                      <input
+                        type="checkbox"
+                        checked={categoryToEdit?.is_active ?? true}
+                        onChange={(e) =>
+                          setCategoryToEdit({ ...categoryToEdit, is_active: e.target.checked })
+                        }
+                        className="rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500"
+                      />
+                      <span>Visible to customers on digital menu</span>
+                    </label>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCategoryFormOpen(false);
+                          setCategoryToEdit(null);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-neutral-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveCategoryModal}
+                        disabled={isSavingCategory || !categoryToEdit?.name?.trim()}
+                        data-testid="save-category-submit"
+                        className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-bold transition-colors flex items-center gap-1.5"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{isSavingCategory ? 'Saving...' : 'Save Category'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-neutral-400">
+                    {categories.length} Categories Configured
+                  </span>
+                  <button
+                    type="button"
+                    data-testid="add-category-button"
+                    onClick={() => {
+                      setCategoryToEdit({
+                        name: '',
+                        name_am: '',
+                        icon: '🍽️',
+                        description: '',
+                        is_active: true,
+                        sort_order: categories.length + 1,
+                      });
+                      setIsCategoryFormOpen(true);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Category</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Delete Confirmation Warning Dialog */}
+              {categoryToDelete && (
+                <div
+                  data-testid="category-delete-warning"
+                  className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 space-y-3 animate-in fade-in"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-rose-300">
+                        Delete category &quot;{categoryToDelete.name}&quot;?
+                      </p>
+                      <p className="text-[11px] text-neutral-300 leading-relaxed">
+                        {menuItems.filter((i) => i.category_id === categoryToDelete.id).length > 0 ? (
+                          <>
+                            <strong>
+                              {menuItems.filter((i) => i.category_id === categoryToDelete.id).length} dishes
+                            </strong>{' '}
+                            in this category will automatically be reassigned to the default category so no dishes are lost.
+                          </>
+                        ) : (
+                          'This category has no dishes. It will be permanently removed.'
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setCategoryToDelete(null)}
+                      className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-xs font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteCategoryConfirm}
+                      disabled={isSavingCategory}
+                      data-testid="delete-category-confirm"
+                      className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors"
+                    >
+                      {isSavingCategory ? 'Deleting...' : 'Confirm Delete'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Categories Reorderable List */}
+              <div className="space-y-2">
+                {categories.map((c, index) => {
+                  const itemCount = menuItems.filter((i) => i.category_id === c.id).length;
+                  return (
+                    <div
+                      key={c.id}
+                      data-testid={`category-row-${c.id}`}
+                      className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 flex items-center justify-between gap-3 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Reorder Buttons */}
+                        <div className="flex flex-col items-center justify-center gap-0.5">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => handleMoveCategory(index, 'up')}
+                            className="p-1 rounded text-neutral-400 hover:text-white disabled:opacity-20 hover:bg-white/5 transition-colors"
+                            title="Move Up"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === categories.length - 1}
+                            onClick={() => handleMoveCategory(index, 'down')}
+                            className="p-1 rounded text-neutral-400 hover:text-white disabled:opacity-20 hover:bg-white/5 transition-colors"
+                            title="Move Down"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Category Icon */}
+                        <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg shrink-0">
+                          {c.icon}
+                        </div>
+
+                        {/* Category Details */}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-white truncate">{c.name}</p>
+                            {c.name_am && (
+                              <span className="text-[11px] text-neutral-400 font-sans truncate">
+                                ({c.name_am})
+                              </span>
+                            )}
+                            {!c.is_active && (
+                              <span className="px-1.5 py-0.2 rounded text-[10px] bg-neutral-800 text-neutral-400 border border-neutral-700">
+                                Hidden
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-neutral-400 mt-0.5">
+                            {itemCount} {itemCount === 1 ? 'dish' : 'dishes'}
+                            {c.description ? ` • ${c.description}` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCategoryToEdit(c);
+                            setIsCategoryFormOpen(true);
+                          }}
+                          data-testid={`edit-category-btn-${c.id}`}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"
+                          title="Edit Category"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCategoryToDelete(c)}
+                          data-testid={`delete-category-btn-${c.id}`}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/20 text-neutral-400 hover:text-rose-400 transition-colors"
+                          title="Delete Category"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

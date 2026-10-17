@@ -1,9 +1,12 @@
-import { MenuItem, Offer, DishReview, Restaurant } from '@/types/database';
+import { MenuItem, Offer, DishReview, Restaurant, Category } from '@/types/database';
 
 export type SyncEvent =
   | { type: 'ITEM_UPDATED'; item: MenuItem }
   | { type: 'ITEM_DELETED'; itemId: string }
   | { type: 'ITEMS_REFRESH' }
+  | { type: 'CATEGORY_UPDATED'; category: Category }
+  | { type: 'CATEGORY_DELETED'; categoryId: string }
+  | { type: 'CATEGORIES_REFRESH' }
   | { type: 'REVIEW_SUBMITTED'; review: DishReview }
   | { type: 'REVIEW_UPDATED'; review: DishReview }
   | { type: 'OFFER_UPDATED'; offer: Offer }

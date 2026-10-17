@@ -18,10 +18,13 @@ import { ServiceAssistanceModal } from './ServiceAssistanceModal';
 import { SettingsModal } from './SettingsModal';
 import { AllergenLegendModal } from './AllergenLegendModal';
 import { QrModal } from './QrModal';
+import { applyThemeTokensToDOM } from './ThemeManager';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeSync } from '@/lib/sync-channel';
 import {
   getMenuItems,
+  getMenuCategories,
+  getStoredRestaurant,
   createServiceRequest,
   recordOfferInteraction,
   MOCK_OFFERS_ADDIS,
@@ -40,7 +43,7 @@ import {
 import { calculateDishReviewStats } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
 import Link from 'next/link';
-import { ArrowUp, Share2, QrCode, Info, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen, Search, Heart } from 'lucide-react';
+import { ArrowUp, Share2, QrCode, Info, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen, Search, Heart, MapPin, ExternalLink } from 'lucide-react';
 import { Language, TRANSLATIONS, CATEGORY_TRANSLATIONS } from '@/lib/translations';
 
 interface ClientMenuContainerProps {
@@ -54,14 +57,41 @@ interface ClientMenuContainerProps {
 }
 
 export function ClientMenuContainer({
-  restaurant,
-  categories,
+  restaurant: initialRestaurant,
+  categories: initialCategories,
   initialItems,
   initialOffers,
   initialReviews,
   initialReviewSettings,
   initialTable,
 }: ClientMenuContainerProps) {
+  // Restaurant state (updated live via sync / realtime / cache)
+  const [restaurant, setRestaurant] = useState<Restaurant>(initialRestaurant);
+
+  useEffect(() => {
+    // Check if there are locally stored design/restaurant updates
+    const stored = getStoredRestaurant(initialRestaurant.slug);
+    if (stored) {
+      setRestaurant(stored);
+      applyThemeTokensToDOM(stored.theme_config);
+    } else if (initialRestaurant.theme_config) {
+      applyThemeTokensToDOM(initialRestaurant.theme_config);
+    }
+  }, [initialRestaurant]);
+
+  useEffect(() => {
+    if (restaurant.theme_config) {
+      applyThemeTokensToDOM(restaurant.theme_config);
+    }
+  }, [restaurant.theme_config]);
+
+  // Categories state (updated live via sync / realtime)
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
+
   // Items state (updated in real-time via Supabase Realtime)
   const [items, setItems] = useState<MenuItem[]>(initialItems);
 
@@ -70,6 +100,11 @@ export function ClientMenuContainer({
     getMenuItems(restaurant.id).then((freshItems) => {
       if (freshItems && freshItems.length > 0) {
         setItems(freshItems);
+      }
+    });
+    getMenuCategories(restaurant.id).then((freshCats) => {
+      if (freshCats && freshCats.length > 0) {
+        setCategories(freshCats);
       }
     });
   }, [restaurant.id]);
@@ -296,6 +331,22 @@ export function ClientMenuContainer({
           }
           return [event.offer, ...prev];
         });
+      } else if (event.type === 'CATEGORY_UPDATED') {
+        setCategories((prev) => {
+          const idx = prev.findIndex((c) => c.id === event.category.id);
+          if (idx >= 0) {
+            const copy = [...prev];
+            copy[idx] = event.category;
+            return copy;
+          }
+          return [...prev, event.category];
+        });
+      } else if (event.type === 'CATEGORY_DELETED') {
+        setCategories((prev) => prev.filter((c) => c.id !== event.categoryId));
+      } else if (event.type === 'CATEGORIES_REFRESH') {
+        getMenuCategories(restaurant.id).then((cats) => {
+          if (cats && cats.length > 0) setCategories(cats);
+        });
       } else if (event.type === 'REVIEW_SUBMITTED') {
         setReviews((prev) => {
           if (prev.some((r) => r.id === event.review.id)) return prev;
@@ -305,6 +356,11 @@ export function ClientMenuContainer({
         setReviews((prev) =>
           prev.map((r) => (r.id === event.review.id ? { ...r, ...event.review } : r))
         );
+      } else if (event.type === 'RESTAURANT_UPDATED') {
+        if (!event.restaurant.slug || event.restaurant.slug === initialRestaurant.slug || event.restaurant.id === initialRestaurant.id) {
+          setRestaurant(event.restaurant);
+          applyThemeTokensToDOM(event.restaurant.theme_config);
+        }
       }
     });
 
@@ -1046,7 +1102,21 @@ export function ClientMenuContainer({
           {restaurant.name}
         </h3>
         <p>{restaurant.hours}</p>
-        <p>{restaurant.address}</p>
+        {restaurant.google_maps_url ? (
+          <a
+            href={restaurant.google_maps_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 text-[var(--primary)] hover:underline font-semibold"
+            title="Open Addis Cafe & Bakery on Google Maps"
+          >
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>{restaurant.address}</span>
+            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+          </a>
+        ) : (
+          <p>{restaurant.address}</p>
+        )}
         <div className="flex justify-center gap-4 text-xs font-semibold" style={{ color: 'var(--primary)' }}>
           <button onClick={() => setIsQrModalOpen(true)} className="inline-flex items-center gap-1">
             <QrCode className="w-3.5 h-3.5" />

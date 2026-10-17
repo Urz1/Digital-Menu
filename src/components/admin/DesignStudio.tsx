@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Restaurant, ThemeConfig, MenuItem, CustomBadge, HolidayClosure } from '@/types/database';
 import { checkWcagContrast } from '@/lib/admin-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
+import { applyThemeTokensToDOM } from '@/components/ThemeManager';
 import {
   Palette,
   Type,
@@ -106,8 +107,45 @@ export function DesignStudio({
   // Preview Mode: 'light' | 'dark' (Default is light)
   const [previewThemeMode, setPreviewThemeMode] = useState<'dark' | 'light'>('light');
 
+  // Sync state if restaurant prop updates
+  useEffect(() => {
+    if (restaurant.theme_config) {
+      setThemeConfig((prev) => ({
+        ...prev,
+        ...restaurant.theme_config,
+      }));
+    }
+    if (restaurant.feature_flags) {
+      setFeatureFlags(restaurant.feature_flags);
+    }
+    if (restaurant.custom_badges) {
+      setCustomBadges(restaurant.custom_badges);
+    }
+    if (restaurant.custom_labels) {
+      setCustomLabels(restaurant.custom_labels);
+    }
+    if (restaurant.closed_message) {
+      setClosedMessage(restaurant.closed_message);
+    }
+    if (restaurant.holiday_closures) {
+      setHolidayClosures(restaurant.holiday_closures);
+    }
+  }, [restaurant]);
+
   // Contrast check
   const contrastCheck = checkWcagContrast(themeConfig.primaryColor, '#FFFFFF');
+
+  const handlePrimaryColorChange = (color: string) => {
+    const updated = { ...themeConfig, primaryColor: color };
+    setThemeConfig(updated);
+    applyThemeTokensToDOM(updated);
+  };
+
+  const handleAccentColorChange = (color: string) => {
+    const updated = { ...themeConfig, accentColor: color };
+    setThemeConfig(updated);
+    applyThemeTokensToDOM(updated);
+  };
 
   // 6 Ready-Made Themes
   const THEME_PRESETS: {
@@ -184,20 +222,25 @@ export function DesignStudio({
 
   const handleApplyPreset = (preset: typeof THEME_PRESETS[0]) => {
     triggerHaptic(10);
-    setThemeConfig({
+    const updatedTheme: ThemeConfig = {
       ...themeConfig,
       primaryColor: preset.primary,
       primaryHover: preset.hover,
       accentColor: preset.accent,
       fontFamily: preset.font,
       borderRadius: preset.radius,
-    });
+    };
+    setThemeConfig(updatedTheme);
+    setCustomBadges((prev) =>
+      prev.map((b, i) => (i === 0 ? { ...b, color: preset.primary } : b))
+    );
+    applyThemeTokensToDOM(updatedTheme);
     onShowToast(`Applied theme preset: ${preset.name}`, 'success');
   };
 
   const handleSaveAll = async () => {
     triggerHaptic(15);
-    await onSaveRestaurant({
+    const updated = await onSaveRestaurant({
       theme_config: themeConfig,
       feature_flags: featureFlags,
       custom_badges: customBadges,
@@ -205,6 +248,11 @@ export function DesignStudio({
       closed_message: closedMessage,
       holiday_closures: holidayClosures,
     });
+    if (updated?.theme_config) {
+      applyThemeTokensToDOM(updated.theme_config);
+    } else {
+      applyThemeTokensToDOM(themeConfig);
+    }
     onShowToast('Design settings and brand configuration published.', 'success');
   };
 
@@ -343,17 +391,13 @@ export function DesignStudio({
                       type="color"
                       data-testid="design-primary-color"
                       value={themeConfig.primaryColor}
-                      onChange={(e) => {
-                        setThemeConfig({ ...themeConfig, primaryColor: e.target.value });
-                      }}
+                      onChange={(e) => handlePrimaryColorChange(e.target.value)}
                       className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0"
                     />
                     <input
                       type="text"
                       value={themeConfig.primaryColor}
-                      onChange={(e) =>
-                        setThemeConfig({ ...themeConfig, primaryColor: e.target.value })
-                      }
+                      onChange={(e) => handlePrimaryColorChange(e.target.value)}
                       className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white font-mono text-xs uppercase w-32 focus:outline-none focus:border-amber-500"
                     />
                   </div>
@@ -367,17 +411,13 @@ export function DesignStudio({
                     <input
                       type="color"
                       value={themeConfig.accentColor}
-                      onChange={(e) => {
-                        setThemeConfig({ ...themeConfig, accentColor: e.target.value });
-                      }}
+                      onChange={(e) => handleAccentColorChange(e.target.value)}
                       className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0"
                     />
                     <input
                       type="text"
                       value={themeConfig.accentColor}
-                      onChange={(e) =>
-                        setThemeConfig({ ...themeConfig, accentColor: e.target.value })
-                      }
+                      onChange={(e) => handleAccentColorChange(e.target.value)}
                       className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white font-mono text-xs uppercase w-32 focus:outline-none focus:border-amber-500"
                     />
                   </div>
@@ -820,6 +860,9 @@ export function DesignStudio({
                   : themeConfig.fontFamily === 'display'
                   ? 'Cinzel, serif'
                   : 'Inter, sans-serif',
+              ['--primary' as any]: themeConfig.primaryColor,
+              ['--primary-hover' as any]: themeConfig.primaryHover || themeConfig.primaryColor,
+              ['--accent' as any]: themeConfig.accentColor,
             }}
           >
             {/* Phone Speaker Notch */}

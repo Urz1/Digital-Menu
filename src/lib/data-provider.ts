@@ -32,7 +32,9 @@ export const MOCK_RESTAURANT_ADDIS: Restaurant = {
   currency_code: 'ETB',
   default_table: 'Table 14',
   hours: 'Mon – Sun: 6:30 AM – 11:00 PM',
-  address: 'Bole Medhanealem, Addis Ababa, Ethiopia',
+  branch_name: 'Main Branch — Addis Cafe & Bakery',
+  address: 'XQHC+MJP Addis Cafe and Bakery, Addis Ababa, Ethiopia',
+  google_maps_url: 'https://maps.app.goo.gl/R8WN2zwM9dwVXT3h9?g_st=ac',
   announcement: 'Welcome to Addis Cafeteria & Bakery • Fresh injera, sizzling tibs, and artisanal pastries daily.',
   is_open: true,
   tax_rate: 0.15,
@@ -1833,18 +1835,69 @@ const inMemoryServiceRequests: ServiceRequest[] = [
 // UNIFIED DATA ACCESS FUNCTIONS (SUPABASE + RESILIENT FALLBACK)
 // -----------------------------------------------------------------------------
 
+const STORAGE_KEY_RESTAURANT = 'digital_menu_restaurant_cache';
+
+export function getStoredRestaurant(slug?: string): Restaurant | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_RESTAURANT);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!slug || parsed.slug === slug) {
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+export function persistRestaurant(restaurant: Restaurant): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY_RESTAURANT, JSON.stringify(restaurant));
+  } catch {}
+}
+
 export async function getRestaurantBySlug(slug: string): Promise<Restaurant | null> {
+  // Check client-side cached restaurant first
+  const cached = getStoredRestaurant(slug);
+  if (cached) {
+    inMemoryRestaurant = {
+      ...inMemoryRestaurant,
+      ...cached,
+      theme_config: {
+        ...inMemoryRestaurant.theme_config,
+        ...(cached.theme_config || {}),
+      },
+    };
+  }
+
   // If Supabase is connected with real credentials:
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+      const { data, error } = await Promise.race([
+        supabase.from('restaurants').select('*').eq('slug', slug).single(),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+      ]);
 
-      if (!error && data) return data as Restaurant;
+      if (!error && data) {
+        const merged: Restaurant = {
+          ...MOCK_RESTAURANT_ADDIS,
+          ...inMemoryRestaurant,
+          ...(data as Restaurant),
+          theme_config: {
+            ...(MOCK_RESTAURANT_ADDIS.theme_config || {}),
+            ...((data as any).theme_config || {}),
+            ...inMemoryRestaurant.theme_config,
+          },
+          branch_name: (data as any).branch_name || inMemoryRestaurant.branch_name,
+          address: (data as any).address || inMemoryRestaurant.address,
+          google_maps_url: (data as any).google_maps_url || inMemoryRestaurant.google_maps_url,
+        };
+        inMemoryRestaurant = merged;
+        persistRestaurant(merged);
+        return merged;
+      }
     } catch {
       // Fallback below
     }
@@ -1852,10 +1905,31 @@ export async function getRestaurantBySlug(slug: string): Promise<Restaurant | nu
 
   // Built-in fallback matching requested slug
   if (slug.toLowerCase() === 'addis' || slug.toLowerCase() === 'afla' || slug.toLowerCase() === 'addis-cafeteria' || slug === 'default' || slug === 'aura') {
-    return MOCK_RESTAURANT_ADDIS;
+    return inMemoryRestaurant;
   }
 
   return null;
+}
+
+const STORAGE_KEY_CATEGORIES = 'digital_menu_categories_cache';
+
+let inMemoryCategories: Category[] = [];
+
+function getStoredCategories(): Category[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistCategories(cats: Category[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cats));
+  } catch {}
 }
 
 export async function getMenuCategories(restaurantId: string): Promise<Category[]> {
@@ -1866,11 +1940,18 @@ export async function getMenuCategories(restaurantId: string): Promise<Category[
         .from('categories')
         .select('*')
         .eq('restaurant_id', restaurantId)
-        .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
       if (!error && data && data.length > 0) {
-        inMemoryCategories = data as Category[];
+        const local = getStoredCategories();
+        const dataIds = new Set(data.map((d: any) => d.id));
+        const localOnly = local.filter((c) => !dataIds.has(c.id));
+        const localMap = new Map(local.map((c) => [c.id, c]));
+        inMemoryCategories = [
+          ...(data as Category[]).map((d) => localMap.get(d.id) || d),
+          ...localOnly,
+        ].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+        persistCategories(inMemoryCategories);
         return inMemoryCategories;
       }
     } catch {
@@ -1878,8 +1959,16 @@ export async function getMenuCategories(restaurantId: string): Promise<Category[
     }
   }
 
+  const local = getStoredCategories();
+  if (local.length > 0) {
+    inMemoryCategories = local;
+    return inMemoryCategories;
+  }
+
   if (inMemoryCategories.length > 0) return inMemoryCategories;
-  return MOCK_CATEGORIES_ADDIS;
+  inMemoryCategories = [...MOCK_CATEGORIES_ADDIS];
+  persistCategories(inMemoryCategories);
+  return inMemoryCategories;
 }
 
 export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
@@ -2279,176 +2368,39 @@ export const DEFAULT_REVIEW_SETTINGS_ADDIS: RestaurantReviewSettings = {
 
 let inMemoryReviewSettings: RestaurantReviewSettings = { ...DEFAULT_REVIEW_SETTINGS_ADDIS };
 
-export const MOCK_REVIEWS_ADDIS: DishReview[] = [
-  // --- Tartufo & Wild Morel Sourdough Pizza (4 reviews -> Threshold >= 3 MET! avg 4.8) ---
-  {
-    id: 'rev-pizza-1',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-tartufo-pizza',
-    rating: 5,
-    tags: ['Crispy texture', 'Great portion'],
-    comment: 'The 72-hour sourdough crust has magnificent blistering and the truffle aroma fills the room.',
-    photo_url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80',
-    session_token: 'sess-seed-1',
-    table_number: 'Table 4',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 36 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 36 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-pizza-2',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-tartufo-pizza',
-    rating: 5,
-    tags: ['Would order again', 'Fresh ingredients'],
-    comment: 'Outstanding flavor profile. Best woodfired pizza in the city.',
-    session_token: 'sess-seed-2',
-    table_number: 'Table 14',
-    status: 'published',
-    report_count: 0,
-    owner_reply: 'Thank you so much! Our pizza dough is fermented for 72 hours with unbleached organic flour.',
-    owner_reply_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
-    owner_reply_by: 'Addis Kitchen Team',
-    created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-pizza-3',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-tartufo-pizza',
-    rating: 4,
-    tags: ['Too salty', 'Great portion'],
-    comment: 'Great portion size and the crust was fantastic. A tiny bit too salty on the pecorino cheese.',
-    session_token: 'sess-seed-3',
-    table_number: 'Table 2',
-    status: 'published',
-    report_count: 0,
-    owner_reply: 'We appreciate this honest note! We have alerted our pizzaiolo to calibrate the pecorino balance.',
-    owner_reply_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
-    owner_reply_by: 'Addis Kitchen Team',
-    created_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-pizza-4',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-tartufo-pizza',
-    rating: 5,
-    tags: ['Crispy texture', 'Fresh ingredients'],
-    comment: 'Arrived piping hot and perfectly sliced. Wonderful texture.',
-    session_token: 'sess-seed-4',
-    table_number: 'Table 9',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-  },
-
-  // --- Truffle Burrata & Heirloom Crudo (3 reviews -> Threshold >= 3 MET! avg 4.7) ---
-  {
-    id: 'rev-burrata-1',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-burrata',
-    rating: 5,
-    tags: ['Fresh ingredients', 'Would order again'],
-    comment: 'The burrata was wonderfully creamy with the balsamic glaze.',
-    session_token: 'sess-seed-5',
-    table_number: 'Table 1',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-burrata-2',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-burrata',
-    rating: 5,
-    tags: ['Fresh ingredients'],
-    comment: 'Heirloom tomatoes were super sweet and the garlic focaccia was warm and buttery.',
-    session_token: 'sess-seed-6',
-    table_number: 'Table 7',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'rev-burrata-3',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-burrata',
-    rating: 4,
-    tags: ['Great portion'],
-    comment: 'Loved the portion size for sharing.',
-    session_token: 'sess-seed-7',
-    table_number: 'Table 3',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
-  },
-
-  // --- Crispy Point Judith Calamari Fritti (1 review -> Threshold < 3 NOT MET! clean state) ---
-  {
-    id: 'rev-calamari-1',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-calamari',
-    rating: 5,
-    tags: ['Crispy texture'],
-    comment: 'Flash fried to perfection, not rubbery at all.',
-    session_token: 'sess-seed-8',
-    table_number: 'Table 5',
-    status: 'published',
-    report_count: 0,
-    created_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
-  },
-
-  // --- Reported / Needs Attention Demo Review ---
-  {
-    id: 'rev-reported-demo',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    item_id: 'item-burrata',
-    rating: 1,
-    tags: [],
-    comment: 'Check out cheap crypto telegram @spam_crypto_boost for discounts!',
-    session_token: 'sess-spammer-99',
-    table_number: 'Table 10',
-    status: 'reported',
-    report_count: 2,
-    flagged_reason: 'Reported by guests as spam advertisement',
-    created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
-    updated_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
-  },
-];
+export const MOCK_REVIEWS_ADDIS: DishReview[] = [];
 
 let inMemoryReviews: DishReview[] = [];
 
-export const MOCK_MODERATION_LOGS_ADDIS: ReviewModerationLog[] = [
-  {
-    id: 'log-1',
-    restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    review_id: 'rev-pizza-2',
-    user_role: 'staff',
-    user_name: 'Staff - Addis Kitchen Team',
-    action: 'reply',
-    reason: 'Replied with baking details',
-    created_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
-  },
-];
+export const MOCK_MODERATION_LOGS_ADDIS: ReviewModerationLog[] = [];
 
-let inMemoryModerationLogs: ReviewModerationLog[] = [...MOCK_MODERATION_LOGS_ADDIS];
+let inMemoryModerationLogs: ReviewModerationLog[] = [];
+
+const STORAGE_KEY_REVIEW_OVERRIDES = 'digital_menu_review_overrides';
+
+function getStoredReviewOverrides(): Record<string, Partial<DishReview>> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_REVIEW_OVERRIDES);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveReviewOverride(reviewId: string, updates: Partial<DishReview>) {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getStoredReviewOverrides();
+    current[reviewId] = { ...(current[reviewId] || {}), ...updates };
+    localStorage.setItem(STORAGE_KEY_REVIEW_OVERRIDES, JSON.stringify(current));
+  } catch {}
+}
 
 export async function getDishReviews(
   restaurantId: string,
   itemId?: string
 ): Promise<DishReview[]> {
-  let list = inMemoryReviews.filter((r) => r.restaurant_id === restaurantId);
-  if (itemId) {
-    list = list.filter((r) => r.item_id === itemId);
-  }
-
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
       const supabase = createClient();
@@ -2463,29 +2415,29 @@ export async function getDishReviews(
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (!error && data) {
-        const demoReported = MOCK_REVIEWS_ADDIS.filter((r) => r.status !== 'published');
-        const nonPublishedLocal = demoReported.filter(
-          (r) => !inMemoryReviews.some((local) => local.id === r.id && local.status === 'published')
-        );
-        const reportedIds = new Set(nonPublishedLocal.map((r) => r.id));
-        const cleanDbReviews = (data as DishReview[]).filter((r) => !reportedIds.has(r.id));
-        const allReviews = [...cleanDbReviews, ...nonPublishedLocal];
-        inMemoryReviews = allReviews;
-        return allReviews.sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+        const overrides = getStoredReviewOverrides();
+        inMemoryReviews = (data as DishReview[]).map((r) => {
+          if (overrides[r.id]) {
+            return { ...r, ...overrides[r.id] };
+          }
+          return r;
+        });
+        return inMemoryReviews;
       }
     } catch {
       // Fallback below
     }
   }
 
-  if (inMemoryReviews.length > 0) {
-    return [...list].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+  const overrides = getStoredReviewOverrides();
+  let list = inMemoryReviews.map((r) => (overrides[r.id] ? { ...r, ...overrides[r.id] } : r));
+  list = list.filter((r) => r.restaurant_id === restaurantId);
+  if (itemId) {
+    list = list.filter((r) => r.item_id === itemId);
   }
-  return MOCK_REVIEWS_ADDIS;
+  return [...list].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 }
 
 export async function submitDishReview(params: {
@@ -2603,13 +2555,30 @@ export async function replyToDishReview(
   replyText: string,
   staffName: string = 'Addis Staff'
 ): Promise<boolean> {
-  const review = inMemoryReviews.find((r) => r.id === reviewId);
+  let review = inMemoryReviews.find((r) => r.id === reviewId);
+  if (!review && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase.from('reviews').select('*').eq('id', reviewId).single();
+      if (data) {
+        review = data as DishReview;
+        inMemoryReviews.push(review);
+      }
+    } catch {}
+  }
   if (!review) return false;
 
   review.owner_reply = replyText.trim();
   review.owner_reply_at = new Date().toISOString();
   review.owner_reply_by = staffName;
   review.updated_at = new Date().toISOString();
+
+  saveReviewOverride(reviewId, {
+    owner_reply: review.owner_reply,
+    owner_reply_at: review.owner_reply_at,
+    owner_reply_by: review.owner_reply_by,
+    updated_at: review.updated_at,
+  });
 
   inMemoryModerationLogs.unshift({
     id: `log-${Date.now()}`,
@@ -2665,7 +2634,17 @@ export async function moderateDishReview(
     };
   }
 
-  const review = inMemoryReviews.find((r) => r.id === reviewId);
+  let review = inMemoryReviews.find((r) => r.id === reviewId);
+  if (!review && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase.from('reviews').select('*').eq('id', reviewId).single();
+      if (data) {
+        review = data as DishReview;
+        inMemoryReviews.push(review);
+      }
+    } catch {}
+  }
   if (!review) {
     return { success: false, error: 'Review not found.' };
   }
@@ -2678,6 +2657,12 @@ export async function moderateDishReview(
     review.flagged_reason = reason;
   }
   review.updated_at = new Date().toISOString();
+
+  saveReviewOverride(reviewId, {
+    status: review.status,
+    flagged_reason: review.flagged_reason,
+    updated_at: review.updated_at,
+  });
 
   inMemoryModerationLogs.unshift({
     id: `log-${Date.now()}`,
@@ -2787,7 +2772,6 @@ export const MOCK_MENU_VERSIONS_ADDIS: MenuVersion[] = [
 let inMemoryMenuVersions: MenuVersion[] = [...MOCK_MENU_VERSIONS_ADDIS];
 
 let inMemoryItems: MenuItem[] = [];
-let inMemoryCategories: Category[] = [];
 let inMemoryRestaurant: Restaurant = { ...MOCK_RESTAURANT_ADDIS };
 
 export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuItem> {
@@ -3006,27 +2990,153 @@ export async function bulkUpdateItems(
 
 export async function saveCategory(categoryData: Partial<Category>): Promise<Category> {
   const existingIdx = inMemoryCategories.findIndex((c) => c.id === categoryData.id);
+  let savedCategory: Category;
+
   if (existingIdx >= 0) {
-    inMemoryCategories[existingIdx] = {
+    savedCategory = {
       ...inMemoryCategories[existingIdx],
       ...categoryData,
     } as Category;
-    return inMemoryCategories[existingIdx];
+    inMemoryCategories[existingIdx] = savedCategory;
   } else {
+    const slug = (categoryData.name || 'category')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
     const newCat: Category = {
-      id: categoryData.id || `cat-${Date.now()}`,
+      id: categoryData.id || `cat-${slug || Date.now()}`,
       restaurant_id: categoryData.restaurant_id || MOCK_RESTAURANT_ADDIS.id,
       name: categoryData.name || 'New Category',
+      name_am: categoryData.name_am,
+      name_so: categoryData.name_so,
       name_es: categoryData.name_es,
       icon: categoryData.icon || '🍽️',
       description: categoryData.description || '',
+      description_am: categoryData.description_am,
+      description_so: categoryData.description_so,
       description_es: categoryData.description_es,
       sort_order: categoryData.sort_order ?? inMemoryCategories.length + 1,
       is_active: categoryData.is_active ?? true,
     };
     inMemoryCategories.push(newCat);
-    return newCat;
+    savedCategory = newCat;
   }
+
+  // Persist locally
+  persistCategories(inMemoryCategories);
+
+  // Broadcast update immediately to customer & admin across tabs
+  broadcastSync({ type: 'CATEGORY_UPDATED', category: savedCategory });
+
+  // Sync to Supabase
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const isUuid = (val?: string) =>
+        val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+      if (isUuid(savedCategory.restaurant_id)) {
+        const supabase = createClient();
+        const payload: Record<string, any> = {
+          name: savedCategory.name,
+          name_am: savedCategory.name_am,
+          name_so: savedCategory.name_so,
+          name_es: savedCategory.name_es,
+          icon: savedCategory.icon,
+          description: savedCategory.description || '',
+          description_am: savedCategory.description_am,
+          description_so: savedCategory.description_so,
+          description_es: savedCategory.description_es,
+          sort_order: savedCategory.sort_order,
+          is_active: savedCategory.is_active,
+          restaurant_id: savedCategory.restaurant_id,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (isUuid(savedCategory.id)) {
+          payload.id = savedCategory.id;
+          await Promise.race([
+            supabase.from('categories').upsert(payload),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+          ]);
+        }
+      }
+    } catch {
+      // Offline fallback
+    }
+  }
+
+  return savedCategory;
+}
+
+export async function deleteCategory(
+  categoryId: string
+): Promise<{ success: boolean; affectedDishesCount: number; error?: string }> {
+  const idx = inMemoryCategories.findIndex((c) => c.id === categoryId);
+  if (idx === -1) {
+    return { success: false, affectedDishesCount: 0, error: 'Category not found.' };
+  }
+
+  // Reassign any dishes belonging to this category to the first remaining category
+  const remaining = inMemoryCategories.filter((c) => c.id !== categoryId);
+  const fallbackCatId = remaining[0]?.id || 'cat-breakfast';
+  let affectedDishesCount = 0;
+
+  inMemoryItems = inMemoryItems.map((item) => {
+    if (item.category_id === categoryId) {
+      affectedDishesCount++;
+      return { ...item, category_id: fallbackCatId };
+    }
+    return item;
+  });
+
+  if (affectedDishesCount > 0 && typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('digital_menu_items_cache', JSON.stringify(inMemoryItems));
+      broadcastSync({ type: 'ITEMS_REFRESH' });
+    } catch {}
+  }
+
+  inMemoryCategories.splice(idx, 1);
+  persistCategories(inMemoryCategories);
+
+  broadcastSync({ type: 'CATEGORY_DELETED', categoryId });
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const isUuid = (val?: string) =>
+        val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+      if (isUuid(categoryId)) {
+        const supabase = createClient();
+        await Promise.race([
+          supabase.from('categories').delete().eq('id', categoryId),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+        ]);
+      }
+    } catch {
+      // Offline fallback
+    }
+  }
+
+  return { success: true, affectedDishesCount };
+}
+
+export async function reorderCategories(reordered: Category[]): Promise<Category[]> {
+  inMemoryCategories = reordered.map((cat, idx) => ({ ...cat, sort_order: idx + 1 }));
+  persistCategories(inMemoryCategories);
+
+  broadcastSync({ type: 'CATEGORIES_REFRESH' });
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      for (const cat of inMemoryCategories) {
+        await supabase.from('categories').update({ sort_order: cat.sort_order }).eq('id', cat.id);
+      }
+    } catch {}
+  }
+
+  return inMemoryCategories;
 }
 
 export async function updateRestaurantSettings(
@@ -3048,8 +3158,53 @@ export async function updateRestaurantSettings(
       ...inMemoryRestaurant.feature_flags,
       ...(updates.feature_flags || {}),
     },
+    custom_badges: updates.custom_badges || inMemoryRestaurant.custom_badges,
+    custom_labels: updates.custom_labels || inMemoryRestaurant.custom_labels,
+    closed_message: updates.closed_message || inMemoryRestaurant.closed_message,
+    holiday_closures: updates.holiday_closures || inMemoryRestaurant.holiday_closures,
     updated_at: new Date().toISOString(),
   };
+
+  // 1. Persist locally to localStorage
+  persistRestaurant(inMemoryRestaurant);
+
+  // 2. Broadcast immediately across all open tabs/windows
+  broadcastSync({ type: 'RESTAURANT_UPDATED', restaurant: inMemoryRestaurant });
+
+  // 3. Sync to Supabase
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const isUuid = (val?: string) =>
+        val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+      const supabase = createClient();
+      const payload: Record<string, any> = {
+        theme_config: inMemoryRestaurant.theme_config,
+        wifi_config: inMemoryRestaurant.wifi_config,
+        updated_at: new Date().toISOString(),
+      };
+      if (updates.name) payload.name = updates.name;
+      if (updates.hours) payload.hours = updates.hours;
+      if (updates.address) payload.address = updates.address;
+      if (updates.announcement !== undefined) payload.announcement = updates.announcement;
+      if (updates.is_open !== undefined) payload.is_open = updates.is_open;
+
+      if (isUuid(restaurantId)) {
+        await Promise.race([
+          supabase.from('restaurants').update(payload).eq('id', restaurantId),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+        ]);
+      } else {
+        await Promise.race([
+          supabase.from('restaurants').update(payload).eq('slug', inMemoryRestaurant.slug),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
+        ]);
+      }
+    } catch {
+      // Offline fallback
+    }
+  }
+
   return inMemoryRestaurant;
 }
 

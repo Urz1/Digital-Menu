@@ -33,6 +33,8 @@ import {
   deleteMenuItem,
   bulkUpdateItems,
   saveCategory,
+  deleteCategory,
+  reorderCategories,
   updateRestaurantSettings,
   getScheduledMenus,
   saveScheduledMenu,
@@ -43,7 +45,9 @@ import {
   getOffers,
   getMenuItems,
   getMenuCategories,
+  getStoredRestaurant,
 } from '@/lib/data-provider';
+import { applyThemeTokensToDOM } from '@/components/ThemeManager';
 import { AdminSidebar, AdminSection } from '@/components/admin/AdminSidebar';
 import { subscribeSync } from '@/lib/sync-channel';
 import { AdminBottomNav } from '@/components/admin/AdminBottomNav';
@@ -118,7 +122,25 @@ export default function AdminDashboardPage() {
   const [userRole, setUserRole] = useState<UserRole>('owner');
 
   // Core Data State
-  const [restaurant, setRestaurant] = useState<Restaurant>(MOCK_RESTAURANT_ADDIS);
+  const [restaurant, setRestaurant] = useState<Restaurant>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = getStoredRestaurant('addis') || getStoredRestaurant();
+      if (stored) return stored;
+    }
+    return MOCK_RESTAURANT_ADDIS;
+  });
+
+  useEffect(() => {
+    const stored = getStoredRestaurant(restaurant.slug) || getStoredRestaurant();
+    if (stored) {
+      setRestaurant(stored);
+      if (stored.theme_config) {
+        applyThemeTokensToDOM(stored.theme_config);
+      }
+    } else if (restaurant.theme_config) {
+      applyThemeTokensToDOM(restaurant.theme_config);
+    }
+  }, []);
   const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -209,6 +231,27 @@ export default function AdminDashboardPage() {
         setMenuItems((prev) =>
           prev.map((item) => (item.id === event.item.id ? { ...item, ...event.item } : item))
         );
+      } else if (event.type === 'CATEGORY_UPDATED') {
+        setCategories((prev) => {
+          const idx = prev.findIndex((c) => c.id === event.category.id);
+          if (idx >= 0) {
+            const copy = [...prev];
+            copy[idx] = event.category;
+            return copy;
+          }
+          return [...prev, event.category];
+        });
+      } else if (event.type === 'CATEGORY_DELETED') {
+        setCategories((prev) => prev.filter((c) => c.id !== event.categoryId));
+      } else if (event.type === 'CATEGORIES_REFRESH') {
+        getMenuCategories(restaurant.id).then(setCategories);
+      } else if (event.type === 'RESTAURANT_UPDATED') {
+        if (!event.restaurant.slug || event.restaurant.slug === restaurant.slug || event.restaurant.id === restaurant.id) {
+          setRestaurant(event.restaurant);
+          if (event.restaurant.theme_config) {
+            applyThemeTokensToDOM(event.restaurant.theme_config);
+          }
+        }
       }
     });
 
@@ -345,11 +388,38 @@ export default function AdminDashboardPage() {
     return saved;
   };
 
+  const handleDeleteCategory = async (categoryId: string) => {
+    triggerAutosave();
+    const res = await deleteCategory(categoryId);
+    if (res.success) {
+      setCategories((prev) => prev.filter((c) => c.id !== categoryId));
+      if (res.affectedDishesCount > 0) {
+        const items = await getMenuItems(restaurant.id);
+        setMenuItems(items);
+        showToast(`Category removed. ${res.affectedDishesCount} dish(es) reassigned.`, 'info');
+      } else {
+        showToast('Category removed successfully.', 'success');
+      }
+    } else {
+      showToast(res.error || 'Failed to delete category.', 'error');
+    }
+  };
+
+  const handleReorderCategories = async (reordered: Category[]) => {
+    triggerAutosave();
+    const updated = await reorderCategories(reordered);
+    setCategories(updated);
+    showToast('Category sort order updated.', 'success');
+  };
+
   // Restaurant Settings & Branding
   const handleSaveRestaurantSettings = async (updates: Partial<Restaurant>): Promise<Restaurant> => {
     triggerAutosave();
     const updated = await updateRestaurantSettings(restaurant.id, updates);
     setRestaurant(updated);
+    if (updated.theme_config) {
+      applyThemeTokensToDOM(updated.theme_config);
+    }
     return updated;
   };
 
@@ -662,6 +732,8 @@ export default function AdminDashboardPage() {
               onBulkUpdate={handleBulkUpdate}
               onReorderItems={handleReorderItems}
               onSaveCategory={handleSaveCategory}
+              onDeleteCategory={handleDeleteCategory}
+              onReorderCategories={handleReorderCategories}
               onSaveScheduledMenu={handleSaveScheduledMenu}
               onCreateVersion={handleCreateVersion}
               onRestoreVersion={handleRestoreVersion}

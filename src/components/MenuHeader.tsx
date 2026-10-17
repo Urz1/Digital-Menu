@@ -71,6 +71,21 @@ export function MenuHeader({
             <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]"></span>
               <span>{restaurant.is_open ? t.openNow : t.closed}</span>
+              {restaurant.google_maps_url && (
+                <>
+                  <span className="text-neutral-400 dark:text-neutral-600">•</span>
+                  <a
+                    href={restaurant.google_maps_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[var(--primary)] hover:underline"
+                    title="View branch location on Google Maps"
+                  >
+                    <MapPin className="w-3 h-3 text-[var(--primary)] flex-shrink-0" />
+                    <span className="truncate max-w-[100px]">{restaurant.branch_name || 'Main Branch'}</span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>

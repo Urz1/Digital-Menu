@@ -40,6 +40,7 @@ import {
   Eye,
   EyeOff,
   Edit2,
+  MapPin,
 } from 'lucide-react';
 
 interface SettingsSectionProps {
@@ -55,8 +56,16 @@ export function SettingsSection({
 }: SettingsSectionProps) {
   // Settings Form State
   const [selectedTable, setSelectedTable] = useState('Table 14');
-  const [hours, setHours] = useState(restaurant.hours || 'Mon – Sun: 7:00 AM – 10:00 PM');
-  const [address, setAddress] = useState(restaurant.address || 'Bole Road, Addis Ababa');
+  const [hours, setHours] = useState(restaurant.hours || 'Mon – Sun: 6:30 AM – 11:00 PM');
+  const [address, setAddress] = useState(
+    restaurant.address || 'XQHC+MJP Addis Cafe and Bakery, Addis Ababa, Ethiopia'
+  );
+  const [branchName, setBranchName] = useState(
+    restaurant.branch_name || 'Main Branch — Addis Cafe & Bakery'
+  );
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(
+    restaurant.google_maps_url || 'https://maps.app.goo.gl/R8WN2zwM9dwVXT3h9?g_st=ac'
+  );
   const [taxRate, setTaxRate] = useState(
     restaurant.tax_rate ? (restaurant.tax_rate * 100).toString() : '15'
   );
@@ -112,6 +121,8 @@ export function SettingsSection({
     const updates: Partial<Restaurant> = {
       hours,
       address,
+      branch_name: branchName,
+      google_maps_url: googleMapsUrl,
       tax_rate: isNaN(parsedTax) ? 0.15 : parsedTax / 100,
       tax_mode: taxMode,
       currency,
@@ -737,32 +748,85 @@ export function SettingsSection({
               </div>
             </div>
 
-            {/* Operating Hours & Address */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">
-                  Display Operating Hours
-                </label>
-                <input
-                  type="text"
-                  value={hours}
-                  onChange={(e) => setHours(e.target.value)}
-                  placeholder="Mon – Sun: 7:00 AM – 10:00 PM"
-                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
-                />
+            {/* Main Branch & Physical Location */}
+            <div className="space-y-3 pt-3 border-t border-white/5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>Main Branch & Physical Location</span>
+                  </h4>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Currently set for 1 Main Branch. All diner QR stands and navigation links route directly to this verified Google Maps location.
+                  </p>
+                </div>
+                {googleMapsUrl && (
+                  <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/20 transition-colors w-fit"
+                  >
+                    <span>Test Map Link</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">
-                  Physical Address
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Bole Road, Addis Ababa"
-                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Branch Name / Label
+                  </label>
+                  <input
+                    type="text"
+                    value={branchName}
+                    onChange={(e) => setBranchName(e.target.value)}
+                    placeholder="Main Branch — Addis Cafe & Bakery"
+                    className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Display Operating Hours
+                  </label>
+                  <input
+                    type="text"
+                    value={hours}
+                    onChange={(e) => setHours(e.target.value)}
+                    placeholder="Mon – Sun: 6:30 AM – 11:00 PM"
+                    className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Physical Address & Plus Code
+                  </label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="XQHC+MJP Addis Cafe and Bakery, Addis Ababa, Ethiopia"
+                    className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                    Google Maps Place / Directions URL
+                  </label>
+                  <input
+                    type="url"
+                    value={googleMapsUrl}
+                    onChange={(e) => setGoogleMapsUrl(e.target.value)}
+                    placeholder="https://maps.app.goo.gl/..."
+                    className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                  />
+                </div>
               </div>
             </div>
 

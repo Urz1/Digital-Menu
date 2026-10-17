@@ -60,6 +60,8 @@ export interface Restaurant {
   default_table: string;
   hours: string;
   address: string;
+  branch_name?: string;
+  google_maps_url?: string;
   announcement?: string;
   is_open: boolean;
   theme_config: ThemeConfig;
