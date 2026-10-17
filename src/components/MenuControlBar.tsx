@@ -69,8 +69,11 @@ export function MenuControlBar({
   const t = TRANSLATIONS[locale] || TRANSLATIONS.en;
 
   // Compute active category details
-  const activeCategory = categories.find((c) => c.id === activeCategoryId);
   const isOffersActive = activeCategoryId === 'offers' || activeFilter === 'onOffer';
+  const isAllCategories = !activeCategoryId || activeCategoryId === 'all';
+  const activeCategory = isAllCategories ? null : categories.find((c) => c.id === activeCategoryId);
+
+  const totalItemsCount = Object.values(itemCounts).reduce((a, b) => a + b, 0);
 
   const activeCategoryName = isOffersActive
     ? t.specialOffer
@@ -86,7 +89,7 @@ export function MenuControlBar({
     ? offersCount
     : activeCategory
     ? itemCounts[activeCategory.id] || 0
-    : 0;
+    : totalItemsCount;
 
   // Filter definitions
   const FILTER_OPTIONS: { id: DietaryFilter; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
@@ -137,8 +140,10 @@ export function MenuControlBar({
             <div className="flex items-center gap-1.5 min-w-0">
               {isOffersActive ? (
                 <Tag className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+              ) : activeCategory ? (
+                <span className="text-sm leading-none flex-shrink-0">{activeCategory.icon || '🍽️'}</span>
               ) : (
-                <Grid className="w-3.5 h-3.5 text-[var(--primary)] flex-shrink-0" />
+                <Utensils className="w-3.5 h-3.5 text-[var(--primary)] flex-shrink-0" />
               )}
               <span className="truncate text-left text-xs text-[var(--foreground)] font-bold">
                 {activeCategoryName}

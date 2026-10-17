@@ -118,6 +118,6 @@ test.describe('Category CRUD & Inline Creation Flow', () => {
     await expect(page.locator('h1:has-text("Addis Cafeteria")')).toBeVisible();
 
     // Categories are rendered on customer page
-    await expect(page.locator('text=Breakfast & Starters').first()).toBeVisible();
+    await expect(page.locator('text=Soft Cake').first()).toBeVisible();
   });
 });

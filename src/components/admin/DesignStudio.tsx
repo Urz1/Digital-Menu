@@ -54,7 +54,7 @@ export function DesignStudio({
     fontFamily: restaurant.theme_config?.fontFamily || 'serif',
     borderRadius: restaurant.theme_config?.borderRadius || 'md',
     defaultMode: restaurant.theme_config?.defaultMode || 'light',
-    defaultLayout: restaurant.theme_config?.defaultLayout || 'list',
+    defaultLayout: restaurant.theme_config?.defaultLayout || 'grid',
     cardStyle: restaurant.theme_config?.cardStyle || 'elevated',
     imageSize: restaurant.theme_config?.imageSize || 'standard',
     priceStyle: restaurant.theme_config?.priceStyle || 'accented',

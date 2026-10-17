@@ -47,7 +47,7 @@ export const MOCK_RESTAURANT_ADDIS: Restaurant = {
     fontFamily: 'serif',
     borderRadius: 'md',
     defaultMode: 'light',
-    defaultLayout: 'list',
+    defaultLayout: 'grid',
     cardStyle: 'elevated',
     imageSize: 'standard',
     priceStyle: 'accented',

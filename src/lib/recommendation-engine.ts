@@ -153,7 +153,7 @@ export function getIntelligentPairings(
     }
 
     // Slot 2: Traditional Macchiato or Buna (universal Addis post-tibs digestive)
-    const macchiato = findItem('item-macchiato', 'macchiato', 'coffee');
+    const macchiato = findItem('item-macchiato', 'macchiato') || findItem('coffee', 'buna');
     if (macchiato) {
       recommendations.push({
         item: macchiato,
@@ -374,13 +374,14 @@ export function getIntelligentPairings(
   // ---------------------------------------------------------------------------
   if (
     targetCategory === 'cat-hot-beverage' ||
+    targetCategory === 'cat-hot-drinks' ||
     targetCategory === 'cat-cold-drinks' ||
     targetCategory === 'cat-juice' ||
     targetCategory === 'cat-drinks' ||
     targetCategory === 'cat-juices'
   ) {
     // When ordering a beverage, recommend artisanal bakery items
-    const croissant = findItem('croissant plain', 'white plain', 'bombolino');
+    const croissant = findItem('item-croissant', 'croissant plain', 'croissant', 'white plain', 'bombolino');
     if (croissant) {
       recommendations.push({
         item: croissant,

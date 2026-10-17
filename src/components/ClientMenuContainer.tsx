@@ -43,7 +43,7 @@ import {
 import { calculateDishReviewStats } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
 import Link from 'next/link';
-import { ArrowUp, Share2, QrCode, Info, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen, Search, Heart, MapPin, ExternalLink } from 'lucide-react';
+import { ArrowUp, Share2, QrCode, Info, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen, Search, Heart, MapPin, ExternalLink, Utensils } from 'lucide-react';
 import { Language, TRANSLATIONS, CATEGORY_TRANSLATIONS } from '@/lib/translations';
 
 interface ClientMenuContainerProps {
@@ -231,9 +231,9 @@ export function ClientMenuContainer({
   );
   const [locale, setLocale] = useState<Language>('en');
   const [layout, setLayout] = useState<'list' | 'grid'>(
-    restaurant.theme_config?.defaultLayout || 'list'
+    restaurant.theme_config?.defaultLayout || 'grid'
   );
-  const [activeCategoryId, setActiveCategoryId] = useState<string>(categories[0]?.id || '');
+  const [activeCategoryId, setActiveCategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<DietaryFilter>('all');
@@ -676,6 +676,11 @@ export function ClientMenuContainer({
   const filteredItems = useMemo(() => {
     let result = [...items];
 
+    // Specific category filter: if activeCategoryId is set and not 'all' or 'offers'
+    if (activeCategoryId && activeCategoryId !== 'all' && activeCategoryId !== 'offers') {
+      result = result.filter((i) => i.category_id === activeCategoryId);
+    }
+
     // Search query filter
     if (searchQuery.trim().length > 0) {
       const q = searchQuery.toLowerCase();
@@ -719,6 +724,22 @@ export function ClientMenuContainer({
 
     return result;
   }, [items, searchQuery, activeFilter, activeCategoryId, sortOrder, favorites, itemPricingMap]);
+
+  // Active Category object (null when in 'all' or 'offers' mode)
+  const activeCategory = useMemo(() => {
+    if (!activeCategoryId || activeCategoryId === 'all' || activeCategoryId === 'offers') {
+      return null;
+    }
+    return categories.find((c) => c.id === activeCategoryId) || null;
+  }, [categories, activeCategoryId]);
+
+  // Categories displayed on screen (all categories if 'all', or only the selected category)
+  const displayedCategories = useMemo(() => {
+    if (!activeCategoryId || activeCategoryId === 'all' || activeCategoryId === 'offers') {
+      return categories;
+    }
+    return categories.filter((c) => c.id === activeCategoryId);
+  }, [categories, activeCategoryId]);
 
   // Gentle pairing recommendations for "Goes well with"
   const pairingItems = useMemo(() => {
@@ -859,7 +880,7 @@ export function ClientMenuContainer({
         onFilterChange={(filter) => {
           setActiveFilter(filter);
           if (filter !== 'onOffer' && activeCategoryId === 'offers') {
-            setActiveCategoryId(categories[0]?.id || '');
+            setActiveCategoryId('all');
           }
         }}
         sortOrder={sortOrder}
@@ -874,9 +895,8 @@ export function ClientMenuContainer({
             setActiveFilter('onOffer');
           } else {
             if (activeFilter === 'onOffer') setActiveFilter('all');
-            const el = document.getElementById(`cat-${id}`);
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
           }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           setTimeout(() => {
             isManualScrollRef.current = false;
           }, 800);
@@ -963,75 +983,151 @@ export function ClientMenuContainer({
             </div>
           </section>
         ) : (
-          // Standard Category-grouped sections
-          categories.map((cat, catIdx) => {
-            const catItems = filteredItems.filter((i) => i.category_id === cat.id);
-            if (catItems.length === 0) return null;
-
-            const displayName =
-              CATEGORY_TRANSLATIONS[cat.id]?.[locale]?.name ||
-              (locale === 'am' && cat.name_am) ||
-              (locale === 'so' && cat.name_so) ||
-              (locale === 'es' && cat.name_es) ||
-              cat.name;
-            const displayDesc =
-              CATEGORY_TRANSLATIONS[cat.id]?.[locale]?.description ||
-              (locale === 'am' && cat.description_am) ||
-              (locale === 'so' && cat.description_so) ||
-              (locale === 'es' && cat.description_es) ||
-              cat.description;
-
-            // Find next non-empty category
-            const nextCat = categories.slice(catIdx + 1).find((c) =>
-              filteredItems.some((i) => i.category_id === c.id)
-            );
-            const nextDisplayName = nextCat
-              ? (CATEGORY_TRANSLATIONS[nextCat.id]?.[locale]?.name ||
-                 (locale === 'am' && nextCat.name_am) ||
-                 (locale === 'so' && nextCat.name_so) ||
-                 (locale === 'es' && nextCat.name_es) ||
-                 nextCat.name)
-              : '';
-
-            return (
-              <section key={cat.id} id={`cat-${cat.id}`} className="mb-10 scroll-mt-36">
-                <div className="mb-3 flex items-baseline justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
-                      <span>{cat.icon}</span>
-                      <span>{displayName}</span>
+          <>
+            {/* Active Category Filter Header (Shown when viewing a specific category) */}
+            {activeCategoryId !== 'all' && activeCategoryId !== 'offers' && activeCategory && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="text-2xl flex-shrink-0">{activeCategory.icon || '🍽️'}</span>
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-[var(--foreground)] truncate font-brand flex items-center gap-1.5">
+                      <span>
+                        {CATEGORY_TRANSLATIONS[activeCategory.id]?.[locale]?.name ||
+                          (locale === 'am' && activeCategory.name_am) ||
+                          (locale === 'so' && activeCategory.name_so) ||
+                          (locale === 'es' && activeCategory.name_es) ||
+                          activeCategory.name}
+                      </span>
+                      <span className="text-[11px] font-semibold text-[var(--muted)] px-1.5 py-0.2 rounded-full bg-[var(--background)] border border-[var(--border)]">
+                        {filteredItems.length}
+                      </span>
                     </h2>
-                    <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+                    <p className="text-[11px] text-[var(--muted)] truncate mt-0.5">
+                      {CATEGORY_TRANSLATIONS[activeCategory.id]?.[locale]?.description ||
+                        (locale === 'am' && activeCategory.description_am) ||
+                        (locale === 'so' && activeCategory.description_so) ||
+                        (locale === 'es' && activeCategory.description_es) ||
+                        activeCategory.description}
+                    </p>
                   </div>
-                  <span className="text-[11px] font-semibold text-[var(--muted)]">
-                    {catItems.length} {catItems.length === 1 ? 'dish' : 'dishes'}
-                  </span>
                 </div>
-
-                <div className={layout === 'grid' ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
-                  {catItems.map((item) => (
-                    <ItemCard
-                      key={item.id}
-                      item={item}
-                      pricingResult={itemPricingMap.get(item.id)}
-                      reviewStats={reviewStatsMap.get(item.id)}
-                      currencySymbol={restaurant.currency || 'ETB'}
-                      isFavorite={favorites.has(item.id)}
-                      onToggleFavorite={handleToggleFavorite}
-                      onOpenDetails={setSelectedDetailItem}
-                      onQuickAdd={(i) => handleAddToCart(i, 1, [], '')}
-                      layout={layout}
-                      locale={locale}
-                    />
-                  ))}
+                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic(8);
+                      setActiveCategoryId('all');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="px-2.5 py-1.5 rounded-full bg-[var(--background)] hover:bg-[var(--border)] text-[var(--foreground)] border border-[var(--border)] text-xs font-bold flex items-center gap-1.5 transition-colors active:scale-95 shadow-2xs"
+                    title="View All Menu"
+                  >
+                    <Utensils className="w-3.5 h-3.5 text-[var(--primary)]" />
+                    <span>{locale === 'am' ? 'ሁሉንም አሳይ' : 'Show All'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic(8);
+                      setIsCategoryDrawerOpen(true);
+                    }}
+                    className="w-8 h-8 rounded-full bg-[var(--background)] hover:bg-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] border border-[var(--border)] flex items-center justify-center transition-colors active:scale-95"
+                    title={TRANSLATIONS[locale]?.browseCategories || 'Directory'}
+                    aria-label={TRANSLATIONS[locale]?.browseCategories || 'Directory'}
+                  >
+                    <Compass className="w-4 h-4 text-[var(--primary)]" />
+                  </button>
                 </div>
+              </div>
+            )}
 
-                {/* In-feed Next Category Transition Link & Directory Jump */}
-                {nextCat && (
-                  <div className="mt-4 pt-3 border-t border-dashed border-[var(--border)] flex items-center justify-between">
-                    <span className="text-[11px] text-[var(--muted)]">
-                      {TRANSLATIONS[locale]?.endOfCategory || 'End of'} {displayName}
+            {/* Category-grouped sections (all categories OR filtered single category) */}
+            {displayedCategories.map((cat, catIdx) => {
+              const catItems = filteredItems.filter((i) => i.category_id === cat.id);
+              if (catItems.length === 0) return null;
+
+              const displayName =
+                CATEGORY_TRANSLATIONS[cat.id]?.[locale]?.name ||
+                (locale === 'am' && cat.name_am) ||
+                (locale === 'so' && cat.name_so) ||
+                (locale === 'es' && cat.name_es) ||
+                cat.name;
+              const displayDesc =
+                CATEGORY_TRANSLATIONS[cat.id]?.[locale]?.description ||
+                (locale === 'am' && cat.description_am) ||
+                (locale === 'so' && cat.description_so) ||
+                (locale === 'es' && cat.description_es) ||
+                cat.description;
+
+              // Find next non-empty category from master list
+              const currentCatIdxInAll = categories.findIndex((c) => c.id === cat.id);
+              const nextCat = categories.slice(currentCatIdxInAll + 1).find((c) =>
+                items.some((i) => i.category_id === c.id)
+              );
+              const nextDisplayName = nextCat
+                ? (CATEGORY_TRANSLATIONS[nextCat.id]?.[locale]?.name ||
+                   (locale === 'am' && nextCat.name_am) ||
+                   (locale === 'so' && nextCat.name_so) ||
+                   (locale === 'es' && nextCat.name_es) ||
+                   nextCat.name)
+                : '';
+
+              return (
+                <section key={cat.id} id={`cat-${cat.id}`} className="mb-10 scroll-mt-36">
+                  <div className="mb-3 flex items-baseline justify-between">
+                    <div>
+                      <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
+                        <span>{cat.icon}</span>
+                        <span>{displayName}</span>
+                      </h2>
+                      <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+                    </div>
+                    <span className="text-[11px] font-semibold text-[var(--muted)]">
+                      {catItems.length} {catItems.length === 1 ? 'dish' : 'dishes'}
                     </span>
+                  </div>
+
+                  <div className={layout === 'grid' ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
+                    {catItems.map((item) => (
+                      <ItemCard
+                        key={item.id}
+                        item={item}
+                        pricingResult={itemPricingMap.get(item.id)}
+                        reviewStats={reviewStatsMap.get(item.id)}
+                        currencySymbol={restaurant.currency || 'ETB'}
+                        isFavorite={favorites.has(item.id)}
+                        onToggleFavorite={handleToggleFavorite}
+                        onOpenDetails={setSelectedDetailItem}
+                        onQuickAdd={(i) => handleAddToCart(i, 1, [], '')}
+                        layout={layout}
+                        locale={locale}
+                      />
+                    ))}
+                  </div>
+
+                  {/* In-feed Next Category Transition Link & Directory Jump */}
+                  <div className="mt-4 pt-3 border-t border-dashed border-[var(--border)] flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {activeCategoryId !== 'all' ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic(8);
+                            setActiveCategoryId('all');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:underline active:scale-95 transition-transform"
+                        >
+                          <Utensils className="w-3.5 h-3.5" />
+                          <span>{locale === 'am' ? '← ወደ ሙሉ ዝርዝር ተመለስ' : '← View All Categories'}</span>
+                        </button>
+                      ) : (
+                        <span className="text-[11px] text-[var(--muted)]">
+                          {TRANSLATIONS[locale]?.endOfCategory || 'End of'} {displayName}
+                        </span>
+                      )}
+                    </div>
+
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -1044,31 +1140,32 @@ export function ClientMenuContainer({
                         <Compass className="w-3 h-3 text-[var(--primary)]" />
                         <span className="hidden sm:inline">{TRANSLATIONS[locale]?.browseCategories || 'Directory'}</span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic(8);
-                          isManualScrollRef.current = true;
-                          setActiveCategoryId(nextCat.id);
-                          const nextEl = document.getElementById(`cat-${nextCat.id}`);
-                          if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth' });
-                          setTimeout(() => {
-                            isManualScrollRef.current = false;
-                          }, 800);
-                        }}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:underline active:scale-95 transition-transform"
-                      >
-                        <span>
-                          Next: {nextCat.icon} {nextDisplayName}
-                        </span>
-                        <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
-                      </button>
+                      {nextCat && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            triggerHaptic(8);
+                            isManualScrollRef.current = true;
+                            setActiveCategoryId(nextCat.id);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            setTimeout(() => {
+                              isManualScrollRef.current = false;
+                            }, 800);
+                          }}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:underline active:scale-95 transition-transform"
+                        >
+                          <span>
+                            Next: {nextCat.icon} {nextDisplayName}
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+                        </button>
+                      )}
                     </div>
                   </div>
-                )}
-              </section>
-            );
-          })
+                </section>
+              );
+            })}
+          </>
         )}
       </main>
 
@@ -1282,6 +1379,46 @@ export function ClientMenuContainer({
 
             {/* Category Directory Cards */}
             <div className="overflow-y-auto flex-1 mt-3 flex flex-col gap-2 pr-1">
+              {/* All Categories Option (Lists entire menu) */}
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic(12);
+                  setActiveCategoryId('all');
+                  if (activeFilter === 'onOffer') setActiveFilter('all');
+                  setIsCategoryDrawerOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                  activeCategoryId === 'all' && activeFilter !== 'onOffer'
+                    ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.08)] shadow-xs font-bold'
+                    : 'border-[var(--border)] bg-[var(--background)] hover:border-[var(--muted)]'
+                }`}
+              >
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center flex-shrink-0 mt-0.5 text-[var(--primary)]">
+                    <Utensils className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div
+                      className={`text-sm font-bold truncate ${
+                        activeCategoryId === 'all' && activeFilter !== 'onOffer'
+                          ? 'text-[var(--primary)]'
+                          : 'text-[var(--foreground)]'
+                      }`}
+                    >
+                      {TRANSLATIONS[locale]?.allCategories || 'All Categories'}
+                    </div>
+                    <div className="text-xs text-[var(--muted)] line-clamp-1 mt-0.5">
+                      {items.length} {locale === 'am' ? 'ምግቦች በሙሉ' : 'total dishes across all categories'}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--card)] border border-[var(--border)] text-[var(--muted)] flex-shrink-0 ml-2">
+                  {items.length}
+                </span>
+              </button>
+
               {activeOffers.length > 0 && (
                 <button
                   type="button"
@@ -1290,6 +1427,7 @@ export function ClientMenuContainer({
                     setActiveCategoryId('offers');
                     setActiveFilter('onOffer');
                     setIsCategoryDrawerOpen(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
                     activeCategoryId === 'offers' || activeFilter === 'onOffer'
@@ -1316,7 +1454,7 @@ export function ClientMenuContainer({
                 </button>
               )}
               {categories.map((cat) => {
-                const isSelected = activeCategoryId === cat.id;
+                const isSelected = activeCategoryId === cat.id && activeFilter !== 'onOffer';
                 const translatedName =
                   CATEGORY_TRANSLATIONS[cat.id]?.[locale]?.name ||
                   (locale === 'am' && cat.name_am) ||
@@ -1340,10 +1478,7 @@ export function ClientMenuContainer({
                       setActiveCategoryId(cat.id);
                       if (activeFilter === 'onOffer') setActiveFilter('all');
                       setIsCategoryDrawerOpen(false);
-                      setTimeout(() => {
-                        const el = document.getElementById(`cat-${cat.id}`);
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
                       isSelected

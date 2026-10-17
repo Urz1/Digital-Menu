@@ -1,9 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { getIntelligentPairings } from '../src/lib/recommendation-engine';
-import { MOCK_ITEMS_ADDIS } from '../src/lib/data-provider';
+import { MenuItem } from '../src/types/database';
 
 test.describe('Intelligent Recommendation Engine - Research & Cultural Rules', () => {
-  const items = MOCK_ITEMS_ADDIS;
+  const items: MenuItem[] = [
+    { id: 'item-beyaynetu', restaurant_id: 'res-1', category_id: 'cat-fasting', name: 'Yetsom Beyaynetu', price: 250, description: 'Traditional vegan platter', image_url: '', tags: ['fasting', 'vegan'], allergens: [], spice_level: 1, is_available: true, is_chefs_pick: true, sort_order: 1 },
+    { id: 'item-yebeg-tibs', restaurant_id: 'res-1', category_id: 'cat-lunch-dinner', name: 'Yebeg Tibs', price: 450, description: 'Sizzling lamb tibs', image_url: '', tags: ['meat'], allergens: ['Meat'], spice_level: 2, is_available: true, is_chefs_pick: true, sort_order: 2 },
+    { id: 'item-special-mendi', restaurant_id: 'res-1', category_id: 'cat-mendi', name: 'Special Mendi', price: 650, description: 'Slow-roasted rice and meat', image_url: '', tags: ['meat'], allergens: ['Meat'], spice_level: 1, is_available: true, is_chefs_pick: true, sort_order: 3 },
+    { id: 'item-special-burger', restaurant_id: 'res-1', category_id: 'cat-burgers', name: 'Special Burger', price: 350, description: 'Juicy beef burger', image_url: '', tags: ['meat'], allergens: ['Meat', 'Gluten'], spice_level: 0, is_available: true, is_chefs_pick: true, sort_order: 4 },
+    { id: 'item-coffee-buna', restaurant_id: 'res-1', category_id: 'cat-hot-beverage', name: 'Traditional Buna', price: 50, description: 'Single origin highland coffee', image_url: '', tags: ['beverage'], allergens: [], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 5 },
+    { id: 'item-ambo-water', restaurant_id: 'res-1', category_id: 'cat-cold-drinks', name: 'Ambo Water', price: 40, description: 'Sparkling mineral water', image_url: '', tags: ['beverage', 'fasting'], allergens: [], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 6 },
+    { id: 'item-macchiato', restaurant_id: 'res-1', category_id: 'cat-hot-drinks', name: 'Macchiato', price: 60, description: 'Highland espresso with milk foam', image_url: '', tags: ['beverage'], allergens: ['Dairy'], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 7 },
+    { id: 'item-somali-tea', restaurant_id: 'res-1', category_id: 'cat-hot-drinks', name: 'Somali Shaah', price: 45, description: 'Spiced aromatic tea', image_url: '', tags: ['beverage', 'fasting'], allergens: [], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 8 },
+    { id: 'item-french-fries', restaurant_id: 'res-1', category_id: 'cat-snacks', name: 'French Fries', price: 120, description: 'Crispy golden fries', image_url: '', tags: ['snack', 'vegetarian', 'fasting'], allergens: [], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 9 },
+    { id: 'item-croissant', restaurant_id: 'res-1', category_id: 'cat-soft-cake', name: 'Croissant Plain', price: 150, description: 'Flaky butter croissant', image_url: '', tags: ['bakery'], allergens: ['Dairy', 'Gluten'], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 10 },
+    { id: 'item-spris', restaurant_id: 'res-1', category_id: 'cat-juice', name: 'Spris Juice', price: 140, description: 'Layered fresh juice', image_url: '', tags: ['juice', 'fasting'], allergens: [], spice_level: 0, is_available: true, is_chefs_pick: false, sort_order: 11 },
+  ];
 
   test('1. Fasting Isolation Rule: Fasting dish NEVER recommends meat or dairy', () => {
     const beyaynetu = items.find((i) => i.id === 'item-beyaynetu')!;

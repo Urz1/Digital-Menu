@@ -313,33 +313,71 @@ nextjs-portal,
 
 /* Solid Colored Buttons and Elements MUST retain Crisp White Text */
 [data-admin-theme="light"] button.bg-amber-600,
-[data-admin-theme="light"] button.bg-amber-500,
 [data-admin-theme="light"] button.bg-orange-500,
 [data-admin-theme="light"] button.bg-orange-600,
 [data-admin-theme="light"] button.bg-emerald-600,
 [data-admin-theme="light"] button.bg-rose-600,
 [data-admin-theme="light"] button.bg-blue-600,
-[data-admin-theme="light"] button[type="submit"],
+[data-admin-theme="light"] button.bg-neutral-900,
 [data-admin-theme="light"] .bg-amber-600.text-white,
-[data-admin-theme="light"] .bg-amber-500.text-white,
 [data-admin-theme="light"] .bg-orange-600.text-white,
 [data-admin-theme="light"] .bg-emerald-600.text-white,
 [data-admin-theme="light"] .bg-rose-600.text-white,
 [data-admin-theme="light"] .bg-blue-600.text-white,
 [data-admin-theme="light"] .bg-purple-600.text-white,
+[data-admin-theme="light"] .bg-neutral-900.text-white,
 [data-admin-theme="light"] .bg-black .text-white {
   color: #FFFFFF !important;
 }
 
 [data-admin-theme="light"] button.bg-amber-600 *,
-[data-admin-theme="light"] button.bg-amber-500 *,
 [data-admin-theme="light"] button.bg-orange-500 *,
 [data-admin-theme="light"] button.bg-orange-600 *,
 [data-admin-theme="light"] button.bg-emerald-600 *,
 [data-admin-theme="light"] button.bg-rose-600 *,
 [data-admin-theme="light"] button.bg-blue-600 *,
-[data-admin-theme="light"] button[type="submit"] * {
+[data-admin-theme="light"] button.bg-neutral-900 * {
   color: #FFFFFF !important;
+}
+
+/* Explicit Black Text preservation for buttons with text-black or text-neutral-950 */
+[data-admin-theme="light"] .text-black,
+[data-admin-theme="light"] button.text-black,
+[data-admin-theme="light"] button.text-black *,
+[data-admin-theme="light"] .text-neutral-950,
+[data-admin-theme="light"] button.text-neutral-950,
+[data-admin-theme="light"] button.text-neutral-950 * {
+  color: #000000 !important;
+}
+
+/* Profile Banner in Light Mode */
+[data-admin-theme="light"] .profile-banner {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-admin-theme="light"] .profile-banner h2 {
+  color: #111827 !important;
+}
+
+/* Toast Notifications */
+[data-admin-theme="light"] [data-testid="admin-toast"],
+[data-admin-theme="light"] [data-testid="admin-toast"] * {
+  color: #FFFFFF !important;
+}
+
+/* Inputs, Textareas, Selects in Admin Light Mode */
+[data-admin-theme="light"] input,
+[data-admin-theme="light"] textarea,
+[data-admin-theme="light"] select {
+  color: #111827 !important;
+}
+
+[data-admin-theme="light"] input::placeholder,
+[data-admin-theme="light"] textarea::placeholder {
+  color: #9CA3AF !important;
 }
 
 /* Logo letter badge on solid brand color */

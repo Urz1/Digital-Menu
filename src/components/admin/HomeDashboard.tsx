@@ -76,21 +76,21 @@ export function HomeDashboard({
   return (
     <div className="flex flex-col gap-8 pb-16 max-w-7xl mx-auto w-full">
       {/* Celebration Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600/30 via-orange-600/20 to-neutral-900 border border-amber-500/30 p-5 md:p-6 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-amber-500/10 via-orange-500/5 to-amber-500/10 dark:from-amber-600/30 dark:via-orange-600/20 dark:to-neutral-900 border border-amber-500/30 p-5 md:p-6 shadow-xs dark:shadow-xl">
         <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl flex-shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 dark:text-amber-400 text-2xl flex-shrink-0">
               <UtensilsCrossed className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg md:text-xl font-bold text-white">Your digital menu is live!</h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <h2 className="text-lg md:text-xl font-bold text-neutral-900 dark:text-white">Your digital menu is live!</h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
                   Ready for Orders
                 </span>
               </div>
-              <p className="text-xs md:text-sm text-neutral-300 mt-0.5">
+              <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-300 mt-0.5">
                 Guests can view your artisanal menu on any phone. Print table QR stands to start serving.
               </p>
             </div>
@@ -99,7 +99,7 @@ export function HomeDashboard({
             <Link
               href={`/${restaurant.slug}?table=1`}
               target="_blank"
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white/10 dark:hover:bg-white/15 dark:text-white text-xs font-bold transition-all border border-neutral-800 dark:border-white/10 flex items-center justify-center gap-2 shadow-sm"
             >
               <Eye className="w-4 h-4 text-amber-400" />
               <span>Preview Live Menu</span>
@@ -109,7 +109,7 @@ export function HomeDashboard({
                 triggerHaptic(10);
                 onOpenHelp();
               }}
-              className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/20 flex items-center gap-1.5"
+              className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold transition-all border border-amber-500/20 flex items-center gap-1.5 cursor-pointer"
             >
               <HelpCircle className="w-4 h-4" />
               <span>Help & Tips</span>
