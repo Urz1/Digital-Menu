@@ -293,12 +293,22 @@ export function evaluateOfferSchedule(
 // -----------------------------------------------------------------------------
 
 export function isItemApplicableToOffer(item: MenuItem, offer: Offer): boolean {
-  if (offer.scope_type === 'all') return true;
+  // Free item threshold offers apply at the cart/order level, not per item
+  if (offer.discount_type === 'free_item' || (offer.min_order_amount && offer.min_order_amount > 0)) {
+    return false;
+  }
+  if (offer.scope_type === 'all') {
+    // For fixed money-off offers, the item price must exceed the discount value
+    if (offer.discount_type === 'fixed_amount' && item.price <= Number(offer.discount_value)) {
+      return false;
+    }
+    return true;
+  }
   if (offer.scope_type === 'categories') {
-    return offer.category_ids?.includes(item.category_id) ?? false;
+    return (offer.category_ids?.length ?? 0) > 0 && (offer.category_ids?.includes(item.category_id) ?? false);
   }
   if (offer.scope_type === 'items') {
-    return offer.item_ids?.includes(item.id) ?? false;
+    return (offer.item_ids?.length ?? 0) > 0 && (offer.item_ids?.includes(item.id) ?? false);
   }
   return false;
 }
@@ -309,7 +319,12 @@ export function calculateDiscountAmount(originalPrice: number, offer: Offer): nu
     return Math.min(originalPrice, Math.max(0, Number(discount.toFixed(2))));
   }
   if (offer.discount_type === 'fixed_amount') {
-    return Math.min(originalPrice, Math.max(0, Number(Number(offer.discount_value).toFixed(2))));
+    const discountVal = Number(offer.discount_value || 0);
+    // Never allow a fixed discount to reduce item price to 0 ETB or negative
+    if (originalPrice <= discountVal) {
+      return 0;
+    }
+    return Math.min(originalPrice, Math.max(0, Number(discountVal.toFixed(2))));
   }
   return 0;
 }

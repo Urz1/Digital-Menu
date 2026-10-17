@@ -18,6 +18,7 @@ import { ServiceAssistanceModal } from './ServiceAssistanceModal';
 import { SettingsModal } from './SettingsModal';
 import { AllergenLegendModal } from './AllergenLegendModal';
 import { QrModal } from './QrModal';
+import { IosInstallModal } from './IosInstallModal';
 import { applyThemeTokensToDOM } from './ThemeManager';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeSync } from '@/lib/sync-channel';
@@ -150,11 +151,12 @@ export function ClientMenuContainer({
     return () => clearInterval(timer);
   }, []);
 
-  // PWA Offline detection & Repeat Visitor Install Prompt
+  // PWA Offline detection & Real Mobile Install Prompt
   const [isOffline, setIsOffline] = useState(false);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
+  const [isIosInstallModalOpen, setIsIosInstallModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
@@ -167,30 +169,46 @@ export function ClientMenuContainer({
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Repeat visitor check (> 1 visit) and not previously dismissed
-    try {
-      let visits = parseInt(localStorage.getItem('menu_visit_count') || '0', 10);
-      if (!sessionStorage.getItem('menu_session_active')) {
-        sessionStorage.setItem('menu_session_active', 'true');
-        visits += 1;
-        localStorage.setItem('menu_visit_count', visits.toString());
-      }
-      const isDismissed = localStorage.getItem('menu_pwa_install_dismissed') === 'true';
+    // 1. Standalone check: If app is ALREADY installed and running in standalone mode, NEVER prompt
+    const isStandalone =
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone === true ||
+        document.referrer.includes('android-app://'));
 
-      if (visits > 1 && !isDismissed) {
-        setShowInstallPrompt(true);
-      }
-    } catch {
-      // quota/privacy fallback
+    if (isStandalone) {
+      setShowInstallPrompt(false);
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
     }
 
-    // Capture browser beforeinstallprompt
+    const isIOSDevice =
+      typeof navigator !== 'undefined' &&
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as any).MSStream;
+
+    let isDismissed = false;
+    try {
+      isDismissed = localStorage.getItem('menu_pwa_install_dismissed') === 'true';
+    } catch {}
+
+    // 2. Android / Chromium: Listen for real beforeinstallprompt event from browser
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredInstallPrompt(e);
+      if (!isDismissed) {
+        setShowInstallPrompt(true);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+
+    // 3. iOS Safari (does not support beforeinstallprompt event): show banner if not dismissed
+    if (isIOSDevice && !isDismissed) {
+      setShowInstallPrompt(true);
+    }
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -201,20 +219,37 @@ export function ClientMenuContainer({
 
   const handleInstallClick = async () => {
     triggerHaptic(10);
+    const isIOSDevice =
+      typeof navigator !== 'undefined' &&
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as any).MSStream;
+
     if (deferredInstallPrompt) {
-      deferredInstallPrompt.prompt();
-      const choiceResult = await deferredInstallPrompt.userChoice;
-      if (choiceResult?.outcome === 'accepted') {
-        setShowInstallPrompt(false);
+      // Real native Android/Chrome system install prompt
+      try {
+        deferredInstallPrompt.prompt();
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        if (choiceResult?.outcome === 'accepted') {
+          setShowInstallPrompt(false);
+          try {
+            localStorage.setItem('menu_pwa_install_dismissed', 'true');
+          } catch {}
+        }
+      } catch (err) {
+        console.warn('Install prompt error:', err);
       }
       setDeferredInstallPrompt(null);
+    } else if (isIOSDevice) {
+      // iPhone/iPad: Open dedicated step-by-step visual instructions sheet
+      setIsIosInstallModalOpen(true);
     } else {
-      showToast('Tap Share / Menu and select "Add to Home Screen"');
+      // Desktop Chrome / Edge: Guide user to native install icon in address bar
+      showToast('Tap the install icon (⊕) in your browser address bar or menu (⋮) to install');
       setShowInstallPrompt(false);
+      try {
+        localStorage.setItem('menu_pwa_install_dismissed', 'true');
+      } catch {}
     }
-    try {
-      localStorage.setItem('menu_pwa_install_dismissed', 'true');
-    } catch {}
   };
 
   const handleDismissInstall = () => {
@@ -1345,6 +1380,12 @@ export function ClientMenuContainer({
         restaurantName={restaurant.name}
         tableNumber={tableNumber}
         locale={locale}
+      />
+
+      <IosInstallModal
+        isOpen={isIosInstallModalOpen}
+        onClose={() => setIsIosInstallModalOpen(false)}
+        restaurantName={restaurant.name}
       />
 
       {/* Category Directory Modal / Drawer */}

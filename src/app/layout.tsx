@@ -24,6 +24,15 @@ export const metadata: Metadata = {
   title: "Digital Menu — Mobile-First Dining Platform",
   description: "Next.js multi-tenant digital restaurant menu system with Supabase Realtime and PWA.",
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Addis Menu",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

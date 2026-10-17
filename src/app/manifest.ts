@@ -2,23 +2,33 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Addis Digital Menu',
+    name: 'Addis Cafeteria & Restaurant',
     short_name: 'Addis Menu',
-    description: 'Mobile-first QR digital restaurant menu and instant ordering',
-    start_url: '/',
+    description: 'Digital restaurant menu, contactless dining & instant ordering',
+    start_url: '/addis?utm_source=pwa',
+    scope: '/',
     display: 'standalone',
+    orientation: 'portrait',
     background_color: '#101115',
     theme_color: '#E8590C',
     icons: [
       {
-        src: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=192&h=192&q=80',
+        src: '/icons/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
+        purpose: 'any',
       },
       {
-        src: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=512&h=512&q=80',
+        src: '/icons/icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-maskable-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
       },
     ],
   };

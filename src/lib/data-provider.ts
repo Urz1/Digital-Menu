@@ -3267,8 +3267,8 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
   {
     id: 'f1a8c1e2-3456-4789-a012-3456789abc01',
     restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    title: 'Happy Hour: 20% Off Wood-Fired Specialties',
-    description: 'Enjoy 20% off all artisan wood-fired mains every afternoon.',
+    title: 'Happy Hour: 20% Off Handcrafted Pizzas',
+    description: 'Enjoy 20% off all artisan sourdough pizzas every afternoon.',
     badge_text: '20% Off',
     template_type: 'happy_hour',
     status: 'live',
@@ -3276,14 +3276,14 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
     discount_type: 'percentage',
     discount_value: 20,
     scope_type: 'categories',
-    category_ids: ['cat-woodfired'],
+    category_ids: ['cat-pizzas'],
     timezone: 'Africa/Addis_Ababa',
     days_of_week: [0, 1, 2, 3, 4, 5, 6],
     start_time: '08:00',
     end_time: '23:59',
     honest_urgency_hours: 2,
     show_top_banner: true,
-    banner_text: 'Afternoon Happy Hour: 20% off all artisan wood-fired dishes until late.',
+    banner_text: 'Afternoon Happy Hour: 20% off all handcrafted pizzas until late.',
     banner_link_text: 'See offer',
     stacking_rule: 'best_discount',
     priority: 10,
@@ -3297,16 +3297,16 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
   {
     id: 'f2b9d2e3-4567-4890-b123-456789abc02',
     restaurant_id: MOCK_RESTAURANT_ADDIS.id,
-    title: 'Addis Sourdough Truffle Burrata Combo',
-    description: 'Save 40 ETB when enjoying our signature Truffle Burrata Flatbread.',
-    badge_text: '40 ETB Off',
+    title: 'Special Mendi Feast (100 ETB Off)',
+    description: 'Save 100 ETB when ordering our authentic slow-cooked Special Mendi.',
+    badge_text: '100 ETB Off',
     template_type: 'money_off',
     status: 'live',
     is_paused: false,
     discount_type: 'fixed_amount',
-    discount_value: 40.0,
+    discount_value: 100.0,
     scope_type: 'items',
-    item_ids: ['item-burrata'],
+    item_ids: ['item-special-mendi-138'],
     timezone: 'Africa/Addis_Ababa',
     days_of_week: [0, 1, 2, 3, 4, 5, 6],
     honest_urgency_hours: 0,
@@ -3332,7 +3332,7 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
     discount_type: 'free_item',
     discount_value: 0,
     min_order_amount: 500.0,
-    free_item_id: 'item-espresso',
+    free_item_id: 'item-coffee-75',
     scope_type: 'all',
     timezone: 'Africa/Addis_Ababa',
     days_of_week: [0, 1, 2, 3, 4, 5, 6],
@@ -3362,24 +3362,58 @@ export async function getOffers(restaurantId: string): Promise<Offer[]> {
         .order('priority', { ascending: false });
 
       if (!error && data) {
-        const mapped = data.map((d: any) => ({
-          ...d,
-          status: d.status || (d.is_active ? 'live' : 'paused'),
-          is_paused: d.is_paused ?? !d.is_active,
-          show_top_banner: d.show_top_banner ?? true,
-          template_type: d.template_type || d.offer_type || 'percentage_off',
-          scope_type: d.scope_type || (d.target_category_ids?.length ? 'categories' : d.target_item_ids?.length ? 'items' : 'all'),
-          category_ids: d.category_ids || d.target_category_ids || ['cat-woodfired'],
-          item_ids: d.item_ids || d.target_item_ids || [],
-          timezone: d.timezone || 'Africa/Addis_Ababa',
-          days_of_week: d.days_of_week || [0, 1, 2, 3, 4, 5, 6],
-          start_time: d.start_time || '00:00',
-          end_time: d.end_time || '23:59',
-          honest_urgency_hours: d.honest_urgency_hours ?? 2,
-          banner_text: d.banner_text || d.title,
-          banner_link_text: d.banner_link_text || 'See offer',
-          stacking_rule: d.stacking_rule || 'best_discount',
-        })) as Offer[];
+        const mapped = data
+          .map((d: any) => {
+            const rawCategoryIds: string[] = Array.isArray(d.category_ids)
+              ? d.category_ids
+              : Array.isArray(d.target_category_ids)
+              ? d.target_category_ids
+              : [];
+            const rawItemIds: string[] = Array.isArray(d.item_ids)
+              ? d.item_ids
+              : Array.isArray(d.target_item_ids)
+              ? d.target_item_ids
+              : [];
+
+            let scopeType: 'all' | 'categories' | 'items' = 'items';
+            if (d.scope_type) {
+              scopeType = d.scope_type;
+            } else if (d.offer_type === 'category_discount' || rawCategoryIds.length > 0) {
+              scopeType = 'categories';
+            } else if (d.offer_type === 'item_discount' || rawItemIds.length > 0) {
+              scopeType = 'items';
+            } else if (d.offer_type === 'order_threshold') {
+              scopeType = 'all';
+            }
+
+            return {
+              ...d,
+              status: d.status || (d.is_active ? 'live' : 'paused'),
+              is_paused: d.is_paused ?? !d.is_active,
+              show_top_banner: d.show_top_banner ?? false,
+              template_type: d.template_type || d.offer_type || 'percentage_off',
+              discount_type: d.discount_type || (d.offer_type === 'order_threshold' ? 'free_item' : 'percentage'),
+              discount_value: Number(d.discount_value || 0),
+              min_order_amount: Number(d.threshold_amount || d.min_order_amount || 0),
+              scope_type: scopeType,
+              category_ids: rawCategoryIds,
+              item_ids: rawItemIds,
+              timezone: d.timezone || 'Africa/Addis_Ababa',
+              days_of_week: d.days_of_week || [0, 1, 2, 3, 4, 5, 6],
+              start_time: d.start_time || '00:00',
+              end_time: d.end_time || '23:59',
+              honest_urgency_hours: d.honest_urgency_hours ?? 2,
+              banner_text: d.banner_text || d.title,
+              banner_link_text: d.banner_link_text || 'See offer',
+              stacking_rule: d.stacking_rule || 'best_discount',
+            };
+          })
+          .filter((o: any) => {
+            // Never apply an item discount if it has 0 items, or category discount if it has 0 categories
+            if (o.scope_type === 'items' && (!o.item_ids || o.item_ids.length === 0)) return false;
+            if (o.scope_type === 'categories' && (!o.category_ids || o.category_ids.length === 0)) return false;
+            return true;
+          }) as Offer[];
 
         inMemoryOffers = mapped;
         return mapped;

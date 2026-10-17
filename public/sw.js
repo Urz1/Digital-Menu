@@ -3,7 +3,10 @@ const CACHE_NAME = 'digital-menu-cache-v2';
 const OFFLINE_URLS = [
   '/',
   '/addis',
-  '/manifest.webmanifest'
+  '/manifest.webmanifest',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
