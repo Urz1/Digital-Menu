@@ -52,7 +52,7 @@ export function DesignStudio({
     accentColor: restaurant.theme_config?.accentColor || '#F76707',
     fontFamily: restaurant.theme_config?.fontFamily || 'serif',
     borderRadius: restaurant.theme_config?.borderRadius || 'md',
-    defaultMode: restaurant.theme_config?.defaultMode || 'auto',
+    defaultMode: restaurant.theme_config?.defaultMode || 'light',
     defaultLayout: restaurant.theme_config?.defaultLayout || 'list',
     cardStyle: restaurant.theme_config?.cardStyle || 'elevated',
     imageSize: restaurant.theme_config?.imageSize || 'standard',
@@ -103,8 +103,8 @@ export function DesignStudio({
   const [newBadgeName, setNewBadgeName] = useState('');
   const [newBadgeColor, setNewBadgeColor] = useState('#E8590C');
 
-  // Preview Mode: 'dark' | 'light'
-  const [previewThemeMode, setPreviewThemeMode] = useState<'dark' | 'light'>('dark');
+  // Preview Mode: 'light' | 'dark' (Default is light)
+  const [previewThemeMode, setPreviewThemeMode] = useState<'dark' | 'light'>('light');
 
   // Contrast check
   const contrastCheck = checkWcagContrast(themeConfig.primaryColor, '#FFFFFF');

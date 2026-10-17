@@ -81,10 +81,33 @@ import {
   Droplets,
   Utensils,
   Receipt,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+
+  // Theme State (Strict Light Mode by default for Owner & Staff)
+  const [adminTheme, setAdminTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('admin_theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+      } catch {}
+    }
+    return 'light';
+  });
+
+  const toggleAdminTheme = () => {
+    const next = adminTheme === 'light' ? 'dark' : 'light';
+    triggerHaptic(8);
+    setAdminTheme(next);
+    try {
+      localStorage.setItem('admin_theme', next);
+    } catch {}
+    showToast(`Switched admin console to ${next.toUpperCase()} mode.`, 'info');
+  };
 
   // Authentication & Session State
   const [session, setSession] = useState<AdminAuthSession | null>(null);
@@ -430,7 +453,7 @@ export default function AdminDashboardPage() {
   // Secure Gate: If checking or unauthenticated, block view and show authentication redirect
   if (isAuthChecking || !session) {
     return (
-      <div className="min-h-screen bg-[#0C0D11] text-white flex flex-col items-center justify-center p-4">
+      <div data-admin-theme={adminTheme} className="min-h-screen bg-[#0C0D11] text-white flex flex-col items-center justify-center p-4">
         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4 animate-pulse">
           <ShieldCheck className="w-6 h-6" />
         </div>
@@ -446,6 +469,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div
+      data-admin-theme={adminTheme}
       data-hydrated={isHydrated ? 'true' : undefined}
       className="min-h-screen bg-[#0C0D11] text-white flex flex-col md:flex-row selection:bg-amber-500 selection:text-black"
     >
@@ -475,23 +499,23 @@ export default function AdminDashboardPage() {
       {/* MAIN VIEWPORT CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0 pb-16 md:pb-0">
         {/* TOP ADMIN HEADER BAR */}
-        <header className="sticky top-0 z-30 border-b border-white/10 px-4 md:px-8 py-3.5 flex items-center justify-between bg-[#0C0D11]/90 backdrop-blur-md">
+        <header className="sticky top-0 z-30 border-b border-white/10 px-3 sm:px-6 md:px-8 py-2.5 sm:py-3.5 flex items-center justify-between bg-[#0C0D11]/90 backdrop-blur-md">
           {/* Left: Mobile Title / Brand */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-md text-sm md:hidden"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-md text-xs sm:text-sm md:hidden flex-shrink-0"
               style={{ backgroundColor: restaurant.theme_config.primaryColor }}
             >
               {restaurant.logo_letter || 'A'}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-bold text-sm md:text-base text-white truncate max-w-[140px] sm:max-w-none">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="font-bold text-xs sm:text-sm md:text-base text-white truncate max-w-[105px] sm:max-w-none">
                   {restaurant.name}
                 </h1>
                 <span
                   data-testid="role-badge"
-                  className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
+                  className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${
                     userRole === 'owner'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                       : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
@@ -500,12 +524,12 @@ export default function AdminDashboardPage() {
                   {userRole} Mode
                 </span>
               </div>
-              <p className="text-[11px] text-neutral-400 hidden sm:block">/{restaurant.slug}</p>
+              <p className="text-[10px] sm:text-[11px] text-neutral-400 hidden sm:block">/{restaurant.slug}</p>
             </div>
           </div>
 
           {/* Right: Autosave Status, Authenticated User Info, Sign Out & Customer View */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Autosave Calm Status Indicator */}
             <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px]">
               <span
@@ -523,28 +547,37 @@ export default function AdminDashboardPage() {
               <span className="font-bold text-white truncate max-w-[140px]">{session?.name || (userRole === 'owner' ? 'Owner' : 'Staff')}</span>
             </div>
 
-            {/* Sign Out Button */}
-            <button
-              type="button"
-              data-testid="admin-signout-btn"
-              onClick={handleSignOut}
-              className="h-8 px-3 rounded-full bg-white/5 hover:bg-rose-500/15 border border-white/10 hover:border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors text-neutral-300 hover:text-rose-300 cursor-pointer"
-              title="Sign out of administration console"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
-            </button>
-
-
             {/* Customer Live Menu Link */}
             <Link
               href={`/${restaurant.slug}?table=14`}
               target="_blank"
-              className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-white/10 text-neutral-200"
+              className="h-8 w-8 sm:w-auto sm:px-3 rounded-full bg-white/10 hover:bg-white/15 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-white/10 text-neutral-200"
+              title="Preview Customer Live Menu"
             >
-              <Eye className="w-3.5 h-3.5 text-amber-400" />
+              <Eye className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
               <span className="hidden sm:inline">Customer Menu</span>
             </Link>
+
+            {/* Theme Toggle Button (Light by default for Owner & Staff) */}
+            <button
+              type="button"
+              data-testid="admin-theme-toggle"
+              onClick={toggleAdminTheme}
+              className="h-8 w-8 sm:w-auto sm:px-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-neutral-300 hover:text-white"
+              title={adminTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {adminTheme === 'light' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
 
             {/* Help Button */}
             <button
@@ -553,10 +586,22 @@ export default function AdminDashboardPage() {
                 setIsHelpOpen(true);
               }}
               data-testid="admin-help-button"
-              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-neutral-300 hover:text-white transition-colors"
+              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-neutral-300 hover:text-white transition-colors flex-shrink-0"
               title="Help & tips"
             >
               <HelpCircle className="w-4 h-4" />
+            </button>
+
+            {/* Sign Out Button */}
+            <button
+              type="button"
+              data-testid="admin-signout-btn"
+              onClick={handleSignOut}
+              className="h-8 px-2 sm:px-3 rounded-full bg-white/5 hover:bg-rose-500/15 border border-white/10 hover:border-rose-500/30 text-xs font-semibold flex items-center justify-center gap-1 transition-colors text-neutral-300 hover:text-rose-300 cursor-pointer flex-shrink-0"
+              title="Sign out of administration console"
+            >
+              <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </header>

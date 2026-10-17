@@ -24,10 +24,33 @@ import {
   AlertCircle,
   CheckCircle2,
   HelpCircle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
+
+  // Theme State (Strict Light Mode by default for Owner & Staff)
+  const [adminTheme, setAdminTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('admin_theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+      } catch {}
+    }
+    return 'light';
+  });
+
+  const toggleAdminTheme = () => {
+    const next = adminTheme === 'light' ? 'dark' : 'light';
+    triggerHaptic(8);
+    setAdminTheme(next);
+    try {
+      localStorage.setItem('admin_theme', next);
+    } catch {}
+  };
+
   const [tab, setTab] = useState<'owner' | 'staff'>('owner');
 
   // Owner form state
@@ -121,16 +144,40 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0D11] text-white flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-black">
+    <div
+      data-admin-theme={adminTheme}
+      className="min-h-screen bg-[#0C0D11] text-white flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-black"
+    >
       <div className="w-full max-w-md bg-white/[0.04] border border-white/10 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
-        {/* Back Link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Restaurant Menu</span>
-        </Link>
+        {/* Top Header: Back Link & Theme Toggle */}
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Menu</span>
+          </Link>
+          <button
+            type="button"
+            data-testid="login-theme-toggle"
+            onClick={toggleAdminTheme}
+            className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer text-neutral-300 hover:text-white"
+            title={adminTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          >
+            {adminTheme === 'light' ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-blue-400" />
+                <span>Dark</span>
+              </>
+            )}
+          </button>
+        </div>
 
         {/* Branding */}
         <div className="text-center mb-6">
