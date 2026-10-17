@@ -21,6 +21,7 @@ import { QrModal } from './QrModal';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeSync } from '@/lib/sync-channel';
 import {
+  getMenuItems,
   createServiceRequest,
   recordOfferInteraction,
   MOCK_OFFERS_ADDIS,
@@ -63,6 +64,22 @@ export function ClientMenuContainer({
 }: ClientMenuContainerProps) {
   // Items state (updated in real-time via Supabase Realtime)
   const [items, setItems] = useState<MenuItem[]>(initialItems);
+
+  // Sync client-side on mount from Supabase / cache to guarantee exact parity with Admin console
+  useEffect(() => {
+    getMenuItems(restaurant.id).then((freshItems) => {
+      if (freshItems && freshItems.length > 0) {
+        setItems(freshItems);
+      }
+    });
+  }, [restaurant.id]);
+
+  // Keep state updated if server props re-evaluate
+  useEffect(() => {
+    if (initialItems && initialItems.length > 0) {
+      setItems(initialItems);
+    }
+  }, [initialItems]);
 
   // Offers state (updated in real-time via Supabase Realtime)
   const [offers, setOffers] = useState<Offer[]>(initialOffers || []);

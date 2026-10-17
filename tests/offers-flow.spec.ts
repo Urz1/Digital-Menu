@@ -105,9 +105,7 @@ test.describe('Stage 3: Offers System - End to End Flow', () => {
     await expect(offerBadge).toBeVisible();
 
     // Open dish detail bottom sheet for an authentic dish on offer
-    const dishCard = page.locator('article:has-text("Fetira"):has-text("Off")').or(
-      page.locator('article:has-text("20% Off"):not(:has-text("Sold Out"))')
-    ).first();
+    const dishCard = page.locator('article:has-text("Special Fetira"):has-text("Off")').first();
     await dishCard.click();
 
     // Verify dish modal details:

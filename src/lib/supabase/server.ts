@@ -1,6 +1,16 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+// Node 20 SSR polyfill: Ensure global WebSocket exists for realtime-js constructor
+if (typeof window === 'undefined' && typeof globalThis.WebSocket === 'undefined') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    globalThis.WebSocket = require('ws');
+  } catch {
+    // Handled in environments where ws is not required or already present
+  }
+}
+
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
 

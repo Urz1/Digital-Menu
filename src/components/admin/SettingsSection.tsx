@@ -184,7 +184,7 @@ export function SettingsSection({
     setNewStaffPin('');
     setIsAddingStaff(false);
     triggerHaptic(12);
-    onShowToast(`Staff account created for ${created.name} (Password/PIN: ${created.pin_code})`, 'success');
+    onShowToast(`Staff account created for ${created.name} successfully.`, 'success');
   };
 
   const handleUpdateStaffPin = (staffId: string) => {

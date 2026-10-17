@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
   const [tab, setTab] = useState<'owner' | 'staff'>('owner');
 
   // Owner form state
-  const [ownerIdentifier, setOwnerIdentifier] = useState('owner@addiscafeteria.com');
+  const [ownerIdentifier, setOwnerIdentifier] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
   const [showOwnerPassword, setShowOwnerPassword] = useState(false);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
   const [recoverySent, setRecoverySent] = useState(false);
 
   // Staff form state
-  const [staffUsername, setStaffUsername] = useState('staff_selam');
+  const [staffUsername, setStaffUsername] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
   const [showStaffPassword, setShowStaffPassword] = useState(false);
 
@@ -268,20 +268,6 @@ export default function AdminLoginPage() {
               <span>{isLoading ? 'Authenticating...' : 'Sign In as Owner'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-
-            {/* Initial Seeded Hint Box */}
-            <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-neutral-300">
-              <div className="font-bold text-amber-400 text-[11px] mb-1 flex items-center gap-1">
-                <span>🔑 Default Initial Owner Credentials:</span>
-              </div>
-              <div className="text-[11px] font-mono space-y-0.5 text-neutral-300">
-                <div>Email: <strong className="text-white">owner@addiscafeteria.com</strong></div>
-                <div>Password: <strong className="text-white">Owner@2026</strong></div>
-              </div>
-              <p className="text-[10px] text-neutral-400 mt-1.5">
-                You can change your password and email at any time inside Settings!
-              </p>
-            </div>
           </form>
         )}
 
@@ -300,11 +286,11 @@ export default function AdminLoginPage() {
                 <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
                 <div className="text-sm font-bold text-emerald-400 mb-1">Recovery Dispatched</div>
                 <p className="text-xs text-neutral-300">
-                  Password instructions sent to <strong>{recoveryEmail}</strong>.
+                  Password instructions and reset link dispatched to <strong>{recoveryEmail}</strong>.
                 </p>
-                <div className="mt-3 p-2 rounded-lg bg-black/30 text-[11px] font-mono text-amber-300">
-                  Current password: {DEFAULT_OWNER_PROFILE.password}
-                </div>
+                <p className="text-[11px] text-neutral-400 mt-2">
+                  Please check your inbox (and spam folder) to complete your password update.
+                </p>
                 <button
                   type="button"
                   onClick={() => {
@@ -415,20 +401,6 @@ export default function AdminLoginPage() {
               <span>{isLoading ? 'Verifying Credentials...' : 'Open Staff Console'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-
-            {/* Initial Seeded Staff Hint */}
-            <div className="mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-neutral-300">
-              <div className="font-bold text-amber-400 text-[11px] mb-1">
-                🔑 Initial Seeded Staff Accounts:
-              </div>
-              <div className="text-[11px] font-mono space-y-1 text-neutral-300">
-                <div>• Username: <strong className="text-white">staff_selam</strong> | PIN: <strong className="text-white">1234</strong></div>
-                <div>• Username: <strong className="text-white">staff_yonas</strong> | PIN: <strong className="text-white">5678</strong></div>
-              </div>
-              <p className="text-[10px] text-neutral-400 mt-1.5">
-                Staff accounts are provisioned and passwords managed exclusively by the owner.
-              </p>
-            </div>
           </form>
         )}
       </div>

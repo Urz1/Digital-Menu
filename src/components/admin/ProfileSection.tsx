@@ -30,6 +30,13 @@ import {
   Clock,
   Sparkles,
   ClipboardList,
+  UtensilsCrossed,
+  Users,
+  Tag,
+  Sliders,
+  Zap,
+  MessageSquare,
+  Bell,
 } from 'lucide-react';
 
 interface ProfileSectionProps {
@@ -559,64 +566,102 @@ export function ProfileSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           {isOwner ? (
             <>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">🍽️</span>
-                <h4 className="text-xs font-bold text-white">Full Menu Control</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Create, price, tag, and schedule all dishes.
-                </p>
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <UtensilsCrossed className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Full Menu Control</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Create, price, tag, and schedule all dishes.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">👥</span>
-                <h4 className="text-xs font-bold text-white">Staff Management</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Provision new staff accounts, reset pins, and revoke access.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Staff Management</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Provision new staff accounts, reset pins, and revoke access.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">🏷️</span>
-                <h4 className="text-xs font-bold text-white">Offers Engine</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Automate happy hours, combos, and time schedules.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Offers Engine</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Automate happy hours, combos, and time schedules.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">⚙️</span>
-                <h4 className="text-xs font-bold text-white">Site & Tax Setup</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Configure currencies (ETB), tax rules, and guest WiFi.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Sliders className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Site & Tax Setup</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Configure currencies (ETB), tax rules, and guest WiFi.
+                  </p>
+                </div>
               </div>
             </>
           ) : (
             <>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">⚡</span>
-                <h4 className="text-xs font-bold text-white">86 / Sold Out Control</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Instantly toggle out-of-stock items in real time.
-                </p>
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">86 / Sold Out Control</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Instantly toggle out-of-stock items in real time.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">🏷️</span>
-                <h4 className="text-xs font-bold text-white">Active Offers Monitor</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  View and pause running promotions during busy hours.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Active Offers Monitor</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    View and pause running promotions during busy hours.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">💬</span>
-                <h4 className="text-xs font-bold text-white">Guest Reviews Reply</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Read feedback and post friendly staff replies to diners.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Guest Reviews Reply</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Read feedback and post friendly staff replies to diners.
+                  </p>
+                </div>
               </div>
-              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-xl block mb-1">🛎️</span>
-                <h4 className="text-xs font-bold text-white">Service Requests</h4>
-                <p className="text-[11px] text-neutral-400 mt-0.5">
-                  Acknowledge and mark table calls and refills as served.
-                </p>
+
+              <div className="group p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
+                    <Bell className="w-4 h-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Service Requests</h4>
+                  <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                    Acknowledge and mark table calls and refills as served.
+                  </p>
+                </div>
               </div>
             </>
           )}
