@@ -508,8 +508,8 @@ export function ReviewsManager({
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white font-brand">
-                      {item?.name || 'Unknown Dish'}
+                    <span className="font-bold text-sm text-white font-brand capitalize">
+                      {item?.name || (rev.item_id ? rev.item_id.replace(/^item-/, '').replace(/-\d+$/, '').replace(/-/g, ' ') : 'Verified Dish')}
                     </span>
                     {rev.table_number && (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-neutral-400">

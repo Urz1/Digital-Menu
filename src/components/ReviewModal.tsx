@@ -144,7 +144,7 @@ export function ReviewModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 transition-opacity"
+      className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-xs flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 transition-opacity"
       role="dialog"
       aria-modal="true"
       onClick={onClose}

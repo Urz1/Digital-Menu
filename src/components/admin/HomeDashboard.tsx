@@ -464,9 +464,9 @@ export function HomeDashboard({
             </div>
 
             <div className="flex flex-col gap-3">
-              {reviews.slice(0, 3).map((rev) => {
+              {reviews.filter((r) => r.status !== 'removed').slice(0, 4).map((rev) => {
                 const item = menuItems.find((i) => i.id === rev.item_id);
-                const dishName = item?.name || 'Artisanal Dish';
+                const dishName = item?.name || (rev.item_id ? rev.item_id.replace(/^item-/, '').replace(/-\d+$/, '').replace(/-/g, ' ') : 'Dish Feedback');
 
                 return (
                   <div key={rev.id} className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
