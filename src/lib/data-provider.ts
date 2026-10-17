@@ -33,7 +33,7 @@ export const MOCK_RESTAURANT_ADDIS: Restaurant = {
   default_table: 'Table 14',
   hours: 'Mon – Sun: 6:30 AM – 11:00 PM',
   address: 'Bole Medhanealem, Addis Ababa, Ethiopia',
-  announcement: '✨ Welcome to Addis Cafeteria & Bakery! Fresh injera, sizzling tibs, and artisanal pastries daily.',
+  announcement: 'Welcome to Addis Cafeteria & Bakery • Fresh injera, sizzling tibs, and artisanal pastries daily.',
   is_open: true,
   tax_rate: 0.15,
   created_at: new Date().toISOString(),
@@ -2008,7 +2008,7 @@ export const MOCK_OFFERS_ADDIS: Offer[] = [
     end_time: '23:59',
     honest_urgency_hours: 2,
     show_top_banner: true,
-    banner_text: '🌿 Afternoon Happy Hour: 20% off all artisan wood-fired dishes until late.',
+    banner_text: 'Afternoon Happy Hour: 20% off all artisan wood-fired dishes until late.',
     banner_link_text: 'See offer',
     stacking_rule: 'best_discount',
     priority: 10,
@@ -2101,7 +2101,7 @@ export async function getOffers(restaurantId: string): Promise<Offer[]> {
           start_time: d.start_time || '00:00',
           end_time: d.end_time || '23:59',
           honest_urgency_hours: d.honest_urgency_hours ?? 2,
-          banner_text: d.banner_text || `🌿 ${d.title}`,
+          banner_text: d.banner_text || d.title,
           banner_link_text: d.banner_link_text || 'See offer',
           stacking_rule: d.stacking_rule || 'best_discount',
         })) as Offer[];
@@ -2503,7 +2503,7 @@ export async function submitDishReview(params: {
   // 1. Bot check
   const botCheck = validateBotCheck(params.honeypot, params.submissionDurationMs ?? 2000);
   if (!botCheck.isHuman) {
-    return { success: false, error: botCheck.reason || 'Bot activity detected.' };
+    return { success: false, error: botCheck.reason || 'Automated submission blocked.' };
   }
 
   // 2. Rate limit & duplicate check

@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from 'react';
 import { Category } from '@/types/database';
 import { triggerHaptic } from '@/lib/utils';
 import { Language, CATEGORY_TRANSLATIONS, TRANSLATIONS } from '@/lib/translations';
-import { Compass } from 'lucide-react';
+import { Compass, Tag } from 'lucide-react';
 
 interface CategoryTabsProps {
   categories: Category[];
@@ -81,7 +81,7 @@ export function CategoryTabs({
               backgroundColor: activeCategoryId === 'offers' ? 'var(--primary)' : undefined,
             }}
           >
-            <span>🏷️</span>
+            <Tag className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{locale === 'am' ? 'ልዩ ቅናሾች' : locale === 'so' ? 'Dalabyada' : 'Offers'}</span>
             {offersCount > 0 && (
               <span

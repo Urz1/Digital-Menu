@@ -4,7 +4,7 @@ import React from 'react';
 import { CartItem } from '@/types/menu';
 import { CartPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { X, Minus, Plus, Tablet, BellRing, Tag, Gift } from 'lucide-react';
+import { X, Minus, Plus, Tablet, BellRing, Tag, Gift, ShoppingBag } from 'lucide-react';
 
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
@@ -99,7 +99,9 @@ export function OrderSummarySheet({
           {/* Items List */}
           {cart.length === 0 ? (
             <div className="py-12 text-center text-[var(--muted)]">
-              <span className="text-3xl block mb-2">🛍️</span>
+              <div className="w-12 h-12 rounded-2xl bg-[var(--background)] border border-[var(--border)] flex items-center justify-center mx-auto mb-2.5 text-[var(--muted)]">
+                <ShoppingBag className="w-6 h-6 opacity-60" />
+              </div>
               <p className="text-sm font-medium">{t.emptyOrder}</p>
               <p className="text-xs mt-1">{t.emptyOrderHint}</p>
             </div>

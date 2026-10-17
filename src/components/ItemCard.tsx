@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MenuItem, DishReviewStats } from '@/types/database';
 import { ItemPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { Heart, Plus, Tag, Clock, Star, ChefHat } from 'lucide-react';
+import { Heart, Plus, Tag, Clock, Star, ChefHat, Salad, Sprout, Leaf, WheatOff, ShieldCheck, Flame } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ItemCardProps {
@@ -159,33 +159,35 @@ export function ItemCard({
           {/* Dietary tags */}
           <div className="flex items-center gap-1 mt-1.5 flex-wrap">
             {item.tags?.includes('fasting') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)]">
-                🥗 Tsom
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)] inline-flex items-center gap-1">
+                <Salad className="w-2.5 h-2.5 text-emerald-500" /> Tsom
               </span>
             )}
             {item.tags?.includes('vegetarian') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)]">
-                🌱 Veg
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-600 font-semibold border border-[var(--border)] inline-flex items-center gap-1">
+                <Sprout className="w-2.5 h-2.5 text-emerald-500" /> Veg
               </span>
             )}
             {item.tags?.includes('vegan') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-700 font-semibold border border-[var(--border)]">
-                🌿 Vegan
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-emerald-700 font-semibold border border-[var(--border)] inline-flex items-center gap-1">
+                <Leaf className="w-2.5 h-2.5 text-emerald-600" /> Vegan
               </span>
             )}
             {item.tags?.includes('gluten-free') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-amber-700 font-semibold border border-[var(--border)]">
-                🌾 GF
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-amber-700 font-semibold border border-[var(--border)] inline-flex items-center gap-1">
+                <WheatOff className="w-2.5 h-2.5 text-amber-500" /> GF
               </span>
             )}
             {item.tags?.includes('halal') && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-neutral-700 font-semibold border border-[var(--border)]">
-                🥩 Halal
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-neutral-700 dark:text-neutral-300 font-semibold border border-[var(--border)] inline-flex items-center gap-1">
+                <ShieldCheck className="w-2.5 h-2.5 text-emerald-500" /> Halal
               </span>
             )}
             {item.spice_level > 0 && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-red-600 font-semibold">
-                {'🌶️'.repeat(Math.min(item.spice_level, 3))}
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--background)] text-rose-500 font-semibold border border-[var(--border)] inline-flex items-center gap-0.5">
+                {Array.from({ length: Math.min(item.spice_level, 3) }).map((_, i) => (
+                  <Flame key={i} className="w-2.5 h-2.5 fill-rose-500/25 text-rose-500" />
+                ))}
               </span>
             )}
           </div>

@@ -14,7 +14,7 @@ import {
   Check,
   X,
   Compass,
-  Sparkles,
+  Award,
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
   ArrowDownAZ,
@@ -72,10 +72,6 @@ export function MenuControlBar({
   const activeCategory = categories.find((c) => c.id === activeCategoryId);
   const isOffersActive = activeCategoryId === 'offers' || activeFilter === 'onOffer';
 
-  const activeCategoryIcon = isOffersActive
-    ? '🏷️'
-    : activeCategory?.icon || '🧭';
-
   const activeCategoryName = isOffersActive
     ? t.specialOffer
     : activeCategory
@@ -106,7 +102,7 @@ export function MenuControlBar({
 
   // Sort definitions
   const SORT_OPTIONS: { id: SortOrder; label: string; icon: React.ComponentType<{ className?: string }>; desc: string }[] = [
-    { id: 'featured', label: t.sortFeatured, icon: Sparkles, desc: 'Popular and chef-recommended dishes first' },
+    { id: 'featured', label: t.sortFeatured, icon: Award, desc: 'Popular and chef-recommended dishes first' },
     { id: 'price-asc', label: t.sortPriceAsc, icon: ArrowDownNarrowWide, desc: 'Most affordable items first' },
     { id: 'price-desc', label: t.sortPriceDesc, icon: ArrowUpNarrowWide, desc: 'Premium platters and feasts first' },
     { id: 'name-asc', label: t.sortNameAsc, icon: ArrowDownAZ, desc: 'Alphabetical order from A to Z' },
@@ -176,7 +172,7 @@ export function MenuControlBar({
             }`}
             title="Dishes on Offer"
           >
-            <span>🏷️</span>
+            <Tag className={`w-3.5 h-3.5 flex-shrink-0 ${isOffersActive ? 'text-white' : 'text-amber-500'}`} />
             <span className="text-xs font-bold">On Offer</span>
             {offersCount > 0 && (
               <span

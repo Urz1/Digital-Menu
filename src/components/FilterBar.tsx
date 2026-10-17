@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DietaryFilter, SortOrder } from '@/types/menu';
 import { triggerHaptic } from '@/lib/utils';
-import { LayoutGrid, List, ArrowUpDown, Check, X, Sparkles, ArrowDownNarrowWide, ArrowUpNarrowWide, ArrowDownAZ } from 'lucide-react';
+import { LayoutGrid, List, ArrowUpDown, Check, X, Award, ArrowDownNarrowWide, ArrowUpNarrowWide, ArrowDownAZ } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface FilterBarProps {
@@ -44,7 +44,7 @@ export function FilterBar({
     {
       id: 'featured',
       label: t.sortFeatured,
-      icon: Sparkles,
+      icon: Award,
       desc: 'Popular and chef-recommended dishes first',
     },
     {

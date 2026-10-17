@@ -66,7 +66,7 @@ export function AdminBottomNav({
       { id: 'profile', label: 'My Profile', icon: User },
       { id: 'qr', label: 'QR Studio', icon: QrCode },
       { id: 'design', label: 'Design Studio', icon: Palette },
-      { id: 'insights', label: 'Insights & Matrix', icon: BarChart3 },
+      { id: 'insights', label: 'Performance', icon: BarChart3 },
       { id: 'settings', label: 'Settings & Staff', icon: Settings },
     ];
   }

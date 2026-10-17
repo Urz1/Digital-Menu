@@ -74,7 +74,6 @@ import {
   Tag,
   Star,
   HelpCircle,
-  Sparkles,
   AlertCircle,
   Eye,
   Sliders,

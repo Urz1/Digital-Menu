@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Sprout, Leaf, WheatOff, ShieldCheck, AlertCircle, Flame, ChefHat } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface AllergenLegendModalProps {
@@ -17,13 +17,48 @@ export function AllergenLegendModal({ isOpen, onClose, locale = 'en' }: Allergen
   const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const legendItems = [
-    { icon: '🌱', title: t.vegetarianTitle, desc: t.vegetarianDesc },
-    { icon: '🌿', title: t.veganTitle, desc: t.veganDesc },
-    { icon: '🌾', title: t.glutenFreeTitle, desc: t.glutenFreeDesc },
-    { icon: '🥩', title: t.halalTitle, desc: t.halalDesc },
-    { icon: '🥜', title: t.nutFreeTitle, desc: t.nutFreeDesc },
-    { icon: '🌶️', title: t.spiceIndicatorsTitle, desc: t.spiceIndicatorsDesc },
-    { icon: '⭐', title: t.chefSelectionTitle, desc: t.chefSelectionDesc },
+    {
+      icon: <Sprout className="w-4 h-4 text-emerald-500" />,
+      bg: 'bg-emerald-500/10 border-emerald-500/20',
+      title: t.vegetarianTitle,
+      desc: t.vegetarianDesc,
+    },
+    {
+      icon: <Leaf className="w-4 h-4 text-emerald-500" />,
+      bg: 'bg-emerald-500/10 border-emerald-500/20',
+      title: t.veganTitle,
+      desc: t.veganDesc,
+    },
+    {
+      icon: <WheatOff className="w-4 h-4 text-amber-500" />,
+      bg: 'bg-amber-500/10 border-amber-500/20',
+      title: t.glutenFreeTitle,
+      desc: t.glutenFreeDesc,
+    },
+    {
+      icon: <ShieldCheck className="w-4 h-4 text-emerald-500" />,
+      bg: 'bg-emerald-500/10 border-emerald-500/20',
+      title: t.halalTitle,
+      desc: t.halalDesc,
+    },
+    {
+      icon: <AlertCircle className="w-4 h-4 text-neutral-400" />,
+      bg: 'bg-neutral-500/10 border-neutral-500/20',
+      title: t.nutFreeTitle,
+      desc: t.nutFreeDesc,
+    },
+    {
+      icon: <Flame className="w-4 h-4 text-rose-500" />,
+      bg: 'bg-rose-500/10 border-rose-500/20',
+      title: t.spiceIndicatorsTitle,
+      desc: t.spiceIndicatorsDesc,
+    },
+    {
+      icon: <ChefHat className="w-4 h-4 text-amber-500" />,
+      bg: 'bg-amber-500/10 border-amber-500/20',
+      title: t.chefSelectionTitle,
+      desc: t.chefSelectionDesc,
+    },
   ];
 
   return (
@@ -62,7 +97,9 @@ export function AllergenLegendModal({ isOpen, onClose, locale = 'en' }: Allergen
               key={item.title}
               className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--background)] border border-[var(--border)]"
             >
-              <span className="text-2xl w-8 text-center flex-shrink-0">{item.icon}</span>
+              <div className={`w-8 h-8 rounded-xl border flex items-center justify-center flex-shrink-0 ${item.bg}`}>
+                {item.icon}
+              </div>
               <div>
                 <h4 className="text-xs font-bold text-[var(--foreground)]">{item.title}</h4>
                 <p className="text-[11px] text-[var(--muted)] leading-tight mt-0.5">{item.desc}</p>
@@ -74,4 +111,3 @@ export function AllergenLegendModal({ isOpen, onClose, locale = 'en' }: Allergen
     </div>
   );
 }
-

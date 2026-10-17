@@ -335,7 +335,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     nutFreeTitle: 'Nut-Free',
     nutFreeDesc: 'Formulated without peanuts or tree nuts in preparation.',
     spiceIndicatorsTitle: 'Spice Indicators',
-    spiceIndicatorsDesc: 'Mild (🌶️) • Medium (🌶️🌶️) • Fiery Hot (🌶️🌶️🌶️)',
+    spiceIndicatorsDesc: 'Level 1: Mild • Level 2: Medium • Level 3: Fiery Hot',
     chefSelectionTitle: "Chef's Selection",
     chefSelectionDesc: 'Signature culinary highlights recommended by our executive chef.',
 
@@ -520,7 +520,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     nutFreeTitle: 'ከለውዝ ነፃ',
     nutFreeDesc: 'ምንም አይነት ለውዝ ሳይገባበት የተዘጋጀ።',
     spiceIndicatorsTitle: 'የማቃጠል ደረጃዎች',
-    spiceIndicatorsDesc: 'ቀላል (🌶️) • መካከለኛ (🌶️🌶️) • በጣም የሚያቃጥል (🌶️🌶️🌶️)',
+    spiceIndicatorsDesc: 'ደረጃ 1: ቀላል • ደረጃ 2: መካከለኛ • ደረጃ 3: በጣም የሚያቃጥል',
     chefSelectionTitle: 'የዋና ሼፍ ምርጥ',
     chefSelectionDesc: 'በዋናው ሼፍ የሚመከሩ ልዩ ተወዳጅ ምግቦች።',
 
@@ -705,7 +705,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     nutFreeTitle: 'Lows La’aan',
     nutFreeDesc: 'Wax loos ama laws geed ah kuma jiraan diyaarinta.',
     spiceIndicatorsTitle: 'Heerarka Basbaaska',
-    spiceIndicatorsDesc: 'Khafiif (🌶️) • Dhexdhexaad (🌶️🌶️) • Aad u kulul (🌶️🌶️🌶️)',
+    spiceIndicatorsDesc: 'Heerka 1: Khafiif • Heerka 2: Dhexdhexaad • Heerka 3: Aad u kulul',
     chefSelectionTitle: 'Xulashada Madaxa Cunto-kariyaha',
     chefSelectionDesc: 'Cuntooyin khaas ah oo uu taliyaha jikadu kugula talinayo.',
 
@@ -890,7 +890,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     nutFreeTitle: 'Sin frutos secos',
     nutFreeDesc: 'Formulado sin cacahuetes ni frutos secos en su preparación.',
     spiceIndicatorsTitle: 'Indicadores de picante',
-    spiceIndicatorsDesc: 'Suave (🌶️) • Medio (🌶️🌶️) • Muy picante (🌶️🌶️🌶️)',
+    spiceIndicatorsDesc: 'Nivel 1: Suave • Nivel 2: Medio • Nivel 3: Muy picante',
     chefSelectionTitle: 'Selección del chef',
     chefSelectionDesc: 'Platos culinarios destacados recomendados por nuestro chef ejecutivo.',
 

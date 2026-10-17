@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Restaurant } from '@/types/database';
-import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Sparkles } from 'lucide-react';
+import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Bell } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { triggerHaptic } from '@/lib/utils';
 
@@ -147,7 +147,7 @@ export function MenuHeader({
             color: 'var(--primary)',
           }}
         >
-          <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+          <Bell className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="truncate">{restaurant.announcement.replace(/^[^\w\s\u1200-\u137F\u00C0-\u024F]+\s*/, '')}</span>
         </div>
       )}

@@ -5,7 +5,6 @@ import { AdminSection } from './AdminSidebar';
 import {
   HelpCircle,
   X,
-  Sparkles,
   Lightbulb,
   CheckCircle2,
   QrCode,
@@ -112,7 +111,7 @@ export function HelpModal({ isOpen, onClose, activeSection }: HelpModalProps) {
       ],
     },
     insights: {
-      title: 'Insights & Matrix Tips',
+      title: 'Menu Performance Tips',
       tips: [
         {
           heading: 'Stars vs Hidden Gems',

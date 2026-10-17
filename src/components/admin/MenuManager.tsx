@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   History,
   Clock,
-  Sparkles,
+  UtensilsCrossed,
   Flame,
   CheckCircle2,
   DollarSign,
@@ -848,7 +848,7 @@ export function MenuManager({
           <div className="w-full max-w-2xl bg-[#12141C] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <UtensilsCrossed className="w-4 h-4 text-amber-400" />
                 <h3 className="text-base font-bold text-white">
                   {editingItem.id ? 'Edit Dish' : 'Add New Dish'}
                 </h3>

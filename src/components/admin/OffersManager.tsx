@@ -20,7 +20,7 @@ import {
   Trash2,
   Edit,
   Clock,
-  Sparkles,
+  BadgePercent,
   CheckCircle2,
   AlertTriangle,
   ChevronRight,
@@ -94,22 +94,22 @@ const OFFER_TEMPLATES: TemplatePreset[] = [
     defaultScope: 'categories',
     defaultHonestUrgency: 0,
     defaultShowBanner: false,
-    defaultBannerText: '✨ Enjoy 20% off all artisan starters this week.',
+    defaultBannerText: 'Enjoy 20% off all appetizers this week.',
   },
   {
     id: 'money_off',
     name: 'Money Off',
     emoji: '🏷️',
     tagline: 'Specific money saving on signature dishes (e.g. 40 ETB Off)',
-    defaultTitle: '40 ETB Off Signature Truffle Flatbread',
-    defaultDesc: 'Save 40 ETB on our 72-hour sourdough truffle burrata pizza.',
+    defaultTitle: '40 ETB Off Sizzling Special Tibs',
+    defaultDesc: 'Save 40 ETB on our tender spiced lamb tibs served with injera.',
     defaultBadge: '40 ETB Off',
     discountType: 'fixed_amount',
     defaultDiscountValue: 40.0,
     defaultScope: 'items',
     defaultHonestUrgency: 0,
     defaultShowBanner: false,
-    defaultBannerText: 'Save 40 ETB on our Chef Signature Truffle Flatbread.',
+    defaultBannerText: 'Save 40 ETB on our Chef Special Sizzling Tibs.',
   },
   {
     id: 'combo_deal',
@@ -159,17 +159,17 @@ const OFFER_TEMPLATES: TemplatePreset[] = [
   {
     id: 'todays_special',
     name: "Today's Special",
-    emoji: '✨',
-    tagline: 'Highlight a fresh daily arrival or special kitchen catch at promotional pricing',
-    defaultTitle: "Chef's Catch of the Day Special",
-    defaultDesc: 'Pan-roasted wild catch at special daily market price.',
+    emoji: '⭐',
+    tagline: 'Highlight a fresh daily arrival or special kitchen dish at promotional pricing',
+    defaultTitle: "Chef's Special Slow-Roasted Mendi",
+    defaultDesc: 'Tender slow-roasted lamb mendi platter at special daily price.',
     defaultBadge: "Today's Special",
     discountType: 'fixed_amount',
     defaultDiscountValue: 50.0,
     defaultScope: 'items',
     defaultHonestUrgency: 2,
     defaultShowBanner: false,
-    defaultBannerText: "Today's Special: Fresh wild sea bass at 50 ETB off.",
+    defaultBannerText: "Today's Special: Chef's Special Mendi platter at 50 ETB off.",
   },
   {
     id: 'limited_time',
@@ -616,7 +616,7 @@ export function OffersManager({
         <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-col justify-between">
           <div className="flex items-center justify-between text-neutral-400 text-xs">
             <span>Total Savings</span>
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <BadgePercent className="w-4 h-4 text-emerald-400" />
           </div>
           <span className="text-2xl font-black text-white mt-2">
             {formatMoney(totalSavings, restaurant.currency)}
@@ -625,9 +625,9 @@ export function OffersManager({
         </div>
       </div>
 
-      {/* Plain-English Performance Sentence */}
+      {/* Performance Summary Banner */}
       <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-center gap-2.5">
-        <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+        <BadgePercent className="w-4 h-4 text-amber-400 flex-shrink-0" />
         <p className="font-medium">
           Guests ordered <strong className="text-white">{totalOrders} dishes</strong> using your live offers, saving a total of{' '}
           <strong className="text-white">{formatMoney(totalSavings, restaurant.currency)}</strong> with 0 intrusive popups.
@@ -1382,8 +1382,8 @@ export function OffersManager({
                       <span className="text-xs font-bold text-white block">{restaurant.name}</span>
                       <span className="text-[9px] text-neutral-400">Table 14</span>
                     </div>
-                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-black">
-                      🏷️ On Offer
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-black inline-flex items-center gap-1">
+                      <Tag className="w-2.5 h-2.5" /> On Offer
                     </span>
                   </div>
 

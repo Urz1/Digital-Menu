@@ -7,7 +7,7 @@ import { triggerHaptic } from '@/lib/utils';
 import { checkWcagContrast } from '@/lib/admin-engine';
 import {
   X,
-  Sparkles,
+  Compass,
   ArrowRight,
   ArrowLeft,
   Check,
@@ -133,7 +133,7 @@ export function OnboardingWizardModal({
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+              <Compass className="w-4 h-4" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white">5-Minute Menu Onboarding</h2>
@@ -500,7 +500,7 @@ export function OnboardingWizardModal({
           {step === 5 && (
             <div className="space-y-6 text-center py-2" data-testid="wizard-step-5">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-orange-500/20">
-                <Sparkles className="w-8 h-8" />
+                <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div>

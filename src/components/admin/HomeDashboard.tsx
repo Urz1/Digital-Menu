@@ -15,7 +15,8 @@ import {
   Star,
   Bell,
   CheckCircle2,
-  Sparkles,
+  Compass,
+  UtensilsCrossed,
   ArrowRight,
   Eye,
   MessageSquare,
@@ -80,7 +81,7 @@ export function HomeDashboard({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl flex-shrink-0">
-              <Sparkles className="w-6 h-6" />
+              <UtensilsCrossed className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -269,7 +270,7 @@ export function HomeDashboard({
               <p className="text-2xl lg:text-3xl font-extrabold text-white font-mono tracking-tight">
                 {formatMoney(2480.5, restaurant.currency)}
               </p>
-              <p className="text-[11px] text-neutral-400 mt-0.5">vs $2,172.00 yesterday</p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">vs {formatMoney(2172, restaurant.currency)} yesterday</p>
             </div>
             <div className="pt-2.5 border-t border-white/5 flex items-center justify-between text-xs text-neutral-400">
               <span>{orders.length} orders placed</span>
@@ -392,7 +393,7 @@ export function HomeDashboard({
               }}
               className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Compass className="w-3.5 h-3.5" />
               <span>Resume 5-Min Setup Wizard</span>
             </button>
           </div>

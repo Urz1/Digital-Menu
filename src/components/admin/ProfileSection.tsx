@@ -28,7 +28,7 @@ import {
   BadgeCheck,
   Building,
   Clock,
-  Sparkles,
+  Crown,
   ClipboardList,
   UtensilsCrossed,
   Users,
@@ -233,7 +233,7 @@ export function ProfileSection({
 
         <div className="flex items-center gap-4 relative z-10">
           <div className="w-16 h-16 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-black text-2xl shadow-inner">
-            {isOwner ? '👑' : '🛡️'}
+            {isOwner ? <Crown className="w-8 h-8 text-amber-400" /> : <Shield className="w-8 h-8 text-amber-400" />}
           </div>
 
           <div>
@@ -554,13 +554,13 @@ export function ProfileSection({
         <div className="flex items-center gap-2.5 mb-2">
           <Shield className="w-5 h-5 text-amber-400" />
           <h3 className="text-base font-bold text-white">
-            {isOwner ? 'Executive Access Privileges' : 'Assigned Station Duties'}
+            {isOwner ? 'Account & Station Permissions' : 'Assigned Station Duties'}
           </h3>
         </div>
         <p className="text-xs text-neutral-400 mb-4">
           {isOwner
-            ? 'As restaurant owner, you hold full root permissions to manage restaurant configuration, staff accounts, financial taxes, and menu items.'
-            : 'As certified dining staff, your console is streamlined for daily floor operations without configuration clutter.'}
+            ? 'Full administrative permissions to manage restaurant configuration, team members, pricing, and dishes.'
+            : 'Streamlined console for daily floor service, table assistance, and review replies.'}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -571,9 +571,9 @@ export function ProfileSection({
                   <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
                     <UtensilsCrossed className="w-4 h-4" />
                   </div>
-                  <h4 className="text-xs font-bold text-white tracking-wide">Full Menu Control</h4>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Menu Management</h4>
                   <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
-                    Create, price, tag, and schedule all dishes.
+                    Update dishes, categories, pricing, and availability.
                   </p>
                 </div>
               </div>
@@ -583,9 +583,9 @@ export function ProfileSection({
                   <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
                     <Users className="w-4 h-4" />
                   </div>
-                  <h4 className="text-xs font-bold text-white tracking-wide">Staff Management</h4>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Staff & Team Access</h4>
                   <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
-                    Provision new staff accounts, reset pins, and revoke access.
+                    Manage team member logins and station access.
                   </p>
                 </div>
               </div>
@@ -595,9 +595,9 @@ export function ProfileSection({
                   <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
                     <Tag className="w-4 h-4" />
                   </div>
-                  <h4 className="text-xs font-bold text-white tracking-wide">Offers Engine</h4>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Promotions & Specials</h4>
                   <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
-                    Automate happy hours, combos, and time schedules.
+                    Configure happy hours, seasonal specials, and meal combos.
                   </p>
                 </div>
               </div>
@@ -607,9 +607,9 @@ export function ProfileSection({
                   <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
                     <Sliders className="w-4 h-4" />
                   </div>
-                  <h4 className="text-xs font-bold text-white tracking-wide">Site & Tax Setup</h4>
+                  <h4 className="text-xs font-bold text-white tracking-wide">Restaurant Settings</h4>
                   <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
-                    Configure currencies (ETB), tax rules, and guest WiFi.
+                    Configure currency (ETB), tax rules, and guest WiFi.
                   </p>
                 </div>
               </div>
@@ -676,8 +676,9 @@ export function ProfileSection({
               {session?.loggedInAt ? new Date(session.loggedInAt).toLocaleTimeString() : 'Current Session'}
             </strong>
           </span>
-          <span className="flex items-center gap-1.5 font-mono text-[10px]">
-            Security Token: <span className="text-emerald-400">●●●●●●●●●●●●</span> (Verified)
+          <span className="flex items-center gap-1.5 text-[11px] text-neutral-400 font-medium">
+            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Authenticated Session • Addis Ababa Station</span>
           </span>
         </div>
       </div>

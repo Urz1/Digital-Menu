@@ -16,7 +16,7 @@ import {
   QrCode,
   ExternalLink,
   HelpCircle,
-  Sparkles,
+  Compass,
   LogOut,
   Shield,
   User,
@@ -128,7 +128,7 @@ export function AdminSidebar({
     },
     {
       id: 'insights',
-      label: 'Insights & Matrix',
+      label: 'Menu Performance',
       icon: BarChart3,
       allowedRoles: ['owner'],
     },
@@ -218,7 +218,7 @@ export function AdminSidebar({
           >
             <div className="flex items-center justify-between text-xs font-bold text-amber-300">
               <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Compass className="w-3.5 h-3.5 text-amber-400" />
                 <span>Quick Setup</span>
               </span>
               <span>{Math.round((onboardingProgress.completed / onboardingProgress.total) * 100)}%</span>

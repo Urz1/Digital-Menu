@@ -10,7 +10,6 @@ import {
   Share2,
   Copy,
   Check,
-  Sparkles,
   Wifi,
   ExternalLink,
   Layers,

@@ -40,7 +40,7 @@ import {
 import { calculateDishReviewStats } from '@/lib/review-engine';
 import { triggerHaptic } from '@/lib/utils';
 import Link from 'next/link';
-import { ArrowUp, Share2, QrCode, Info, Sparkles, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen } from 'lucide-react';
+import { ArrowUp, Share2, QrCode, Info, Tag, Clock, X, WifiOff, Lock, ChevronDown, Compass, BookOpen, Search, Heart } from 'lucide-react';
 import { Language, TRANSLATIONS, CATEGORY_TRANSLATIONS } from '@/lib/translations';
 
 interface ClientMenuContainerProps {
@@ -605,7 +605,7 @@ export function ClientMenuContainer({
       bill: 'The check has been requested!',
     };
 
-    showToast(`🛎️ ${labels[type]} for ${tableNumber}`);
+    showToast(`${labels[type]} for ${tableNumber}`);
   };
 
   // Banner action handler: smoothly jumps to dishes on offer
@@ -831,13 +831,15 @@ export function ClientMenuContainer({
       <main className="px-4 py-4 flex-1">
         {filteredItems.length === 0 ? (
           <div className="py-20 text-center text-[var(--muted)]">
-            <span className="text-4xl block mb-2">
-              {activeFilter === 'onOffer' || activeCategoryId === 'offers'
-                ? '🏷️'
-                : activeFilter === 'favorites'
-                ? '❤️'
-                : '🔍'}
-            </span>
+            <div className="w-14 h-14 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center mx-auto mb-3 shadow-xs">
+              {activeFilter === 'onOffer' || activeCategoryId === 'offers' ? (
+                <Tag className="w-6 h-6 text-amber-500" />
+              ) : activeFilter === 'favorites' ? (
+                <Heart className="w-6 h-6 text-rose-500" />
+              ) : (
+                <Search className="w-6 h-6 text-[var(--muted)]" />
+              )}
+            </div>
             <h3 className="text-base font-bold text-[var(--foreground)]">
               {activeFilter === 'onOffer' || activeCategoryId === 'offers'
                 ? (TRANSLATIONS[locale]?.noActiveOffers || 'No active offers right now')
@@ -870,7 +872,7 @@ export function ClientMenuContainer({
                 {activeFilter === 'onOffer' || activeCategoryId === 'offers' ? (
                   <Tag className="w-4 h-4 text-[var(--primary)]" />
                 ) : (
-                  <Sparkles className="w-4 h-4 text-[var(--primary)]" />
+                  <Compass className="w-4 h-4 text-[var(--primary)]" />
                 )}
                 <h2 className="text-base font-bold text-[var(--foreground)] font-brand">
                   {activeFilter === 'onOffer' || activeCategoryId === 'offers'
@@ -1226,7 +1228,9 @@ export function ClientMenuContainer({
                   }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
-                    <span className="text-2xl flex-shrink-0 mt-0.5">🏷️</span>
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center flex-shrink-0 mt-0.5 text-amber-500">
+                      <Tag className="w-4 h-4" />
+                    </div>
                     <div className="min-w-0">
                       <div className="text-sm font-bold text-amber-600 dark:text-amber-400 truncate">
                         {TRANSLATIONS[locale]?.specialOffer || 'Special Offers & Deals'}

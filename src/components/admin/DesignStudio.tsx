@@ -13,7 +13,7 @@ import {
   Check,
   AlertTriangle,
   CheckCircle2,
-  Sparkles,
+  Receipt,
   Smartphone,
   Eye,
   Plus,
@@ -241,7 +241,7 @@ export function DesignStudio({
           {/* Sub Navigation Tabs */}
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#12141C] border border-white/5 overflow-x-auto">
             {[
-              { id: 'themes', label: 'Presets', icon: Sparkles },
+              { id: 'themes', label: 'Presets', icon: Layers },
               { id: 'colors', label: 'Colors & Contrast', icon: Palette },
               { id: 'layout', label: 'Style & Fonts', icon: Layout },
               { id: 'features', label: 'Feature Switches', icon: Sliders },
@@ -964,7 +964,7 @@ export function DesignStudio({
               )}
               {featureFlags.bill_request_enabled && (
                 <span className="flex items-center gap-1 text-neutral-300">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <Receipt className="w-3 h-3 text-amber-400" />
                   <span>{customLabels.requestBill || 'Request Bill'}</span>
                 </span>
               )}
