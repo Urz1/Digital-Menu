@@ -147,11 +147,11 @@ export default function AdminDashboardPage() {
         const cached = localStorage.getItem('digital_menu_items_cache');
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length >= MOCK_ITEMS_ADDIS.length) return parsed;
         }
       } catch {}
     }
-    return [];
+    return MOCK_ITEMS_ADDIS;
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);

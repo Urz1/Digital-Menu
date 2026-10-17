@@ -3186,7 +3186,7 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
       const cached = localStorage.getItem('digital_menu_items_cache_v3');
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed) && parsed.length >= MOCK_ITEMS_ADDIS.length) {
           inMemoryItems = parsed;
           return inMemoryItems;
         }
@@ -4050,10 +4050,13 @@ export const MOCK_MENU_VERSIONS_ADDIS: MenuVersion[] = [
 
 let inMemoryMenuVersions: MenuVersion[] = [...MOCK_MENU_VERSIONS_ADDIS];
 
-let inMemoryItems: MenuItem[] = [];
+let inMemoryItems: MenuItem[] = [...MOCK_ITEMS_ADDIS];
 let inMemoryRestaurant: Restaurant = { ...MOCK_RESTAURANT_ADDIS };
 
 export async function saveMenuItem(itemData: Partial<MenuItem>): Promise<MenuItem> {
+  if (inMemoryItems.length === 0) {
+    inMemoryItems = [...MOCK_ITEMS_ADDIS];
+  }
   const existingIdx = inMemoryItems.findIndex((i) => i.id === itemData.id);
   let savedItem: MenuItem;
 
