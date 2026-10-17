@@ -1208,7 +1208,7 @@ export function MenuManager({
                               if (compressed) {
                                 triggerHaptic(12);
                                 setEditingItem({ ...editingItem, image_url: compressed });
-                                onShowToast('Photo optimized & loaded!', 'success');
+                                onShowToast('Photo attached (click Save to publish)', 'success');
                               }
                             }
                           }}
@@ -1231,7 +1231,7 @@ export function MenuManager({
                               if (compressed) {
                                 triggerHaptic(12);
                                 setEditingItem({ ...editingItem, image_url: compressed });
-                                onShowToast('Photo optimized from gallery!', 'success');
+                                onShowToast('Photo attached (click Save to publish)', 'success');
                               }
                             }
                           }}

@@ -51,6 +51,7 @@ export function ReviewModal({
 
   const formOpenedAtRef = useRef<number>(Date.now());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isExplicitSubmitRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,6 +65,7 @@ export function ReviewModal({
       setSubmitError(null);
       setIsSuccess(false);
       formOpenedAtRef.current = Date.now();
+      isExplicitSubmitRef.current = false;
     }
   }, [isOpen, item]);
 
@@ -79,6 +81,9 @@ export function ReviewModal({
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isExplicitSubmitRef.current = false;
     setPhotoError(null);
     const file = e.target.files?.[0];
     if (!file) return;
@@ -100,6 +105,12 @@ export function ReviewModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Strictly prevent auto-submission triggered by file dialog enter keyups or label clicks
+    if (!isExplicitSubmitRef.current) {
+      return;
+    }
+    isExplicitSubmitRef.current = false;
+
     setSubmitError(null);
     setIsSubmitting(true);
     triggerHaptic(15);
@@ -175,7 +186,15 @@ export function ReviewModal({
           </div>
         ) : (
           /* REVIEW SUBMISSION FORM (< 15 seconds) */
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+                e.preventDefault();
+              }
+            }}
+            className="flex flex-col gap-4"
+          >
             <div>
               <span className="text-[11px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider block">
                 {t.reviewModalTitle}
@@ -299,6 +318,7 @@ export function ReviewModal({
                     src={photoPreview}
                     alt="Review preview"
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
@@ -309,16 +329,22 @@ export function ReviewModal({
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     className="hidden"
+                    onClick={(e) => e.stopPropagation()}
                     onChange={handlePhotoSelect}
                     id="review-photo-input"
                   />
-                  <label
-                    htmlFor="review-photo-input"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
                     className="h-9 px-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--border)] text-xs font-medium text-[var(--foreground)] flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <Camera className="w-3.5 h-3.5 text-[var(--muted)]" />
                     <span>{t.uploadPhoto}</span>
-                  </label>
+                  </button>
                   <span className="text-[11px] text-[var(--muted)]">JPG, PNG, or WEBP</span>
                 </div>
               )}
@@ -343,6 +369,9 @@ export function ReviewModal({
             <div className="pt-2">
               <button
                 type="submit"
+                onClick={() => {
+                  isExplicitSubmitRef.current = true;
+                }}
                 disabled={isSubmitting}
                 className="w-full h-11 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-98 disabled:opacity-50"
               >

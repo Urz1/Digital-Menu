@@ -149,4 +149,55 @@ test.describe('Dish Reviews System - Customer Submission & Owner Management Pari
     const removeBtn = page.locator('button:has-text("Remove Review")').first();
     await expect(removeBtn).toBeVisible();
   });
+
+  test('4. Customer Flow: Uploading an image does NOT auto-submit or close modal before clicking Submit', async ({ page }) => {
+    // Open customer mobile view on a fresh table
+    await page.goto('/addis?table=Table%2019');
+    await expect(page.locator('h1:has-text("Addis Cafeteria")')).toBeVisible();
+
+    // Open Fetira with Honey & Banana
+    const dishCard = page.locator('article:has-text("Fetira with Honey & Banana")').first();
+    await expect(dishCard).toBeVisible();
+    await dishCard.scrollIntoViewIfNeeded();
+    await dishCard.click();
+
+    // Click "Rate this dish"
+    const rateBtn = page.locator('button:has-text("Rate this dish")');
+    await rateBtn.scrollIntoViewIfNeeded();
+    await rateBtn.click();
+
+    // Review Modal is open
+    await expect(page.locator('text=Quick Dish Review')).toBeVisible();
+    const submitBtn = page.locator('button:has-text("Submit Honest Review")');
+    await expect(submitBtn).toBeVisible();
+
+    // Upload an image via file input
+    const fileInput = page.locator('#review-photo-input');
+    await fileInput.setInputFiles({
+      name: 'crispy-sambusa.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        'base64'
+      ),
+    });
+
+    // Verify photo preview appears
+    await expect(page.locator('img[alt="Review preview"]')).toBeVisible();
+
+    // CRITICAL: Verify modal did NOT auto-submit or close!
+    await expect(submitBtn).toBeVisible();
+    await expect(page.locator('text=Thank you for your review!')).toBeHidden();
+
+    // Add optional comment
+    const commentInput = page.locator('textarea[placeholder*="What made this dish memorable?"]');
+    await commentInput.fill('Golden pastry, warm spiced beef, phenomenal crisp.');
+
+    // Now explicitly click Submit
+    await submitBtn.click();
+
+    // Verify successful submission
+    await expect(page.locator('text=Thank you for your review!')).toBeVisible();
+  });
 });
+
