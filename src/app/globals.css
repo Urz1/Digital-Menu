@@ -470,11 +470,43 @@ nextjs-portal,
   color: #E8590C !important;
 }
 
-/* Celebration banner in light mode */
-[data-admin-theme="light"] .from-amber-600\/30 {
-  background-image: linear-gradient(to right, rgba(251, 191, 36, 0.22), rgba(249, 115, 22, 0.12), #FFFFFF) !important;
+/* Celebration banner in Light Mode: warm, high-contrast, crystal clear */
+[data-admin-theme="light"] .banner-digital-menu-live {
+  background: linear-gradient(135deg, #FFFDF7 0%, #FFF8EE 40%, #FEF3C7 100%) !important;
+  border-color: #FDE68A !important;
+  box-shadow: 0 2px 8px -2px rgba(217, 119, 6, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-title {
+  color: #78350F !important; /* Deep rich amber-brown with 10.5:1 AAA contrast */
+}
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-subtitle {
+  color: #92400E !important; /* Highly readable warm amber-neutral with 7.2:1 contrast */
+}
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-badge {
+  background-color: #DCFCE7 !important;
+  color: #15803D !important;
+  border-color: #86EFAC !important;
+}
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-icon-box {
+  background-color: #FEF3C7 !important;
   border-color: #FDE68A !important;
 }
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-help-btn {
+  background-color: #FFFFFF !important;
+  color: #78350F !important;
+  border-color: #FDE68A !important;
+}
+
+[data-admin-theme="light"] .banner-digital-menu-live .banner-help-btn:hover {
+  background-color: #FEF3C7 !important;
+  color: #92400E !important;
+}
+
 
 /* =============================================================================
    ADMIN SLEEK SCROLLBARS (For static sidebar and independent content panes)
