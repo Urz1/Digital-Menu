@@ -1109,18 +1109,20 @@ export function ClientMenuContainer({
 
               return (
                 <section key={cat.id} id={`cat-${cat.id}`} className="mb-10 scroll-mt-36">
-                  <div className="mb-3 flex items-baseline justify-between">
-                    <div>
-                      <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
-                        <span>{cat.icon}</span>
-                        <span>{displayName}</span>
-                      </h2>
-                      <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+                  {activeCategoryId === 'all' && (
+                    <div className="mb-3 flex items-baseline justify-between">
+                      <div>
+                        <h2 className="text-lg font-bold text-[var(--foreground)] font-brand flex items-center gap-2">
+                          <span>{cat.icon}</span>
+                          <span>{displayName}</span>
+                        </h2>
+                        <p className="text-xs text-[var(--muted)] mt-0.5">{displayDesc}</p>
+                      </div>
+                      <span className="text-[11px] font-semibold text-[var(--muted)]">
+                        {catItems.length} {catItems.length === 1 ? 'dish' : 'dishes'}
+                      </span>
                     </div>
-                    <span className="text-[11px] font-semibold text-[var(--muted)]">
-                      {catItems.length} {catItems.length === 1 ? 'dish' : 'dishes'}
-                    </span>
-                  </div>
+                  )}
 
                   <div className={layout === 'grid' ? 'grid grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
                     {catItems.map((item) => (

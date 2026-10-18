@@ -191,22 +191,24 @@ export function ReviewsManager({
     setIsSubmittingReply(false);
 
     if (success) {
-      setReviews((prev) =>
-        prev.map((r) =>
-          r.id === reviewId
-            ? {
-                ...r,
-                owner_reply: replyText.trim(),
-                owner_reply_at: new Date().toISOString(),
-                owner_reply_by: staffName,
-              }
-            : r
-        )
+      const updatedReviews = reviews.map((r) =>
+        r.id === reviewId
+          ? {
+              ...r,
+              owner_reply: replyText.trim(),
+              owner_reply_at: new Date().toISOString(),
+              owner_reply_by: staffName,
+            }
+          : r
       );
+      setReviews(updatedReviews);
+      onReviewsChange?.(updatedReviews);
       setActiveReplyReviewId(null);
       setReplyText('');
       showToast('Reply published successfully.');
       loadData();
+    } else {
+      showToast('Unable to post reply. Please try again.');
     }
   };
 

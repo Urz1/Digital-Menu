@@ -125,7 +125,7 @@ export function MenuControlBar({
         className="sticky top-[53px] z-30 bg-[var(--card)]/95 backdrop-blur-md border-b border-[var(--border)] transition-colors select-none"
         aria-label="Menu Navigation & Controls"
       >
-        <div className="flex items-center justify-between px-3 py-2 gap-2 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between px-3 py-2 gap-1.5 sm:gap-2 max-w-4xl mx-auto">
           {/* Left: Tactical Category Selector Pill */}
           <button
             type="button"
@@ -133,7 +133,7 @@ export function MenuControlBar({
               triggerHaptic(8);
               onOpenCategoryDirectory();
             }}
-            className="flex-1 min-w-0 h-9 px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
+            className="flex-1 min-w-[125px] h-9 px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
             title={`${t.browseCategories}: ${activeCategoryName}`}
             aria-label={`${t.browseCategories}: ${activeCategoryName}`}
           >
@@ -149,7 +149,7 @@ export function MenuControlBar({
                 {activeCategoryName}
               </span>
               {activeCategoryCount > 0 && (
-                <span className="text-[10px] font-semibold text-[var(--muted)] px-1.5 py-0.2 rounded-full bg-[var(--card)] border border-[var(--border)] flex-shrink-0 hidden xs:inline-block">
+                <span className="text-[10px] font-semibold text-[var(--muted)] px-1.5 py-0.2 rounded-full bg-[var(--card)] border border-[var(--border)] flex-shrink-0 hidden md:inline-block">
                   {activeCategoryCount}
                 </span>
               )}
@@ -171,7 +171,7 @@ export function MenuControlBar({
                   onSelectCategory('offers');
                 }
               }}
-              className={`h-9 px-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border flex-shrink-0 active:scale-95 ${
+              className={`h-9 px-2 sm:px-2.5 rounded-full text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all border flex-shrink-0 active:scale-95 ${
                 isOffersActive
                   ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
                   : 'bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:border-amber-400'
@@ -179,7 +179,7 @@ export function MenuControlBar({
               title="Dishes on Offer"
             >
               <Tag className={`w-3.5 h-3.5 flex-shrink-0 ${isOffersActive ? 'text-white' : 'text-amber-500'}`} />
-              <span className="text-xs font-bold">On Offer</span>
+              <span className="text-xs font-bold hidden xs:inline">Offers</span>
               <span
                 className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
                   isOffersActive
@@ -193,7 +193,7 @@ export function MenuControlBar({
           )}
 
           {/* Right Action Controls: Filter, Sort, Layout */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
             {/* Dietary Filter Trigger */}
             <button
               type="button"
@@ -201,7 +201,7 @@ export function MenuControlBar({
                 triggerHaptic(8);
                 setIsFilterSheetOpen(true);
               }}
-              className={`h-9 px-2.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border active:scale-95 ${
+              className={`h-9 w-9 sm:w-auto sm:px-2.5 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 transition-all border active:scale-95 ${
                 isDietaryFilterActive
                   ? 'bg-[var(--primary)] text-white border-transparent shadow-xs'
                   : 'bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)] border-[var(--border)]'
@@ -223,12 +223,11 @@ export function MenuControlBar({
                 triggerHaptic(8);
                 setIsSortSheetOpen(true);
               }}
-              className="h-9 px-2.5 rounded-full bg-[var(--background)] border border-[var(--border)] hover:text-[var(--foreground)] text-[var(--muted)] flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-2xs"
+              className="h-9 w-9 rounded-full bg-[var(--background)] border border-[var(--border)] hover:text-[var(--foreground)] text-[var(--muted)] flex items-center justify-center transition-all active:scale-95 shadow-2xs"
               title={`Sort by: ${currentSort.label}`}
               aria-label={`Sort by: ${currentSort.label}`}
             >
               <ArrowUpDown className="w-3.5 h-3.5 text-[var(--primary)]" />
-              <currentSort.icon className="w-3.5 h-3.5 text-[var(--muted)]" />
             </button>
 
             {/* Grid / List Layout Toggle */}

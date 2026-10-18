@@ -57,32 +57,36 @@ export function MenuHeader({
     <header className="sticky top-0 z-40 bg-[var(--card)]/95 backdrop-blur-md border-b border-[var(--border)] transition-colors">
       <div className="flex items-center justify-between px-3.5 pt-3 pb-2 gap-2">
         {/* Brand identity */}
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-xs flex-shrink-0"
             style={{ backgroundColor: 'var(--primary)' }}
           >
             {restaurant.logo_letter || 'A'}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="font-bold text-base leading-tight truncate text-[var(--foreground)] font-brand">
               {restaurant.name}
             </h1>
-            <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]"></span>
-              <span>{restaurant.is_open ? t.openNow : t.closed}</span>
+            <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+              <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]"></span>
+                <span>{restaurant.is_open ? t.openNow : t.closed}</span>
+              </span>
+              <span className="text-neutral-300 dark:text-neutral-700 select-none">•</span>
+              <span className="text-[11px] text-[var(--muted)] whitespace-nowrap">Dine-In</span>
               {restaurant.google_maps_url && (
                 <>
-                  <span className="text-neutral-400 dark:text-neutral-600">•</span>
+                  <span className="text-neutral-300 dark:text-neutral-700 select-none">•</span>
                   <a
                     href={restaurant.google_maps_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[var(--primary)] hover:underline"
+                    className="inline-flex items-center gap-0.5 text-[11px] font-medium text-[var(--primary)] hover:underline whitespace-nowrap"
                     title="View branch location on Google Maps"
                   >
-                    <MapPin className="w-3 h-3 text-[var(--primary)] flex-shrink-0" />
-                    <span className="truncate max-w-[140px] sm:max-w-none">
+                    <MapPin className="w-2.5 h-2.5 text-[var(--primary)] flex-shrink-0" />
+                    <span className="truncate max-w-[85px] sm:max-w-none">
                       {restaurant.branch_name ? restaurant.branch_name.split('—')[0].trim() : 'Main Branch'}
                     </span>
                   </a>
@@ -158,7 +162,7 @@ export function MenuHeader({
       {/* Announcement banner if available */}
       {restaurant.announcement && (
         <div
-          className="mx-3.5 mb-2 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5"
+          className="mx-3.5 mb-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5"
           style={{
             backgroundColor: 'rgba(var(--primary-rgb), 0.12)',
             color: 'var(--primary)',
@@ -170,13 +174,13 @@ export function MenuHeader({
       )}
 
       {/* Table & Quick Info Strip */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 border-t border-[var(--border)] text-xs text-[var(--muted)]">
+      <div className="flex items-center justify-between px-3.5 py-1 border-t border-[var(--border)] text-xs text-[var(--muted)]">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] font-bold text-[var(--foreground)] text-[11px] shadow-2xs">
           <UtensilsCrossed className="w-3 h-3 text-amber-500 flex-shrink-0" />
           <span>{tableNumber.toLowerCase().includes('table') ? tableNumber : `Table ${tableNumber}`}</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => {

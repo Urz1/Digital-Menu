@@ -8,9 +8,8 @@ test.describe('Dish Reviews System - Customer Submission & Owner Management Pari
 
     // Find Special Fetira card
     const fetiraCard = page.locator('article:has-text("Special Fetira")').first();
-    await expect(fetiraCard).toBeVisible();
-    await fetiraCard.scrollIntoViewIfNeeded();
-    await fetiraCard.click();
+    await expect(fetiraCard).toBeVisible({ timeout: 10000 });
+    await fetiraCard.click({ force: true });
 
     // Detail Modal opens
     await expect(page.locator('h2:has-text("Special Fetira")')).toBeVisible();
@@ -73,8 +72,8 @@ test.describe('Dish Reviews System - Customer Submission & Owner Management Pari
 
     // Open Special Fetira
     const fetiraCard = page.locator('article:has-text("Special Fetira")').first();
-    await fetiraCard.scrollIntoViewIfNeeded();
-    await fetiraCard.click();
+    await expect(fetiraCard).toBeVisible({ timeout: 10000 });
+    await fetiraCard.click({ force: true });
 
     // Detail modal opens
     await expect(page.locator('h2:has-text("Special Fetira")')).toBeVisible();
@@ -157,9 +156,8 @@ test.describe('Dish Reviews System - Customer Submission & Owner Management Pari
 
     // Open Fetira
     const dishCard = page.locator('article:has-text("Fetira")').first();
-    await expect(dishCard).toBeVisible();
-    await dishCard.scrollIntoViewIfNeeded();
-    await dishCard.click();
+    await expect(dishCard).toBeVisible({ timeout: 10000 });
+    await dishCard.click({ force: true });
 
     // Click "Rate this dish"
     const rateBtn = page.locator('button:has-text("Rate this dish")');

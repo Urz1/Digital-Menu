@@ -3711,6 +3711,12 @@ export async function getDishReviews(
   const list = Array.from(mergedMap.values()).sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
+
+  if (!itemId) {
+    persistReviews(list);
+    inMemoryReviews = list;
+  }
+
   return list;
 }
 
@@ -3790,14 +3796,62 @@ export async function submitDishReview(params: {
   return { success: true, review: newReview };
 }
 
+async function findDishReview(reviewId: string): Promise<DishReview | null> {
+  // 1. inMemoryReviews
+  let review = inMemoryReviews.find((r) => r.id === reviewId);
+  if (review) return review;
+
+  // 2. localStorage cached reviews (from diners or past sessions)
+  const stored = getStoredReviews();
+  const fromStored = stored.find((r) => r.id === reviewId);
+  if (fromStored) {
+    const overrides = getStoredReviewOverrides();
+    const finalReview = overrides[reviewId] ? { ...fromStored, ...overrides[reviewId] } : fromStored;
+    inMemoryReviews.push(finalReview);
+    return finalReview;
+  }
+
+  // 3. Supabase
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase.from('reviews').select('*').eq('id', reviewId).single();
+      if (data) {
+        const overrides = getStoredReviewOverrides();
+        const finalReview = overrides[reviewId] ? { ...data, ...overrides[reviewId] } : (data as DishReview);
+        inMemoryReviews.push(finalReview);
+        return finalReview;
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
 export async function reportDishReview(reviewId: string, reason: string): Promise<boolean> {
-  const review = inMemoryReviews.find((r) => r.id === reviewId);
+  const review = await findDishReview(reviewId);
   if (!review) return false;
 
   review.report_count += 1;
   review.status = 'reported';
   review.flagged_reason = reason;
   review.updated_at = new Date().toISOString();
+
+  saveReviewOverride(reviewId, {
+    report_count: review.report_count,
+    status: review.status,
+    flagged_reason: review.flagged_reason,
+    updated_at: review.updated_at,
+  });
+
+  const stored = getStoredReviews();
+  const existingIdx = stored.findIndex((r) => r.id === reviewId);
+  if (existingIdx >= 0) {
+    stored[existingIdx] = { ...stored[existingIdx], ...review };
+    persistReviews(stored);
+  } else {
+    persistReviews([review, ...stored]);
+  }
 
   inMemoryModerationLogs.unshift({
     id: `log-${Date.now()}`,
@@ -3809,6 +3863,8 @@ export async function reportDishReview(reviewId: string, reason: string): Promis
     reason,
     created_at: new Date().toISOString(),
   });
+
+  broadcastSync({ type: 'REVIEW_UPDATED', review });
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
     try {
@@ -3834,17 +3890,7 @@ export async function replyToDishReview(
   replyText: string,
   staffName: string = 'Addis Staff'
 ): Promise<boolean> {
-  let review = inMemoryReviews.find((r) => r.id === reviewId);
-  if (!review && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
-    try {
-      const supabase = createClient();
-      const { data } = await supabase.from('reviews').select('*').eq('id', reviewId).single();
-      if (data) {
-        review = data as DishReview;
-        inMemoryReviews.push(review);
-      }
-    } catch {}
-  }
+  const review = await findDishReview(reviewId);
   if (!review) return false;
 
   review.owner_reply = replyText.trim();
@@ -3858,6 +3904,24 @@ export async function replyToDishReview(
     owner_reply_by: review.owner_reply_by,
     updated_at: review.updated_at,
   });
+
+  // Ensure stored reviews cache has the updated owner reply
+  const stored = getStoredReviews();
+  const existingIdx = stored.findIndex((r) => r.id === reviewId);
+  if (existingIdx >= 0) {
+    stored[existingIdx] = { ...stored[existingIdx], ...review };
+    persistReviews(stored);
+  } else {
+    persistReviews([review, ...stored]);
+  }
+
+  // Ensure inMemoryReviews has the updated review
+  const memIdx = inMemoryReviews.findIndex((r) => r.id === reviewId);
+  if (memIdx >= 0) {
+    inMemoryReviews[memIdx] = review;
+  } else {
+    inMemoryReviews.push(review);
+  }
 
   inMemoryModerationLogs.unshift({
     id: `log-${Date.now()}`,
@@ -3913,17 +3977,7 @@ export async function moderateDishReview(
     };
   }
 
-  let review = inMemoryReviews.find((r) => r.id === reviewId);
-  if (!review && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://demo.supabase.co') {
-    try {
-      const supabase = createClient();
-      const { data } = await supabase.from('reviews').select('*').eq('id', reviewId).single();
-      if (data) {
-        review = data as DishReview;
-        inMemoryReviews.push(review);
-      }
-    } catch {}
-  }
+  const review = await findDishReview(reviewId);
   if (!review) {
     return { success: false, error: 'Review not found.' };
   }
@@ -3942,6 +3996,22 @@ export async function moderateDishReview(
     flagged_reason: review.flagged_reason,
     updated_at: review.updated_at,
   });
+
+  const stored = getStoredReviews();
+  const existingIdx = stored.findIndex((r) => r.id === reviewId);
+  if (existingIdx >= 0) {
+    stored[existingIdx] = { ...stored[existingIdx], ...review };
+    persistReviews(stored);
+  } else {
+    persistReviews([review, ...stored]);
+  }
+
+  const memIdx = inMemoryReviews.findIndex((r) => r.id === reviewId);
+  if (memIdx >= 0) {
+    inMemoryReviews[memIdx] = review;
+  } else {
+    inMemoryReviews.push(review);
+  }
 
   inMemoryModerationLogs.unshift({
     id: `log-${Date.now()}`,

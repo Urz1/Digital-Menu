@@ -200,7 +200,7 @@ export interface AppTranslations {
 
 export const TRANSLATIONS: Record<Language, AppTranslations> = {
   en: {
-    openNow: 'Open Now • Dine-In',
+    openNow: 'Open Now',
     closed: 'Closed',
     table: 'Table',
     wifi: 'WiFi',
@@ -385,7 +385,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
   },
 
   am: {
-    openNow: 'ክፍት ነው • በቦታው መመገብ',
+    openNow: 'ክፍት ነው',
     closed: 'ተዘግቷል',
     table: 'ጠረጴዛ',
     wifi: 'ዋይፋይ',
@@ -570,7 +570,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
   },
 
   so: {
-    openNow: 'Furan Hadda • Cunto Gudaha',
+    openNow: 'Furan Hadda',
     closed: 'Xiran',
     table: 'Miiska',
     wifi: 'WiFi',
