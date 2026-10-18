@@ -16,6 +16,7 @@ import { CreateOrderInput, ServiceRequestInput } from './validators';
 import { createClient } from './supabase/client';
 import { checkReviewContent, validateBotCheck, checkReviewRateLimit, canRemoveReview } from './review-engine';
 import { broadcastSync } from './sync-channel';
+import { rateLimiter, RATE_LIMITS } from './rate-limiter';
 
 // -----------------------------------------------------------------------------
 // DEFAULT PRODUCTION SEED / FALLBACK DATA FOR "ADDIS" & MULTI-TENANT
@@ -3199,14 +3200,48 @@ export async function getMenuItems(restaurantId: string): Promise<MenuItem[]> {
 }
 
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
+  // 1. Rate Limiting Protection (Anti-Spam / Anti-DDoS)
+  const rateLimitKey = `order:${input.restaurant_id}:${input.table_number}`;
+  const rateCheck = rateLimiter.check(rateLimitKey, RATE_LIMITS.SUBMIT_ORDER);
+  if (!rateCheck.allowed) {
+    throw new Error(rateCheck.errorMessage || 'Too many orders placed. Please wait a moment before trying again.');
+  }
+
+  // 2. Authoritative Price Verification: Recalculate line totals and prevent client price manipulation
+  const itemsCatalog = inMemoryItems.length > 0 ? inMemoryItems : MOCK_ITEMS_ADDIS;
+  const itemsMap = new Map(itemsCatalog.map((item) => [item.id, item]));
+
+  let verifiedSubtotal = 0;
+  const sanitizedItems = input.items.map((cartItem) => {
+    const catalogItem = itemsMap.get(cartItem.item_id);
+    const unitPrice = catalogItem ? catalogItem.price : cartItem.price;
+    const optionsTotal = (cartItem.selected_options || []).reduce((acc, opt) => acc + (opt.price || 0), 0);
+    const lineTotal = Number(((unitPrice + optionsTotal) * cartItem.quantity).toFixed(2));
+    verifiedSubtotal += lineTotal;
+
+    return {
+      ...cartItem,
+      price: unitPrice,
+      line_total: lineTotal,
+    };
+  });
+
+  const verifiedSubtotalRounded = Number(verifiedSubtotal.toFixed(2));
+  const restaurant = getStoredRestaurant(input.restaurant_id) || MOCK_RESTAURANT_ADDIS;
+  const taxRate = restaurant.tax_rate ?? 0.15;
+  const verifiedTax = restaurant.tax_mode === 'exclusive' 
+    ? Number((verifiedSubtotalRounded * taxRate).toFixed(2)) 
+    : 0;
+  const verifiedTotal = Number((verifiedSubtotalRounded + verifiedTax).toFixed(2));
+
   const newOrder: Order = {
     id: `ord-${Date.now()}`,
     restaurant_id: input.restaurant_id,
     table_number: input.table_number,
-    items: input.items,
-    subtotal: input.subtotal,
-    tax: input.tax,
-    total: input.total,
+    items: sanitizedItems,
+    subtotal: verifiedSubtotalRounded,
+    tax: verifiedTax,
+    total: verifiedTotal,
     status: 'pending',
     notes: input.notes,
     created_at: new Date().toISOString(),
@@ -3228,6 +3263,13 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
 }
 
 export async function createServiceRequest(input: ServiceRequestInput): Promise<ServiceRequest> {
+  // Rate Limiting Protection (Anti-Spam waiter call flooding)
+  const rateLimitKey = `service:${input.restaurant_id}:${input.table_number}`;
+  const rateCheck = rateLimiter.check(rateLimitKey, RATE_LIMITS.SERVICE_REQUEST);
+  if (!rateCheck.allowed) {
+    throw new Error(rateCheck.errorMessage || 'Please wait before requesting assistance again.');
+  }
+
   const newRequest: ServiceRequest = {
     id: `req-${Date.now()}`,
     restaurant_id: input.restaurant_id,

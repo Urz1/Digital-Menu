@@ -120,7 +120,7 @@ export default async function RestaurantMenuPage({ params, searchParams }: PageP
       {/* Schema.org Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
 
       <ThemeManager themeConfig={restaurant.theme_config}>

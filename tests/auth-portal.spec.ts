@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Owner and Staff Authentication & Access Gating Flow', () => {
-  test('1. Unauthenticated user accessing /admin is gated and redirected to /admin/login', async ({ page }) => {
-    // Clear any test session in localStorage to simulate fresh real user
+  test('1. Unauthenticated user accessing /admin is gated and redirected to /admin/login', async ({ page, context }) => {
+    // Clear cookies & test session in localStorage to simulate fresh real user
+    await context.clearCookies();
     await page.goto('/admin/login');
     await page.evaluate(() => {
       localStorage.clear();

@@ -399,25 +399,6 @@ export function getCurrentSession(): AdminAuthSession | null {
       return JSON.parse(raw);
     }
 
-    // Allow automated headless test runner (Playwright) to run existing suites without manual interactive sign-in
-    const isHeadlessTest =
-      typeof navigator !== 'undefined' &&
-      (navigator.userAgent.includes('Headless') ||
-        navigator.userAgent.includes('Playwright') ||
-        Boolean((window as unknown as { __PLAYWRIGHT_TEST__?: boolean }).__PLAYWRIGHT_TEST__));
-
-    if (isHeadlessTest && !sessionStorage.getItem('test_force_unauthenticated')) {
-      const defaultSession: AdminAuthSession = {
-        role: 'owner',
-        userId: DEFAULT_OWNER_PROFILE.id,
-        name: DEFAULT_OWNER_PROFILE.name,
-        identifier: DEFAULT_OWNER_PROFILE.email,
-        token: `test-session-${Date.now()}`,
-        loggedInAt: Date.now(),
-      };
-      return defaultSession;
-    }
-
     // Strict gating: No session in storage means unauthenticated.
     return null;
   } catch {
@@ -429,6 +410,11 @@ export function setAuthSession(session: AdminAuthSession): void {
   if (typeof window !== 'undefined') {
     sessionStorage.removeItem('admin_explicitly_logged_out');
     localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(session));
+    // Synchronize session cookie for server-side Next.js route protection middleware
+    const isSecure = window.location.protocol === 'https:';
+    document.cookie = `digital_menu_session=${encodeURIComponent(
+      session.role
+    )}; Path=/; SameSite=Lax${isSecure ? '; Secure' : ''}; Max-Age=${7 * 86400}`;
   }
 }
 
@@ -436,6 +422,7 @@ export function clearAuthSession(): void {
   if (typeof window !== 'undefined') {
     sessionStorage.setItem('admin_explicitly_logged_out', 'true');
     localStorage.removeItem(STORAGE_KEY_SESSION);
+    document.cookie = 'digital_menu_session=; Path=/; Max-Age=0; SameSite=Lax';
   }
 }
 
@@ -462,9 +449,8 @@ export function authenticateOwner(
     return { success: false, error: 'No owner account found with this email or phone' };
   }
 
-  const isValidPassword =
-    verifySaltedCredential(passwordAttempt, owner.password) ||
-    verifySaltedCredential(passwordAttempt, DEFAULT_OWNER_PROFILE.password);
+  // Strictly verify against the authoritative owner password (prevents hardcoded backdoor reuse)
+  const isValidPassword = verifySaltedCredential(passwordAttempt, owner.password);
 
   if (!isValidPassword) {
     return { success: false, error: 'Incorrect owner password. Access denied.' };

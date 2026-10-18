@@ -23,7 +23,38 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Pixel 7'],
-        userAgent: `${devices['Pixel 7'].userAgent} Playwright`,
+        storageState: {
+          cookies: [
+            {
+              name: 'digital_menu_session',
+              value: 'owner',
+              domain: '127.0.0.1',
+              path: '/',
+              expires: Math.floor(Date.now() / 1000) + 86400,
+              httpOnly: false,
+              secure: false,
+              sameSite: 'Lax',
+            },
+          ],
+          origins: [
+            {
+              origin: 'http://127.0.0.1:3005',
+              localStorage: [
+                {
+                  name: 'digital_menu_admin_session_v2',
+                  value: JSON.stringify({
+                    role: 'owner',
+                    userId: 'owner-addis-master',
+                    name: 'Abebe Bikila',
+                    identifier: 'owner@addiscafeteria.com',
+                    token: 'playwright-test-token',
+                    loggedInAt: 1760000000000,
+                  }),
+                },
+              ],
+            },
+          ],
+        },
       },
     },
   ],
