@@ -256,7 +256,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "cream cake",
     "price": 200,
     "description": "cream cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/cream-cake-1.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -273,7 +273,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Black Forest",
     "price": 230,
     "description": "Black Forest prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/black-forest-2.jpg",
     "tags": [
       "popular",
       "vegetarian"
@@ -291,7 +291,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Black&White Forest",
     "price": 230,
     "description": "Black&White Forest prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/black-white-forest-3.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -308,7 +308,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "strawberry cake",
     "price": 230,
     "description": "strawberry cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/strawberry-cake-4.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -325,7 +325,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Opera cake",
     "price": 250,
     "description": "Opera cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/opera-cake-5.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -342,7 +342,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Torta cake",
     "price": 1500,
     "description": "Torta cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/torta-cake-6.jpg",
     "tags": [
       "popular",
       "vegetarian"
@@ -360,7 +360,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Cup cake",
     "price": 150,
     "description": "Cup cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/cup-cake-7.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -377,7 +377,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "English Cake",
     "price": 1050,
     "description": "English Cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/english-cake-8.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -394,7 +394,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Basbousa",
     "price": 100,
     "description": "Basbousa prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/basbousa-9.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -411,7 +411,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Orange Basbousa",
     "price": 190,
     "description": "Orange Basbousa prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/orange-basbousa-10.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -428,7 +428,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Croissant Plain",
     "price": 150,
     "description": "Croissant Plain prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/croissant-plain-11.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -445,7 +445,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "White Plain",
     "price": 150,
     "description": "White Plain prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/white-plain-12.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -462,7 +462,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Orange Fasting",
     "price": 150,
     "description": "Orange Fasting prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/orange-fasting-13.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -480,7 +480,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Orange cake",
     "price": 150,
     "description": "Orange cake prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/orange-cake-14.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -497,7 +497,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Venus plain BIG",
     "price": 150,
     "description": "Venus plain BIG prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/venus-plain-big-15.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -514,7 +514,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Venus plane SHORT",
     "price": 100,
     "description": "Venus plane SHORT prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/venus-plane-short-16.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -531,7 +531,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Beckewhe",
     "price": 80,
     "description": "Beckewhe prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/beckewhe-17.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -548,7 +548,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "COOKISE",
     "price": 800,
     "description": "COOKISE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/cookise-18.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -565,7 +565,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CALVINE BREAD",
     "price": 50,
     "description": "CALVINE BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/calvine-bread-19.jpg",
     "tags": [
       "vegan"
     ],
@@ -582,7 +582,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "OTES BREAD",
     "price": 50,
     "description": "OTES BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/otes-bread-20.jpg",
     "tags": [
       "vegan"
     ],
@@ -599,7 +599,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "FEWAST BREAD",
     "price": 50,
     "description": "FEWAST BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/fewast-bread-21.jpg",
     "tags": [
       "vegan"
     ],
@@ -616,7 +616,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "RAGEST BRADE",
     "price": 50,
     "description": "RAGEST BRADE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/ragest-brade-22.jpg",
     "tags": [
       "vegan"
     ],
@@ -633,7 +633,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AJA BREAD",
     "price": 20,
     "description": "AJA BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/aja-bread-23.jpg",
     "tags": [
       "vegan"
     ],
@@ -650,7 +650,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AJA RAGKESTE",
     "price": 10,
     "description": "AJA RAGKESTE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/aja-ragkeste-24.jpg",
     "tags": [
       "vegan"
     ],
@@ -667,7 +667,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GEBIS BREAD",
     "price": 15,
     "description": "GEBIS BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/gebis-bread-25.jpg",
     "tags": [
       "vegan"
     ],
@@ -684,7 +684,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GEBIS BAGET",
     "price": 15,
     "description": "GEBIS BAGET prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/gebis-baget-26.jpg",
     "tags": [
       "vegan"
     ],
@@ -701,7 +701,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GEBIS MINI",
     "price": 15,
     "description": "GEBIS MINI prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/gebis-mini-27.jpg",
     "tags": [
       "vegan"
     ],
@@ -718,7 +718,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MIN BREAD ROG",
     "price": 10,
     "description": "MIN BREAD ROG prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/min-bread-rog-28.jpg",
     "tags": [
       "vegan"
     ],
@@ -735,7 +735,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "NORMAL BREAD 180G",
     "price": 50,
     "description": "NORMAL BREAD 180G prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/normal-bread-180g-29.jpg",
     "tags": [
       "vegan"
     ],
@@ -752,7 +752,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "NORMAL BREAD 110G",
     "price": 20,
     "description": "NORMAL BREAD 110G prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/normal-bread-110g-30.jpg",
     "tags": [
       "vegan"
     ],
@@ -769,7 +769,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CARE BREAD",
     "price": 100,
     "description": "CARE BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/care-bread-31.jpg",
     "tags": [
       "vegan"
     ],
@@ -786,7 +786,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CRIZIL BREAD",
     "price": 50,
     "description": "CRIZIL BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/crizil-bread-32.jpg",
     "tags": [
       "vegan"
     ],
@@ -803,7 +803,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GEBIC CAKE",
     "price": 100,
     "description": "GEBIC CAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/gebic-cake-33.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -820,7 +820,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AJA BAGESTE LONG",
     "price": 50,
     "description": "AJA BAGESTE LONG prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/aja-bageste-long-34.jpg",
     "tags": [
       "vegan"
     ],
@@ -837,7 +837,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "BABESFI BREAD",
     "price": 150,
     "description": "BABESFI BREAD prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/babesfi-bread-35.jpg",
     "tags": [
       "vegan"
     ],
@@ -854,7 +854,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "BOMBOLINO",
     "price": 60,
     "description": "BOMBOLINO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/bombolino-36.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -871,7 +871,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "BOKSENYA",
     "price": 110,
     "description": "BOKSENYA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/artisanal-pastry.jpg",
+    "image_url": "/images/dishes/boksenya-37.jpg",
     "tags": [
       "vegan"
     ],
@@ -888,7 +888,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Feta with Honey",
     "price": 350,
     "description": "Feta with Honey prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/feta-with-honey-38.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -906,7 +906,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Feta with Tamer",
     "price": 350,
     "description": "Feta with Tamer prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/feta-with-tamer-39.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -923,7 +923,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Feta with Honey, Tamer, and banana",
     "price": 450,
     "description": "Feta with Honey, Tamer, and banana prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/feta-with-honey-tamer-and-banana-40.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -941,7 +941,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Fetira",
     "price": 300,
     "description": "Fetira prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/fetira.jpeg",
     "tags": [
       "vegetarian"
     ],
@@ -976,7 +976,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Full Normal",
     "price": 280,
     "description": "Full Normal prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/full-normal-43.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -993,7 +993,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Full Special",
     "price": 575,
     "description": "Full Special prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/ful-special.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -1011,7 +1011,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Addis Combo Break fast",
     "price": 750,
     "description": "Addis Combo Break fast prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/addis-combo-break-fast-45.jpg",
     "tags": [
       "popular"
     ],
@@ -1028,7 +1028,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Scramble Egg",
     "price": 300,
     "description": "Scramble Egg prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/scramble-egg-46.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1045,7 +1045,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Egg Sandwich",
     "price": 350,
     "description": "Egg Sandwich prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/egg-sandwich-47.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1062,7 +1062,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Omelet",
     "price": 350,
     "description": "Omelet prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/omelet-48.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1079,7 +1079,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Avocado Toast",
     "price": 350,
     "description": "Avocado Toast prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/avocado-toast-49.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1097,7 +1097,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chechebisa Fasting",
     "price": 300,
     "description": "Chechebisa Fasting prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/chechebisa-fasting-50.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1115,7 +1115,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chechebisa",
     "price": 400,
     "description": "Chechebisa prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/chechebisa-51.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -1133,7 +1133,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chechebisa Teff",
     "price": 400,
     "description": "Chechebisa Teff prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/chechebisa-teff-52.jpg",
     "tags": [
       "gluten-free",
       "vegetarian"
@@ -1151,7 +1151,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Oats",
     "price": 300,
     "description": "Oats prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/oats-53.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1169,7 +1169,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Siga Firfir",
     "price": 500,
     "description": "Siga Firfir prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/siga-firfir-54.jpg",
     "tags": [
       "popular"
     ],
@@ -1186,7 +1186,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Injera Firfir",
     "price": 350,
     "description": "Injera Firfir prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/injera-firfir-55.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1204,7 +1204,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Special Burger",
     "price": 799,
     "description": "Special Burger prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-burger.jpg",
+    "image_url": "/images/dishes/special-burger-56.jpg",
     "tags": [
       "popular"
     ],
@@ -1221,7 +1221,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chicken Burger",
     "price": 599,
     "description": "Chicken Burger prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-burger.jpg",
+    "image_url": "/images/dishes/chicken-burger-57.jpg",
     "tags": [
       "popular"
     ],
@@ -1238,7 +1238,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Cheese Burger",
     "price": 599,
     "description": "Cheese Burger prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-burger.jpg",
+    "image_url": "/images/dishes/cheese-burger-58.jpg",
     "tags": [
       "popular"
     ],
@@ -1255,7 +1255,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Beef Burger",
     "price": 498,
     "description": "Beef Burger prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-burger.jpg",
+    "image_url": "/images/dishes/beef-burger-59.jpg",
     "tags": [
       "popular"
     ],
@@ -1272,7 +1272,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Speacial Pizza",
     "price": 1099,
     "description": "Speacial Pizza prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/speacial-pizza-60.jpg",
     "tags": [
       "popular"
     ],
@@ -1289,7 +1289,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Margarita Pizza",
     "price": 700,
     "description": "Margarita Pizza prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/margarita-pizza-61.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1306,7 +1306,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chicken Pizza",
     "price": 899,
     "description": "Chicken Pizza prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/chicken-pizza-62.jpg",
     "tags": [
       "popular"
     ],
@@ -1323,7 +1323,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Tuna Pizza",
     "price": 899,
     "description": "Tuna Pizza prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/tuna-pizza-63.jpg",
     "tags": [
       "popular"
     ],
@@ -1340,7 +1340,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Vegetable Pizza",
     "price": 460,
     "description": "Vegetable Pizza prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/vegetable-pizza-64.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1358,7 +1358,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "French frise",
     "price": 345,
     "description": "French frise prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/french-frise-65.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1376,7 +1376,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Spring roll vegetable",
     "price": 345,
     "description": "Spring roll vegetable prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/spring-roll-vegetable-66.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1394,7 +1394,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Spring roll meat",
     "price": 500,
     "description": "Spring roll meat prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/spring-roll-meat-67.jpg",
     "tags": [
       "popular"
     ],
@@ -1411,7 +1411,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Addis snack",
     "price": 575,
     "description": "Addis snack prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/addis-snack-68.jpg",
     "tags": [
       "popular"
     ],
@@ -1428,7 +1428,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Fish & chips",
     "price": 750,
     "description": "Fish & chips prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/fish-chips-69.jpg",
     "tags": [
       "popular"
     ],
@@ -1445,7 +1445,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Fried Chicken wings",
     "price": 750,
     "description": "Fried Chicken wings prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/fried-chicken-wings-70.jpg",
     "tags": [
       "popular"
     ],
@@ -1462,7 +1462,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chicken nugget",
     "price": 750,
     "description": "Chicken nugget prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/chicken-nugget-71.jpg",
     "tags": [
       "popular"
     ],
@@ -1479,7 +1479,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "A. Chicken Tender 4pcs",
     "price": 600,
     "description": "A. Chicken Tender 4pcs prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/a-chicken-tender-4pcs-72.jpg",
     "tags": [
       "popular"
     ],
@@ -1496,7 +1496,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "A. Chicken Tender 6pcs",
     "price": 800,
     "description": "A. Chicken Tender 6pcs prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/a-chicken-tender-6pcs-73.jpg",
     "tags": [
       "popular"
     ],
@@ -1513,7 +1513,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SPECIAL MILK",
     "price": 200,
     "description": "SPECIAL MILK prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/special-milk-74.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1548,7 +1548,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "TEA",
     "price": 60,
     "description": "TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/tea-76.jpg",
     "tags": [
       "vegan"
     ],
@@ -1565,7 +1565,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MACCHIATO",
     "price": 120,
     "description": "MACCHIATO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/macchiato-77.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -1583,7 +1583,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "DOUBLE MACCHIATO",
     "price": 220,
     "description": "DOUBLE MACCHIATO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/double-macchiato-78.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -1601,7 +1601,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "STEAM COFFEE",
     "price": 100,
     "description": "STEAM COFFEE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/steam-coffee-79.jpg",
     "tags": [
       "vegan"
     ],
@@ -1618,7 +1618,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SPECIAL TEA",
     "price": 200,
     "description": "SPECIAL TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/special-tea-80.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -1636,7 +1636,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SAFI MILK",
     "price": 120,
     "description": "SAFI MILK prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/safi-milk-81.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1653,7 +1653,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CAFE LATE",
     "price": 150,
     "description": "CAFE LATE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/cafe-late-82.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1670,7 +1670,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CAPPUCCINO",
     "price": 200,
     "description": "CAPPUCCINO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/cappuccino-83.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1687,7 +1687,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GINGER TEA",
     "price": 100,
     "description": "GINGER TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/ginger-tea-84.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1705,7 +1705,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "LEWOZE TEA",
     "price": 170,
     "description": "LEWOZE TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/lewoze-tea-85.jpg",
     "tags": [
       "vegan"
     ],
@@ -1722,7 +1722,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MILK TEA",
     "price": 140,
     "description": "MILK TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/milk-tea-86.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1739,7 +1739,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SOMALI TEA",
     "price": 140,
     "description": "SOMALI TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/somali-tea-87.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -1757,7 +1757,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GREEN TEA",
     "price": 80,
     "description": "GREEN TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/green-tea-88.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1775,7 +1775,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "ORANGE TEA",
     "price": 120,
     "description": "ORANGE TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/orange-tea-89.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1793,7 +1793,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AMERICANO COFFEE",
     "price": 200,
     "description": "AMERICANO COFFEE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/americano-coffee-90.jpg",
     "tags": [
       "vegan"
     ],
@@ -1810,7 +1810,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "LEMON TEA",
     "price": 80,
     "description": "LEMON TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/lemon-tea-91.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1828,7 +1828,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SPRICE TEA",
     "price": 120,
     "description": "SPRICE TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/sprice-tea-92.jpg",
     "tags": [
       "vegan"
     ],
@@ -1845,7 +1845,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "HOT CHOCOLATE",
     "price": 200,
     "description": "HOT CHOCOLATE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/hot-chocolate-93.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -1862,7 +1862,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "NANA TEA",
     "price": 100,
     "description": "NANA TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/nana-tea-94.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1880,7 +1880,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "LIPTON TEA",
     "price": 80,
     "description": "LIPTON TEA prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/lipton-tea-95.jpg",
     "tags": [
       "vegan"
     ],
@@ -1897,7 +1897,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AVOCADO",
     "price": 300,
     "description": "AVOCADO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/avocado-96.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -1916,7 +1916,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "PAPAYA JUICE",
     "price": 300,
     "description": "PAPAYA JUICE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/papaya-juice-97.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1934,7 +1934,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "WATERMELON JUICE",
     "price": 300,
     "description": "WATERMELON JUICE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/watermelon-juice-98.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -1952,7 +1952,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MANGO",
     "price": 350,
     "description": "MANGO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/mango-99.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -1971,7 +1971,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SPRICE JUICE",
     "price": 350,
     "description": "SPRICE JUICE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/spris-juice.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -1990,7 +1990,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GISHITA JUICE",
     "price": 350,
     "description": "GISHITA JUICE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/gishita-juice-101.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2008,7 +2008,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "ANANAS",
     "price": 350,
     "description": "ANANAS prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/ananas-102.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2026,7 +2026,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "ORANGE",
     "price": 350,
     "description": "ORANGE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/orange-103.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2044,7 +2044,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "GINGER JUICE",
     "price": 280,
     "description": "GINGER JUICE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/ginger-juice-104.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2062,7 +2062,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "STROBERRY SHAKE",
     "price": 280,
     "description": "STROBERRY SHAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/stroberry-shake-105.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2079,7 +2079,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "BANANA SHAKE",
     "price": 400,
     "description": "BANANA SHAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/banana-shake-106.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2096,7 +2096,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AVOCADO SHAKE",
     "price": 400,
     "description": "AVOCADO SHAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/avocado-shake-107.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2113,7 +2113,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MANGO SHAKE",
     "price": 400,
     "description": "MANGO SHAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/mango-shake-108.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2130,7 +2130,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CHOCOLATE SHAKE",
     "price": 450,
     "description": "CHOCOLATE SHAKE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/chocolate-shake-109.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2147,7 +2147,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Special juice",
     "price": 450,
     "description": "Special juice prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/special-juice-110.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -2165,7 +2165,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "ICE COFFEE",
     "price": 200,
     "description": "ICE COFFEE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/ice-coffee-111.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -2183,7 +2183,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "ICE LATE/AMERICANO",
     "price": 200,
     "description": "ICE LATE/AMERICANO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/ice-late-americano-112.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2200,7 +2200,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "MOJITO",
     "price": 350,
     "description": "MOJITO prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/mojito-113.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -2218,7 +2218,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "SOFT DRINKS",
     "price": 80,
     "description": "SOFT DRINKS prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/soft-drinks-114.jpg",
     "tags": [
       "vegan"
     ],
@@ -2235,7 +2235,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "AMBO WATER",
     "price": 100,
     "description": "AMBO WATER prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/ambo-water-115.jpg",
     "tags": [
       "vegan",
       "popular"
@@ -2253,7 +2253,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "WATER 300ML",
     "price": 305,
     "description": "WATER 300ML prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/water-300ml-116.jpg",
     "tags": [
       "vegan"
     ],
@@ -2270,7 +2270,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "WATER 600ML",
     "price": 50,
     "description": "WATER 600ML prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/water-600ml-117.jpg",
     "tags": [
       "vegan"
     ],
@@ -2287,7 +2287,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "WATER 1000ML",
     "price": 70,
     "description": "WATER 1000ML prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fresh-mango-juice.jpg",
+    "image_url": "/images/dishes/water-1000ml-118.jpg",
     "tags": [
       "vegan"
     ],
@@ -2304,7 +2304,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "CARAMEL ICED COFFEE",
     "price": 200,
     "description": "CARAMEL ICED COFFEE prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/ethiopian-buna.jpg",
+    "image_url": "/images/dishes/caramel-iced-coffee-119.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2321,7 +2321,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Yebeg Tibs",
     "price": 900,
     "description": "Yebeg Tibs prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/yebeg-tibs.jpg",
     "tags": [
       "popular"
     ],
@@ -2338,7 +2338,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Rice with meat",
     "price": 575,
     "description": "Rice with meat prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/rice-with-meat-121.jpg",
     "tags": [
       "popular"
     ],
@@ -2355,7 +2355,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Rice with Vegetable",
     "price": 450,
     "description": "Rice with Vegetable prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/rice-with-vegetable-122.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2373,7 +2373,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Quanta Firfir",
     "price": 550,
     "description": "Quanta Firfir prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/quanta-firfir.jpg",
     "tags": [
       "popular"
     ],
@@ -2390,7 +2390,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Shiro with Butter",
     "price": 400,
     "description": "Shiro with Butter prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/shiro.jpg",
     "tags": [
       "vegetarian",
       "popular"
@@ -2408,7 +2408,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Smart shiro",
     "price": 400,
     "description": "Smart shiro prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/smart-shiro-125.jpg",
     "tags": [
       "vegetarian"
     ],
@@ -2425,7 +2425,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Pasta with Vegetable",
     "price": 450,
     "description": "Pasta with Vegetable prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/pasta-with-vegetable-126.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2443,7 +2443,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Pasta with meat",
     "price": 575,
     "description": "Pasta with meat prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/pasta-with-meat-127.jpg",
     "tags": [
       "popular"
     ],
@@ -2460,7 +2460,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Pasta with tomato",
     "price": 400,
     "description": "Pasta with tomato prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/pasta-with-tomato-128.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2478,7 +2478,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Doro Tibs",
     "price": 800,
     "description": "Doro Tibs prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/doro-tibs-129.jpg",
     "tags": [
       "popular"
     ],
@@ -2495,7 +2495,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Vigitable sup",
     "price": 300,
     "description": "Vigitable sup prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/vigitable-sup-130.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2513,7 +2513,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chikina Tibs",
     "price": 900,
     "description": "Chikina Tibs prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/chikina-tibs-131.jpg",
     "tags": [
       "popular"
     ],
@@ -2530,7 +2530,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Tibs Tefersho",
     "price": 700,
     "description": "Tibs Tefersho prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/tibs-tefersho-132.jpg",
     "tags": [
       "popular"
     ],
@@ -2547,7 +2547,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Yebeg Keywot",
     "price": 700,
     "description": "Yebeg Keywot prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/yebeg-keywot.jpg",
     "tags": [
       "popular"
     ],
@@ -2564,7 +2564,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Agelegil",
     "price": 900,
     "description": "Agelegil prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/agelegil-134.jpg",
     "tags": [
       "popular"
     ],
@@ -2581,7 +2581,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Gomen Besiga",
     "price": 700,
     "description": "Gomen Besiga prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/gomen-besiga-135.jpg",
     "tags": [
       "popular"
     ],
@@ -2598,7 +2598,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Grilled Fish",
     "price": 850,
     "description": "Grilled Fish prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/grilled-fish-136.jpg",
     "tags": [
       "popular"
     ],
@@ -2615,7 +2615,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Mofo",
     "price": 700,
     "description": "Mofo prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/mofo-137.jpg",
     "tags": [
       "popular"
     ],
@@ -2632,7 +2632,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Special Mendi",
     "price": 2000,
     "description": "Special Mendi prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/special-mendi.jpg",
     "tags": [
       "popular"
     ],
@@ -2649,7 +2649,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Mend 1/2",
     "price": 900,
     "description": "Mend 1/2 prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/mend-1-2-139.jpg",
     "tags": [
       "popular"
     ],
@@ -2666,7 +2666,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Mend Full",
     "price": 1800,
     "description": "Mend Full prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/mend-full-140.jpg",
     "tags": [
       "popular"
     ],
@@ -2683,7 +2683,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "1/2 Roasted Chicken",
     "price": 1098,
     "description": "1/2 Roasted Chicken prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/1-2-roasted-chicken-141.jpg",
     "tags": [
       "popular"
     ],
@@ -2700,7 +2700,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Roasted Chicken Full",
     "price": 1900,
     "description": "Roasted Chicken Full prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/traditional-mendi.jpg",
+    "image_url": "/images/dishes/roasted-chicken-full-142.jpg",
     "tags": [
       "popular"
     ],
@@ -2717,7 +2717,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Keywot and Fitfit",
     "price": 790,
     "description": "Keywot and Fitfit prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/keywot-and-fitfit-143.jpg",
     "tags": [
       "popular"
     ],
@@ -2734,7 +2734,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Tibs and Fitfit",
     "price": 900,
     "description": "Tibs and Fitfit prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/tibs-and-fitfit-144.jpg",
     "tags": [
       "popular"
     ],
@@ -2751,7 +2751,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Cooked Vegs and Aja",
     "price": 600,
     "description": "Cooked Vegs and Aja prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/cooked-vegs-and-aja-145.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2769,7 +2769,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Tuna Sandwich",
     "price": 600,
     "description": "Tuna Sandwich prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/tuna-sandwich-146.jpg",
     "tags": [
       "popular"
     ],
@@ -2786,7 +2786,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Beef Shewarema",
     "price": 699,
     "description": "Beef Shewarema prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/beef-shewarema-147.jpg",
     "tags": [
       "popular"
     ],
@@ -2803,7 +2803,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Chicken Shewarma",
     "price": 600,
     "description": "Chicken Shewarma prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/shawarma-wrap.jpg",
+    "image_url": "/images/dishes/chicken-shewarma-148.jpg",
     "tags": [
       "popular"
     ],
@@ -2820,7 +2820,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Shiro",
     "price": 350,
     "description": "Shiro prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/shiro-149.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -2839,7 +2839,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Beyaynetu",
     "price": 500,
     "description": "Beyaynetu prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/beyaynetu.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -2858,7 +2858,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Fasting Agelegil",
     "price": 600,
     "description": "Fasting Agelegil prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/fasting-agelegil-151.jpg",
     "tags": [
       "vegan",
       "fasting",
@@ -2877,7 +2877,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Suf fitfit",
     "price": 350,
     "description": "Suf fitfit prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/suf-fitfit-152.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2895,7 +2895,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Addis special Salad",
     "price": 400,
     "description": "Addis special Salad prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/fasting-beyaynetu.jpg",
+    "image_url": "/images/dishes/addis-special-salad-153.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2913,7 +2913,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Aja with spinach",
     "price": 400,
     "description": "Aja with spinach prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/aja-with-spinach-154.jpg",
     "tags": [
       "vegan",
       "fasting"
@@ -2931,7 +2931,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Takeaway",
     "price": 50,
     "description": "Takeaway prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/takeaway-155.jpg",
     "tags": [],
     "allergens": [],
     "spice_level": 0,
@@ -2946,7 +2946,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Pizza takeaway",
     "price": 100,
     "description": "Pizza takeaway prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/woodfired-pizza.jpg",
+    "image_url": "/images/dishes/pizza-takeaway-156.jpg",
     "tags": [],
     "allergens": [],
     "spice_level": 0,
@@ -2961,7 +2961,7 @@ export const MOCK_ITEMS_ADDIS: MenuItem[] = [
     "name": "Extra cheese",
     "price": 100,
     "description": "Extra cheese prepared freshly at Addis Cafeteria with authentic premium ingredients.",
-    "image_url": "/images/dishes/special-fetira.jpg",
+    "image_url": "/images/dishes/extra-cheese-157.jpg",
     "tags": [
       "vegetarian"
     ],

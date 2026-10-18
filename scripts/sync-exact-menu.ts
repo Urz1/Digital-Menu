@@ -1,3 +1,5 @@
+import { MOCK_ITEMS_ADDIS } from '../src/lib/data-provider';
+
 // Direct Supabase configuration
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://vekhuxcaqybqkoxfknfk.supabase.co';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_oLod2_N8a7RgMgxmVf8Zvg_qV9kc7OR';
@@ -341,38 +343,15 @@ export const DISHES_DATA: RawDish[] = [
   { name: 'Extra cheese', price: 100, category_id: 'cat-takeaway-extras', tags: ['vegetarian'] },
 ];
 
-function getImageForDish(category_id: string, name: string): string {
-  const lower = name.toLowerCase();
-  if (lower.includes('burger')) return '/images/dishes/special-burger.jpg';
-  if (lower.includes('pizza')) return '/images/dishes/woodfired-pizza.jpg';
-  if (lower.includes('mendi') || lower.includes('mend') || lower.includes('roasted chicken') || lower.includes('mofo')) {
-    return '/images/dishes/traditional-mendi.jpg';
+const imageByDishId = new Map(MOCK_ITEMS_ADDIS.map((item) => [item.id, item.image_url]));
+
+function getImageForDish(category_id: string, name: string, id?: string): string {
+  if (id && imageByDishId.has(id)) {
+    return imageByDishId.get(id)!;
   }
-  if (lower.includes('tibs') || lower.includes('keywot') || lower.includes('firfir') || lower.includes('gomen') || lower.includes('agelegil')) {
-    return '/images/dishes/special-fetira.jpg';
-  }
-  if (lower.includes('shiro') || lower.includes('beyaynetu') || lower.includes('fasting') || lower.includes('salad')) {
-    return '/images/dishes/fasting-beyaynetu.jpg';
-  }
-  if (lower.includes('shewarma') || lower.includes('shawarma') || lower.includes('sandwich') || lower.includes('tender') || lower.includes('nugget') || lower.includes('roll') || lower.includes('wings') || lower.includes('frise') || lower.includes('fries') || lower.includes('fish & chips') || lower.includes('snack')) {
-    return '/images/dishes/shawarma-wrap.jpg';
-  }
-  if (lower.includes('fetira') || lower.includes('feta') || lower.includes('chechebisa') || lower.includes('egg') || lower.includes('omelet') || lower.includes('toast') || lower.includes('ful') || lower.includes('oats')) {
-    return '/images/dishes/special-fetira.jpg';
-  }
-  if (lower.includes('cake') || lower.includes('forest') || lower.includes('basbousa') || lower.includes('croissant') || lower.includes('bombolino') || lower.includes('cookise') || lower.includes('bread') || lower.includes('baget') || lower.includes('boksenya') || lower.includes('beckewhe')) {
-    return '/images/dishes/artisanal-pastry.jpg';
-  }
-  if (category_id === 'cat-juice' || lower.includes('juice') || lower.includes('shake') || lower.includes('avocado') || lower.includes('mango') || lower.includes('papaya') || lower.includes('watermelon') || lower.includes('ananas')) {
-    return '/images/dishes/fresh-mango-juice.jpg';
-  }
-  if (category_id === 'cat-hot-beverage' || lower.includes('coffee') || lower.includes('macchiato') || lower.includes('tea') || lower.includes('cappuccino') || lower.includes('late')) {
-    return '/images/dishes/ethiopian-buna.jpg';
-  }
-  if (category_id === 'cat-cold-drinks' || lower.includes('water') || lower.includes('mojito') || lower.includes('soft drinks') || lower.includes('ambo')) {
-    return '/images/dishes/fresh-mango-juice.jpg';
-  }
-  return '/images/dishes/special-fetira.jpg';
+  const match = MOCK_ITEMS_ADDIS.find((item) => item.name.toLowerCase() === name.toLowerCase());
+  if (match) return match.image_url;
+  return '/images/dishes/special-burger.jpg';
 }
 
 async function run() {
@@ -441,7 +420,7 @@ async function run() {
       name: dish.name,
       price: dish.price,
       description: `${dish.name} prepared freshly at Addis Cafeteria with authentic premium ingredients.`,
-      image_url: getImageForDish(dish.category_id, dish.name),
+      image_url: getImageForDish(dish.category_id, dish.name, id),
       tags: dish.tags || [],
       allergens: [],
       spice_level: dish.name.toLowerCase().includes('tibs') ? 2 : 0,
