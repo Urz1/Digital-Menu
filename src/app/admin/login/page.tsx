@@ -73,8 +73,8 @@ export default function AdminLoginPage() {
   // ---------------------------------------------------------------------------
   // OWNER AUTHENTICATION
   // ---------------------------------------------------------------------------
-  const handleOwnerLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOwnerLogin = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e && 'preventDefault' in e) e.preventDefault();
     triggerHaptic(10);
     setIsLoading(true);
     setErrorMsg(null);
@@ -92,8 +92,8 @@ export default function AdminLoginPage() {
 
       setSuccessMsg('Owner authenticated successfully. Loading dashboard...');
       setTimeout(() => {
-        router.push('/admin');
-      }, 350);
+        window.location.href = '/admin';
+      }, 250);
     } catch {
       setIsLoading(false);
       setErrorMsg('Authentication error. Please check your credentials and try again.');
@@ -103,8 +103,8 @@ export default function AdminLoginPage() {
   // ---------------------------------------------------------------------------
   // STAFF AUTHENTICATION
   // ---------------------------------------------------------------------------
-  const handleStaffLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStaffLogin = (e?: React.FormEvent | React.MouseEvent) => {
+    if (e && 'preventDefault' in e) e.preventDefault();
     triggerHaptic(10);
     setIsLoading(true);
     setErrorMsg(null);
@@ -122,9 +122,9 @@ export default function AdminLoginPage() {
 
       setSuccessMsg(`Welcome, ${result.session?.name}! Loading staff console...`);
       setTimeout(() => {
-        router.push('/admin');
-      }, 350);
-    }, 300);
+        window.location.href = '/admin';
+      }, 250);
+    }, 250);
   };
 
   // ---------------------------------------------------------------------------
@@ -143,17 +143,33 @@ export default function AdminLoginPage() {
     }
   };
 
+  const isLight = adminTheme === 'light';
+
   return (
     <div
       data-admin-theme={adminTheme}
-      className="min-h-screen bg-[#0C0D11] text-white flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-black"
+      className={`min-h-screen flex flex-col justify-center items-center px-4 py-12 transition-colors duration-200 ${
+        isLight
+          ? 'bg-[#F8F9FA] text-neutral-900 selection:bg-amber-500 selection:text-white'
+          : 'bg-[#0C0D11] text-white selection:bg-amber-500 selection:text-black'
+      }`}
     >
-      <div className="w-full max-w-md bg-white/[0.04] border border-white/10 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
+      <div
+        className={`w-full max-w-md rounded-3xl p-8 transition-all duration-200 border ${
+          isLight
+            ? 'bg-white border-neutral-200/90 shadow-2xl shadow-neutral-200/60 text-neutral-900'
+            : 'bg-white/[0.04] border-white/10 shadow-2xl backdrop-blur-xl text-white'
+        }`}
+      >
         {/* Top Header: Back Link & Theme Toggle */}
         <div className="flex items-center justify-between mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors"
+            className={`inline-flex items-center gap-1.5 text-xs transition-colors ${
+              isLight
+                ? 'text-neutral-500 hover:text-neutral-900'
+                : 'text-neutral-400 hover:text-white'
+            }`}
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Menu</span>
@@ -162,18 +178,22 @@ export default function AdminLoginPage() {
             type="button"
             data-testid="login-theme-toggle"
             onClick={toggleAdminTheme}
-            className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer text-neutral-300 hover:text-white"
-            title={adminTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+              isLight
+                ? 'bg-neutral-100 hover:bg-neutral-200/80 border-neutral-200 text-neutral-800'
+                : 'bg-white/5 hover:bg-white/10 border-white/10 text-neutral-300 hover:text-white'
+            }`}
+            title={isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
           >
-            {adminTheme === 'light' ? (
+            {isLight ? (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-500" />
-                <span>Light</span>
+                <span>Light Mode</span>
               </>
             ) : (
               <>
                 <Moon className="w-3.5 h-3.5 text-blue-400" />
-                <span>Dark</span>
+                <span>Dark Mode</span>
               </>
             )}
           </button>
@@ -184,14 +204,20 @@ export default function AdminLoginPage() {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center font-bold text-white shadow-xl mx-auto mb-3">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Restaurant Portal</h1>
-          <p className="text-xs text-neutral-400 mt-1">
+          <h1 className={`text-2xl font-bold tracking-tight ${isLight ? 'text-neutral-900' : 'text-white'}`}>
+            Restaurant Portal
+          </h1>
+          <p className={`text-xs mt-1 ${isLight ? 'text-neutral-500' : 'text-neutral-400'}`}>
             Secure authentication for Restaurant Owner and Service Staff
           </p>
         </div>
 
         {/* Role Tabs: Owner vs Staff */}
-        <div className="flex p-1 rounded-2xl bg-white/[0.04] border border-white/10 mb-6">
+        <div
+          className={`flex p-1 rounded-2xl mb-6 border transition-colors ${
+            isLight ? 'bg-neutral-100 border-neutral-200' : 'bg-white/[0.04] border-white/10'
+          }`}
+        >
           <button
             type="button"
             onClick={() => {
@@ -203,6 +229,8 @@ export default function AdminLoginPage() {
             className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               tab === 'owner'
                 ? 'bg-amber-500 text-black shadow-md'
+                : isLight
+                ? 'text-neutral-600 hover:text-neutral-900'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -219,6 +247,8 @@ export default function AdminLoginPage() {
             className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               tab === 'staff'
                 ? 'bg-amber-500 text-black shadow-md'
+                : isLight
+                ? 'text-neutral-600 hover:text-neutral-900'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -228,16 +258,16 @@ export default function AdminLoginPage() {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+          <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-500 dark:text-rose-400" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {/* Success Alert */}
         {successMsg && (
-          <div className="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+          <div className="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>{successMsg}</span>
           </div>
         )}
@@ -248,26 +278,41 @@ export default function AdminLoginPage() {
         {tab === 'owner' && !isForgotOpen && (
           <form onSubmit={handleOwnerLogin} className="flex flex-col gap-4">
             <div>
-              <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
+              <label
+                className={`text-xs font-semibold block mb-1.5 ${
+                  isLight ? 'text-neutral-700' : 'text-neutral-300'
+                }`}
+              >
                 Owner Email or Phone Number
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
+                <Mail className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   required
                   data-testid="owner-identifier-input"
                   value={ownerIdentifier}
                   onChange={(e) => setOwnerIdentifier(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleOwnerLogin(e);
+                  }}
                   placeholder="owner@addiscafeteria.com or +251..."
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  className={`w-full h-11 pl-10 pr-4 rounded-xl text-xs outline-none transition-colors border ${
+                    isLight
+                      ? 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+                      : 'bg-white/[0.05] border-white/10 text-white placeholder:text-neutral-500 focus:border-amber-500'
+                  }`}
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-neutral-300">
+                <label
+                  className={`text-xs font-semibold ${
+                    isLight ? 'text-neutral-700' : 'text-neutral-300'
+                  }`}
+                >
                   Owner Password
                 </label>
                 <button
@@ -276,26 +321,39 @@ export default function AdminLoginPage() {
                     setIsForgotOpen(true);
                     setRecoveryEmail(ownerIdentifier.includes('@') ? ownerIdentifier : '');
                   }}
-                  className="text-[11px] text-amber-400/90 hover:underline cursor-pointer"
+                  className={`text-[11px] hover:underline cursor-pointer ${
+                    isLight ? 'text-amber-600 font-semibold' : 'text-amber-400/90'
+                  }`}
                 >
                   Forgot password?
                 </button>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
+                <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3.5" />
                 <input
                   type={showOwnerPassword ? 'text' : 'password'}
                   required
                   data-testid="owner-password-input"
                   value={ownerPassword}
                   onChange={(e) => setOwnerPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleOwnerLogin(e);
+                  }}
                   placeholder="••••••••••••"
-                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  className={`w-full h-11 pl-10 pr-10 rounded-xl text-xs outline-none transition-colors border ${
+                    isLight
+                      ? 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+                      : 'bg-white/[0.05] border-white/10 text-white placeholder:text-neutral-500 focus:border-amber-500'
+                  }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowOwnerPassword(!showOwnerPassword)}
-                  className="absolute right-3.5 top-3.5 text-neutral-400 hover:text-white"
+                  className={`absolute right-3.5 top-3.5 transition-colors ${
+                    isLight
+                      ? 'text-neutral-400 hover:text-neutral-700'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
                   aria-label={showOwnerPassword ? 'Hide password' : 'Show password'}
                 >
                   {showOwnerPassword ? (
@@ -308,9 +366,10 @@ export default function AdminLoginPage() {
             </div>
 
             <button
-              type="submit"
-              disabled={isLoading || !ownerPassword}
-              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer"
+              type="button"
+              onClick={handleOwnerLogin}
+              disabled={isLoading}
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/20 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer active:scale-[0.99]"
             >
               <span>{isLoading ? 'Authenticating...' : 'Sign In as Owner'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -323,19 +382,23 @@ export default function AdminLoginPage() {
            ========================================================================= */}
         {tab === 'owner' && isForgotOpen && (
           <form onSubmit={handleForgotPassword} className="flex flex-col gap-4 animate-in fade-in">
-            <h3 className="text-sm font-bold text-white">Reset Owner Password</h3>
-            <p className="text-xs text-neutral-400">
+            <h3 className={`text-sm font-bold ${isLight ? 'text-neutral-900' : 'text-white'}`}>
+              Reset Owner Password
+            </h3>
+            <p className={`text-xs ${isLight ? 'text-neutral-500' : 'text-neutral-400'}`}>
               Enter your registered owner email address to receive password recovery instructions.
             </p>
 
             {recoverySent ? (
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
-                <div className="text-sm font-bold text-emerald-400 mb-1">Recovery Dispatched</div>
-                <p className="text-xs text-neutral-300">
+                <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
+                <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+                  Recovery Dispatched
+                </div>
+                <p className={`text-xs ${isLight ? 'text-neutral-700' : 'text-neutral-300'}`}>
                   Password instructions and reset link dispatched to <strong>{recoveryEmail}</strong>.
                 </p>
-                <p className="text-[11px] text-neutral-400 mt-2">
+                <p className={`text-[11px] mt-2 ${isLight ? 'text-neutral-500' : 'text-neutral-400'}`}>
                   Please check your inbox (and spam folder) to complete your password update.
                 </p>
                 <button
@@ -344,7 +407,7 @@ export default function AdminLoginPage() {
                     setIsForgotOpen(false);
                     setRecoverySent(false);
                   }}
-                  className="mt-4 text-xs text-amber-400 underline font-semibold block mx-auto cursor-pointer"
+                  className="mt-4 text-xs text-amber-600 dark:text-amber-400 underline font-semibold block mx-auto cursor-pointer"
                 >
                   Return to Sign In
                 </button>
@@ -352,14 +415,18 @@ export default function AdminLoginPage() {
             ) : (
               <>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
+                  <Mail className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3.5" />
                   <input
                     type="email"
                     required
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
                     placeholder="owner@addiscafeteria.com"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500"
+                    className={`w-full h-11 pl-10 pr-4 rounded-xl text-xs outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+                        : 'bg-white/[0.05] border-white/10 text-white placeholder:text-neutral-500 focus:border-amber-500'
+                    }`}
                   />
                 </div>
 
@@ -367,13 +434,17 @@ export default function AdminLoginPage() {
                   <button
                     type="button"
                     onClick={() => setIsForgotOpen(false)}
-                    className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold hover:bg-white/10 cursor-pointer"
+                    className={`flex-1 h-10 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                      isLight
+                        ? 'bg-neutral-100 hover:bg-neutral-200 border-neutral-200 text-neutral-700'
+                        : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                    }`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 h-10 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 cursor-pointer"
+                    className="flex-1 h-10 rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 cursor-pointer shadow-sm"
                   >
                     Send Recovery
                   </button>
@@ -389,42 +460,68 @@ export default function AdminLoginPage() {
         {tab === 'staff' && (
           <form onSubmit={handleStaffLogin} className="flex flex-col gap-4">
             <div>
-              <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
+              <label
+                className={`text-xs font-semibold block mb-1.5 ${
+                  isLight ? 'text-neutral-700' : 'text-neutral-300'
+                }`}
+              >
                 Staff Username or Phone Number
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
+                <User className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   required
                   data-testid="staff-username-input"
                   value={staffUsername}
                   onChange={(e) => setStaffUsername(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleStaffLogin(e);
+                  }}
                   placeholder="e.g. staff_selam or +251..."
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  className={`w-full h-11 pl-10 pr-4 rounded-xl text-xs outline-none transition-colors border ${
+                    isLight
+                      ? 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+                      : 'bg-white/[0.05] border-white/10 text-white placeholder:text-neutral-500 focus:border-amber-500'
+                  }`}
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-neutral-300 block mb-1.5">
+              <label
+                className={`text-xs font-semibold block mb-1.5 ${
+                  isLight ? 'text-neutral-700' : 'text-neutral-300'
+                }`}
+              >
                 Staff Password / PIN
               </label>
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
+                <KeyRound className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3.5" />
                 <input
                   type={showStaffPassword ? 'text' : 'password'}
                   required
                   data-testid="staff-password-input"
                   value={staffPassword}
                   onChange={(e) => setStaffPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleStaffLogin(e);
+                  }}
                   placeholder="Enter staff password or PIN"
-                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-neutral-500 outline-none focus:border-amber-500 transition-colors"
+                  className={`w-full h-11 pl-10 pr-10 rounded-xl text-xs outline-none transition-colors border ${
+                    isLight
+                      ? 'bg-neutral-50 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20'
+                      : 'bg-white/[0.05] border-white/10 text-white placeholder:text-neutral-500 focus:border-amber-500'
+                  }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowStaffPassword(!showStaffPassword)}
-                  className="absolute right-3.5 top-3.5 text-neutral-400 hover:text-white"
+                  className={`absolute right-3.5 top-3.5 transition-colors ${
+                    isLight
+                      ? 'text-neutral-400 hover:text-neutral-700'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
                   aria-label={showStaffPassword ? 'Hide password' : 'Show password'}
                 >
                   {showStaffPassword ? (
@@ -434,16 +531,21 @@ export default function AdminLoginPage() {
                   )}
                 </button>
               </div>
-              <p className="text-[11px] text-neutral-400 mt-1.5 flex items-center gap-1">
-                <HelpCircle className="w-3 h-3 text-amber-400 flex-shrink-0" />
+              <p
+                className={`text-[11px] mt-1.5 flex items-center gap-1 ${
+                  isLight ? 'text-neutral-500' : 'text-neutral-400'
+                }`}
+              >
+                <HelpCircle className="w-3 h-3 text-amber-500 flex-shrink-0" />
                 <span>Forgot your staff password? Contact your restaurant owner to reset it.</span>
               </p>
             </div>
 
             <button
-              type="submit"
-              disabled={isLoading || !staffPassword}
-              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/40 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer"
+              type="button"
+              onClick={handleStaffLogin}
+              disabled={isLoading}
+              className="w-full h-11 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 font-bold text-xs text-white shadow-lg shadow-orange-950/20 transition-all flex items-center justify-center gap-1.5 mt-2 disabled:opacity-50 cursor-pointer active:scale-[0.99]"
             >
               <span>{isLoading ? 'Verifying Credentials...' : 'Open Staff Console'}</span>
               <ArrowRight className="w-4 h-4" />

@@ -15,7 +15,7 @@ interface OrderSummarySheetProps {
   cartPricing?: CartPricingResult;
   currencySymbol?: string;
   taxRate?: number;
-  tableNumber: string;
+  tableNumber?: string;
   locale?: Language | string;
   onUpdateQty: (cartId: string, delta: number) => void;
   onClearOrder: () => void;
@@ -79,7 +79,7 @@ export function OrderSummarySheet({
           <div className="flex items-center justify-between pb-2 border-b border-[var(--border)]">
             <div>
               <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.myOrder}</h2>
-              <span className="text-xs text-[var(--muted)]">{tableNumber}</span>
+              {tableNumber ? <span className="text-xs text-[var(--muted)]">{tableNumber}</span> : null}
             </div>
             {cart.length > 0 && (
               <button

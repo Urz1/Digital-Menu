@@ -490,10 +490,15 @@ export async function authenticateOwnerAsync(
     try {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: identifier.trim(),
-        password: passwordAttempt.trim(),
-      });
+      const { data, error } = await Promise.race([
+        supabase.auth.signInWithPassword({
+          email: identifier.trim(),
+          password: passwordAttempt.trim(),
+        }),
+        new Promise<any>((_, reject) =>
+          setTimeout(() => reject(new Error('Supabase auth timeout')), 2000)
+        ),
+      ]);
 
       if (!error && data?.user) {
         const owner = getOwnerProfile();

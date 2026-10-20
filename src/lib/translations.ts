@@ -111,6 +111,7 @@ export interface AppTranslations {
   comingSoonCalling: string;
   waiterAssistance: string;
   tableQr: string;
+  menuQr: string;
   shareMenu: string;
   allergenGuide: string;
   staffOwnerPortal: string;
@@ -299,6 +300,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     comingSoonCalling: 'Digital waiter calling is coming soon. Please let your waiter know in person!',
     waiterAssistance: 'Ask Waiter',
     tableQr: 'Table QR',
+    menuQr: 'Menu QR',
     shareMenu: 'Share Menu',
     allergenGuide: 'Allergen Guide',
     staffOwnerPortal: 'Staff & Owner Portal',
@@ -484,6 +486,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     comingSoonCalling: 'በስልክ አስተናጋጅ መጥራት በቅርቡ ይጀምራል፤ እባክዎ በአካል ያነጋግሩን!',
     waiterAssistance: 'አስተናጋጅ ይጠይቁ',
     tableQr: 'የጠረጴዛ QR',
+    menuQr: 'የሜኑ QR',
     shareMenu: 'ምናሌውን ያጋሩ',
     allergenGuide: 'የአለርጂ መመሪያ',
     staffOwnerPortal: 'የሰራተኞች እና የባለቤት መግቢያ',
@@ -669,6 +672,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     comingSoonCalling: 'Wicitaanka tooska ah ee shaqaalaha dhawaan ayuu furmi doonaa. Fadlan toos ula hadal adeegahaaga!',
     waiterAssistance: 'Weydii Adeegaha',
     tableQr: 'QR-ka Miiska',
+    menuQr: 'QR-ka Liiska',
     shareMenu: 'La wadaag Liiska',
     allergenGuide: 'Hagaha Xasaasiyadda',
     staffOwnerPortal: 'Bogga Shaqaalaha & Mulkiilaha',
@@ -854,6 +858,7 @@ export const TRANSLATIONS: Record<Language, AppTranslations> = {
     comingSoonCalling: 'La llamada digital al mesero estará disponible pronto. ¡Por favor avisa a tu mesero en persona!',
     waiterAssistance: 'Pedir ayuda',
     tableQr: 'QR de la mesa',
+    menuQr: 'QR del menú',
     shareMenu: 'Compartir menú',
     allergenGuide: 'Guía de alérgenos',
     staffOwnerPortal: 'Portal del personal y propietario',

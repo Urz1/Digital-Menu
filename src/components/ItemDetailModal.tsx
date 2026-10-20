@@ -80,19 +80,19 @@ export function ItemDetailModal({
     currentLocale === 'am' && item.name_am
       ? item.name_am
       : currentLocale === 'so' && item.name_so
-      ? item.name_so
-      : currentLocale === 'es' && item.name_es
-      ? item.name_es
-      : item.name;
+        ? item.name_so
+        : currentLocale === 'es' && item.name_es
+          ? item.name_es
+          : item.name;
 
   const displayDesc =
     currentLocale === 'am' && item.description_am
       ? item.description_am
       : currentLocale === 'so' && item.description_so
-      ? item.description_so
-      : currentLocale === 'es' && item.description_es
-      ? item.description_es
-      : item.description;
+        ? item.description_so
+        : currentLocale === 'es' && item.description_es
+          ? item.description_es
+          : item.description;
 
   const toggleOption = (opt: ItemOption) => {
     triggerHaptic(8);
@@ -361,11 +361,10 @@ export function ItemDetailModal({
                   return (
                     <label
                       key={opt.id}
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${
-                        isChecked
+                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isChecked
                           ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.05)]'
                           : 'border-[var(--border)] bg-[var(--background)] hover:border-[var(--muted)]'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5">
                         <input
@@ -432,9 +431,8 @@ export function ItemDetailModal({
                             {[1, 2, 3, 4, 5].map((s) => (
                               <Star
                                 key={s}
-                                className={`w-3 h-3 ${
-                                  s <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-neutral-600'
-                                }`}
+                                className={`w-3 h-3 ${s <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-neutral-600'
+                                  }`}
                               />
                             ))}
                           </div>

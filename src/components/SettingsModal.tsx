@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { triggerHaptic } from '@/lib/utils';
-import { X, Sun, Moon, Monitor } from 'lucide-react';
+import { X, Sun, Moon, Monitor, Copy, Check } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface SettingsModalProps {
@@ -10,8 +10,8 @@ interface SettingsModalProps {
   onClose: () => void;
   locale: Language | string;
   onLocaleChange: (loc: Language) => void;
-  tableNumber: string;
-  onTableNumberChange: (table: string) => void;
+  tableNumber?: string;
+  onTableNumberChange?: (table: string) => void;
   wifiInfo: { ssid: string; password?: string };
 }
 
@@ -24,10 +24,24 @@ export function SettingsModal({
   onTableNumberChange,
   wifiInfo,
 }: SettingsModalProps) {
+  const [copiedWifi, setCopiedWifi] = useState(false);
+
   if (!isOpen) return null;
 
   const currentLocale = (locale as Language) || 'en';
   const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
+
+  const handleCopyPassword = () => {
+    if (!wifiInfo.password) return;
+    triggerHaptic(10);
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        navigator.clipboard.writeText(wifiInfo.password).catch(() => {});
+      }
+    } catch {}
+    setCopiedWifi(true);
+    setTimeout(() => setCopiedWifi(false), 2000);
+  };
 
   const setMode = (mode: 'light' | 'dark' | 'auto') => {
     triggerHaptic(10);
@@ -232,20 +246,45 @@ export function SettingsModal({
 
         {/* Dining Table & WiFi */}
         <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[var(--muted)] font-semibold">{t.tableNumberLabel}:</span>
-            <input
-              type="text"
-              value={tableNumber}
-              onChange={(e) => onTableNumberChange(e.target.value)}
-              className="w-24 px-2 py-0.5 rounded border border-[var(--border)] bg-[var(--card)] text-right font-bold text-[var(--foreground)] outline-none"
-            />
-          </div>
+          {tableNumber && onTableNumberChange && (
+            <div className="flex justify-between items-center">
+              <span className="text-[var(--muted)] font-semibold">{t.tableNumberLabel}:</span>
+              <input
+                type="text"
+                value={tableNumber}
+                onChange={(e) => onTableNumberChange(e.target.value)}
+                className="w-24 px-2 py-0.5 rounded border border-[var(--border)] bg-[var(--card)] text-right font-bold text-[var(--foreground)] outline-none"
+              />
+            </div>
+          )}
           <div className="flex justify-between items-center">
             <span className="text-[var(--muted)] font-semibold">{t.guestWifiLabel}:</span>
-            <span className="font-bold text-[var(--foreground)]">
-              {wifiInfo.ssid} {wifiInfo.password ? `(${wifiInfo.password})` : ''}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-[var(--foreground)]">
+                {wifiInfo?.ssid || 'Guest WiFi'}{' '}
+                {wifiInfo?.password ? `(${wifiInfo.password})` : '• Open'}
+              </span>
+              {wifiInfo?.password && (
+                <button
+                  type="button"
+                  onClick={handleCopyPassword}
+                  className="px-2 py-0.5 rounded-md bg-[var(--border)] hover:bg-[rgba(var(--primary-rgb),0.15)] text-[var(--foreground)] text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Copy Wi-Fi password"
+                >
+                  {copiedWifi ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-500" />
+                      <span className="text-emerald-500">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3 text-[var(--muted)]" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

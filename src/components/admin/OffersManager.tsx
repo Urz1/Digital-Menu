@@ -799,7 +799,7 @@ export function OffersManager({
       {/* 4. STEP-BY-STEP CREATION & EDIT WIZARD MODAL WITH LIVE PHONE PREVIEW */}
       {isWizardOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-5xl max-h-[92vh] bg-[#121318] border border-white/15 rounded-3xl overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-5xl max-h-[92vh] bg-[#12141C] border border-white/15 rounded-3xl overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
             {/* Modal Top Header */}
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div>
@@ -1313,7 +1313,7 @@ export function OffersManager({
                 )}
 
                 {/* Wizard Bottom Navigation Buttons */}
-                <div className="sticky bottom-0 bg-[#121318] pt-3 pb-1 border-t border-white/10 flex items-center justify-between z-30">
+                <div className="sticky bottom-0 bg-[#12141C] pt-3 pb-1 border-t border-white/10 flex items-center justify-between z-30">
                   {wizardStep > 1 ? (
                     <button
                       type="button"
@@ -1350,7 +1350,7 @@ export function OffersManager({
               </div>
 
               {/* RIGHT: LIVE INTERACTIVE PHONE PREVIEW (5 COLS) */}
-              <div className="lg:col-span-5 p-6 bg-black/40 flex flex-col items-center justify-center">
+              <div className="lg:col-span-5 p-6 bg-black/40 offer-preview-panel flex flex-col items-center justify-center">
                 <div className="text-center mb-3">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
                     Live Phone Preview
@@ -1359,7 +1359,7 @@ export function OffersManager({
                 </div>
 
                 {/* Mobile Mockup Shell */}
-                <div className="w-[300px] bg-[#16181E] border-4 border-neutral-700 rounded-[32px] overflow-hidden shadow-2xl flex flex-col text-neutral-200">
+                <div className="live-phone-mockup w-[300px] bg-[#16181E] border-4 border-neutral-700 rounded-[32px] overflow-hidden shadow-2xl flex flex-col text-neutral-200">
                   {/* Speaker notch */}
                   <div className="h-5 w-full bg-black flex justify-center items-center">
                     <div className="w-12 h-1 rounded-full bg-neutral-700" />

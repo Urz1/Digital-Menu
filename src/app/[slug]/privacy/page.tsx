@@ -129,8 +129,19 @@ export default async function RestaurantPrivacyPage({ params }: PrivacyPageProps
         </section>
 
         {/* Footer */}
-        <footer className="pt-6 border-t border-white/10 text-center text-[11px] text-neutral-500">
-          Last reviewed: October 2026 • {restaurant.name} Digital Dining Experience
+        <footer className="pt-6 border-t border-white/10 text-center text-[11px] text-neutral-500 flex flex-col items-center gap-1.5">
+          <div>Last reviewed: October 2026 • {restaurant.name} Digital Dining Experience</div>
+          <div className="flex items-center gap-1 text-neutral-500/80">
+            <span>Powered by</span>
+            <a
+              href="https://www.rhizantech.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-white transition-colors underline underline-offset-2"
+            >
+              Rhizantech
+            </a>
+          </div>
         </footer>
       </div>
     </div>

@@ -251,10 +251,12 @@ nextjs-portal,
 [data-admin-theme="light"] .bg-\[\#0E1015\],
 [data-admin-theme="light"] .bg-\[\#08090C\],
 [data-admin-theme="light"] .bg-\[\#101115\],
+[data-admin-theme="light"] .bg-\[\#121318\],
 [data-admin-theme="light"] .bg-\[\#12141C\],
 [data-admin-theme="light"] .bg-\[\#14161E\],
 [data-admin-theme="light"] .bg-\[\#16181E\],
 [data-admin-theme="light"] .bg-\[\#181A20\],
+[data-admin-theme="light"] .bg-\[\#181B26\],
 [data-admin-theme="light"] .bg-\[\#1A1D24\],
 [data-admin-theme="light"] .bg-\[\#1A1D27\],
 [data-admin-theme="light"] .bg-\[\#1E2129\],
@@ -291,11 +293,66 @@ nextjs-portal,
   background-color: #E5E7EB !important;
 }
 
+/* Studio, Preview Panels and Divide borders in Light Mode */
+[data-admin-theme="light"] .offer-preview-panel,
+[data-admin-theme="light"] .preview-backdrop {
+  background-color: #F8F9FA !important;
+  border-color: #E5E7EB !important;
+}
+
+[data-admin-theme="light"] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #E5E7EB !important;
+}
+
 /* Dark Modal Overlay Backdrops */
 [data-admin-theme="light"] .bg-black\/60,
 [data-admin-theme="light"] .bg-black\/70,
 [data-admin-theme="light"] .bg-black\/80 {
   background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+/* Protect Live Phone Mockups (simulate the customer's phone accurately, avoid inverted black text) */
+[data-admin-theme="light"] .live-phone-mockup,
+[data-admin-theme="light"] .live-phone-mockup .bg-\[\#16181E\],
+[data-admin-theme="light"] [data-testid="live-phone-preview"] {
+  background-color: #16181E !important;
+  color: #E5E7EB !important;
+  border-color: #404040 !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .text-white,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .text-white {
+  color: #FFFFFF !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .text-neutral-400,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .text-neutral-400 {
+  color: #9CA3AF !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .text-neutral-200,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .text-neutral-200 {
+  color: #E5E7EB !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .bg-neutral-900,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .bg-neutral-900 {
+  background-color: #1A1D27 !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .bg-neutral-900\/50,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .bg-neutral-900\/50 {
+  background-color: rgba(26, 29, 39, 0.65) !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .bg-black\/40,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-admin-theme="light"] .live-phone-mockup .border-white\/10,
+[data-admin-theme="light"] [data-testid="live-phone-preview"] .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Borders */

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
@@ -18,6 +19,23 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/legacy/**',
+          '**/docs/**',
+          '**/scripts/**',
+          '**/scratch/**',
+          '**/test-results/**',
+          '**/supabase/**',
+        ],
+      };
+    }
+    return config;
   },
   async headers() {
     return [
@@ -38,12 +56,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
+      ...(process.env.NODE_ENV === 'production'
+        ? [
+            {
+              source: '/_next/static/(.*)',
+              headers: [
+                { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+              ],
+            },
+          ]
+        : []),
     ];
   },
 };

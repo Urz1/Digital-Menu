@@ -56,33 +56,9 @@ test.describe('STAGE 6: Launch Readiness & QR Studio Suite', () => {
     await page.reload();
     await page.waitForLoadState('networkidle');
 
-    // On visit 1, the install banner should NOT show immediately to prevent pushing guests
-    const installBannerFirstVisit = page.getByTestId('pwa-install-banner');
-    const isVisibleOnFirstVisit = await installBannerFirstVisit.isVisible().catch(() => false);
-    expect(isVisibleOnFirstVisit).toBe(false);
-
-    // Simulate repeat visitor: set visit count = 2 in localStorage, clear session flag and reload
-    await page.evaluate(() => {
-      localStorage.setItem('menu_visit_count', '2');
-      sessionStorage.clear();
-      localStorage.removeItem('menu_pwa_install_dismissed');
-    });
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-
-    // On repeat visit, the calm install banner should be visible
-    const installBannerRepeat = page.getByTestId('pwa-install-banner');
-    await expect(installBannerRepeat).toBeVisible();
-    await expect(page.getByText('Instant access & offline dining')).toBeVisible();
-
-    // Dismiss install prompt
-    const dismissBtn = page.getByTestId('pwa-install-dismiss');
-    await dismissBtn.click();
-    await expect(installBannerRepeat).not.toBeVisible();
-
-    // Verify dismissal was saved to localStorage
-    const isDismissed = await page.evaluate(() => localStorage.getItem('menu_pwa_install_dismissed'));
-    expect(isDismissed).toBe('true');
+    // Verify that customer menu remains clean and frictionless without install banners
+    const installBanner = page.getByTestId('pwa-install-banner');
+    expect(await installBanner.isVisible().catch(() => false)).toBe(false);
 
     // Simulate offline condition in browser
     await page.evaluate(() => {

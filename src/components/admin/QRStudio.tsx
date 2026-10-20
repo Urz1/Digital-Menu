@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Restaurant } from '@/types/database';
 import { triggerHaptic } from '@/lib/utils';
 import {
@@ -22,12 +22,13 @@ import {
 
 interface QRStudioProps {
   restaurant: Restaurant;
+  onSaveRestaurant?: (updates: Partial<Restaurant>) => Promise<Restaurant> | void;
   onShowToast: (message: string, type?: 'success' | 'info' | 'error') => void;
 }
 
 export type QRTemplateType = 'tent' | 'a4' | 'sticker';
 
-export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
+export function QRStudio({ restaurant, onSaveRestaurant, onShowToast }: QRStudioProps) {
   // Target Selection
   const [targetType, setTargetType] = useState<'main' | 'table'>('table');
   const [singleTableNumber, setSingleTableNumber] = useState<number>(1);
@@ -40,9 +41,43 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
   // Customization Options
   const [qrColor, setQrColor] = useState<string>('#111827');
   const [includeWifi, setIncludeWifi] = useState<boolean>(true);
+  const [wifiSsid, setWifiSsid] = useState<string>(restaurant.wifi_config?.ssid || 'Addis-Guest');
+  const [wifiPassword, setWifiPassword] = useState<string>(restaurant.wifi_config?.password || '');
+  const [isSavingWifi, setIsSavingWifi] = useState<boolean>(false);
+  const [wifiSaved, setWifiSaved] = useState<boolean>(false);
   const [callToAction, setCallToAction] = useState<string>(
     'Scan to browse our seasonal menu, call waiter, & order directly from your phone'
   );
+
+  // Keep Wi-Fi fields synced with restaurant updates
+  useEffect(() => {
+    if (restaurant.wifi_config) {
+      setWifiSsid(restaurant.wifi_config.ssid || '');
+      setWifiPassword(restaurant.wifi_config.password || '');
+    }
+  }, [restaurant.wifi_config?.ssid, restaurant.wifi_config?.password]);
+
+  const handleSaveWifi = async () => {
+    triggerHaptic(10);
+    setIsSavingWifi(true);
+    try {
+      if (onSaveRestaurant) {
+        await onSaveRestaurant({
+          wifi_config: {
+            ssid: wifiSsid.trim(),
+            password: wifiPassword.trim(),
+          },
+        });
+      }
+      setWifiSaved(true);
+      setTimeout(() => setWifiSaved(false), 2500);
+      onShowToast('Guest Wi-Fi network and password saved!', 'success');
+    } catch {
+      onShowToast('Failed to save Wi-Fi settings', 'error');
+    } finally {
+      setIsSavingWifi(false);
+    }
+  };
 
   // Copy state
   const [copiedLink, setCopiedLink] = useState(false);
@@ -96,7 +131,7 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
   <text x="200" y="68" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#6B7280" text-anchor="middle">Table ${targetType === 'table' ? singleTableNumber : 'Main Menu'}</text>
   <image href="${getQrImageUrl(currentQrUrl, 260)}" x="70" y="90" width="260" height="260"/>
   <text x="200" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#4B5563" text-anchor="middle">${callToAction.slice(0, 50)}...</text>
-  <text x="200" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" fill="#9CA3AF" text-anchor="middle">WiFi: ${restaurant.wifi_config.ssid || 'Guest'} • Pass: ${restaurant.wifi_config.password || 'none'}</text>
+  <text x="200" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" fill="#9CA3AF" text-anchor="middle">WiFi: ${wifiSsid || 'Guest'} • Pass: ${wifiPassword || 'none'}</text>
 </svg>`.trim();
 
     const blob = new Blob([svgContent], { type: 'image/svg+xml' });
@@ -147,10 +182,10 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
       ctx.fillText('Scan to view menu & place orders', 300, 580);
 
       // Wi-Fi info
-      if (includeWifi && restaurant.wifi_config.ssid) {
+      if (includeWifi && wifiSsid) {
         ctx.fillStyle = '#9CA3AF';
         ctx.font = '14px monospace';
-        ctx.fillText(`WiFi: ${restaurant.wifi_config.ssid} | Pass: ${restaurant.wifi_config.password || 'none'}`, 300, 630);
+        ctx.fillText(`WiFi: ${wifiSsid} | Pass: ${wifiPassword || 'none'}`, 300, 630);
       }
 
       const pngUrl = canvas.toDataURL('image/png');
@@ -396,6 +431,56 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
                 />
               </div>
 
+              {includeWifi && (
+                <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2.5 animate-in fade-in duration-200">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                      Guest Wi-Fi Network Name (SSID)
+                    </label>
+                    <input
+                      type="text"
+                      value={wifiSsid}
+                      onChange={(e) => setWifiSsid(e.target.value)}
+                      placeholder="e.g. Addis-Guest"
+                      className="w-full px-3 py-1.5 bg-black/40 border border-white/15 rounded-lg text-white text-xs focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                      Guest Wi-Fi Password
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={wifiPassword}
+                        onChange={(e) => setWifiPassword(e.target.value)}
+                        placeholder="e.g. tastethevibes (or leave blank if open)"
+                        className="flex-1 px-3 py-1.5 bg-black/40 border border-white/15 rounded-lg text-white text-xs focus:outline-none focus:border-amber-500 font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveWifi}
+                        disabled={isSavingWifi}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 active:scale-95 text-neutral-950 font-bold text-xs flex items-center gap-1 transition-transform flex-shrink-0"
+                      >
+                        {wifiSaved ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-neutral-950" />
+                            <span>Saved</span>
+                          </>
+                        ) : (
+                          <span>{isSavingWifi ? 'Saving...' : 'Save Wi-Fi'}</span>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Custom Wi-Fi prints directly onto table cards & updates the dining menu header.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                   QR Pattern Tint
@@ -514,12 +599,12 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
               </p>
 
               {/* Wi-Fi Credentials */}
-              {includeWifi && restaurant.wifi_config.ssid && (
+              {includeWifi && wifiSsid && (
                 <div className="mt-4 pt-3 border-t border-neutral-200 w-full flex items-center justify-center gap-1.5 text-[11px] text-neutral-600 font-mono">
                   <Wifi className="w-3.5 h-3.5 text-neutral-700" />
-                  <span>WiFi: <strong>{restaurant.wifi_config.ssid}</strong></span>
+                  <span>WiFi: <strong>{wifiSsid}</strong></span>
                   <span className="text-neutral-400">•</span>
-                  <span>Pass: <strong>{restaurant.wifi_config.password || 'none'}</strong></span>
+                  <span>Pass: <strong>{wifiPassword || 'none'}</strong></span>
                 </div>
               )}
             </div>
@@ -614,9 +699,9 @@ export function QRStudio({ restaurant, onShowToast }: QRStudioProps) {
               {callToAction}
             </p>
 
-            {includeWifi && restaurant.wifi_config.ssid && (
+            {includeWifi && wifiSsid && (
               <div className="pt-4 border-t border-gray-300 w-full text-xs font-mono">
-                WiFi: <strong>{restaurant.wifi_config.ssid}</strong> • Password: <strong>{restaurant.wifi_config.password || 'none'}</strong>
+                WiFi: <strong>{wifiSsid}</strong> • Password: <strong>{wifiPassword || 'none'}</strong>
               </div>
             )}
           </div>

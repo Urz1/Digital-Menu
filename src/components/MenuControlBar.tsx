@@ -133,7 +133,7 @@ export function MenuControlBar({
               triggerHaptic(8);
               onOpenCategoryDirectory();
             }}
-            className="flex-1 min-w-[125px] h-9 px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
+            className="flex-1 min-w-0 h-9 px-2.5 sm:px-3 rounded-full bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] text-xs font-bold text-[var(--foreground)] flex items-center justify-between gap-1.5 transition-all shadow-2xs group active:scale-[0.98]"
             title={`${t.browseCategories}: ${activeCategoryName}`}
             aria-label={`${t.browseCategories}: ${activeCategoryName}`}
           >
@@ -191,6 +191,25 @@ export function MenuControlBar({
               </span>
             </button>
           )}
+
+          {/* Quick "Fasting / Tsom" 1-Tap Pill */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic(10);
+              onFilterChange(activeFilter === 'fasting' ? 'all' : 'fasting');
+            }}
+            className={`h-9 px-2.5 rounded-full text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all border flex-shrink-0 active:scale-95 ${
+              activeFilter === 'fasting'
+                ? 'bg-emerald-600 text-white border-emerald-700 shadow-xs'
+                : 'bg-[var(--background)] text-[var(--foreground)] border-[var(--border)] hover:border-emerald-500'
+            }`}
+            title="Toggle Fasting (Tsom) dishes"
+            aria-label="Toggle Fasting dishes"
+          >
+            <Leaf className={`w-3.5 h-3.5 flex-shrink-0 ${activeFilter === 'fasting' ? 'text-white' : 'text-emerald-500'}`} />
+            <span>{locale === 'am' ? 'ጾም' : 'Fasting'}</span>
+          </button>
 
           {/* Right Action Controls: Filter, Sort, Layout */}
           <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">

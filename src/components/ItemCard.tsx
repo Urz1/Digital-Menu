@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MenuItem, DishReviewStats } from '@/types/database';
 import { ItemPricingResult } from '@/lib/pricing-engine';
 import { formatMoney, triggerHaptic } from '@/lib/utils';
-import { Heart, Plus, Tag, Clock, Star, ChefHat, Salad, Sprout, Leaf, WheatOff, ShieldCheck, Flame } from 'lucide-react';
+import { Heart, Plus, Minus, Tag, Clock, Star, ChefHat, Salad, Sprout, Leaf, WheatOff, ShieldCheck, Flame } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
 interface ItemCardProps {
@@ -17,6 +17,8 @@ interface ItemCardProps {
   onToggleFavorite: (id: string) => void;
   onOpenDetails: (item: MenuItem) => void;
   onQuickAdd: (item: MenuItem) => void;
+  onDecrement?: (item: MenuItem) => void;
+  cartQuantity?: number;
   layout?: 'list' | 'grid';
   locale?: Language | string;
 }
@@ -30,6 +32,8 @@ export function ItemCard({
   onToggleFavorite,
   onOpenDetails,
   onQuickAdd,
+  onDecrement,
+  cartQuantity = 0,
   layout = 'list',
   locale = 'en',
 }: ItemCardProps) {
@@ -40,19 +44,19 @@ export function ItemCard({
     currentLocale === 'am' && item.name_am
       ? item.name_am
       : currentLocale === 'so' && item.name_so
-      ? item.name_so
-      : currentLocale === 'es' && item.name_es
-      ? item.name_es
-      : item.name;
+        ? item.name_so
+        : currentLocale === 'es' && item.name_es
+          ? item.name_es
+          : item.name;
 
   const displayDesc =
     currentLocale === 'am' && item.description_am
       ? item.description_am
       : currentLocale === 'so' && item.description_so
-      ? item.description_so
-      : currentLocale === 'es' && item.description_es
-      ? item.description_es
-      : item.description;
+        ? item.description_so
+        : currentLocale === 'es' && item.description_es
+          ? item.description_es
+          : item.description;
 
   const handleCardClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.action-prevent-modal')) return;
@@ -67,21 +71,22 @@ export function ItemCard({
   return (
     <article
       onClick={handleCardClick}
-      className={`group relative bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:border-[var(--muted-foreground)] ${
-        layout === 'grid' ? 'flex flex-col p-2.5 gap-2' : 'flex gap-3 p-3'
-      } ${!item.is_available ? 'opacity-60' : ''}`}
+      className={`group relative bg-[var(--card)] rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${cartQuantity > 0
+          ? 'border-2 border-[var(--primary)] shadow-xs ring-1 ring-[var(--primary)]/20'
+          : 'border border-[var(--border)] hover:border-[var(--muted-foreground)]'
+        } ${layout === 'grid' ? 'flex flex-col p-2.5 gap-2' : 'flex gap-3 sm:gap-3.5 p-3 sm:p-3.5'
+        } ${!item.is_available ? 'opacity-60' : ''}`}
     >
       {/* Thumbnail Container */}
       <div
-        className={`relative flex-shrink-0 bg-neutral-800 rounded-xl overflow-hidden ${
-          layout === 'grid' ? 'w-full h-32' : 'w-24 h-24'
-        }`}
+        className={`relative flex-shrink-0 bg-neutral-800 rounded-xl overflow-hidden ${layout === 'grid' ? 'w-full h-32' : 'w-24 h-24 sm:w-28 sm:h-28'
+          }`}
       >
         <Image
           src={item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}
           alt={displayName}
           fill
-          sizes={layout === 'grid' ? '(max-width: 480px) 50vw, 220px' : '96px'}
+          sizes={layout === 'grid' ? '(max-width: 480px) 50vw, 220px' : '112px'}
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
@@ -93,9 +98,8 @@ export function ItemCard({
             triggerHaptic(15);
             onToggleFavorite(item.id);
           }}
-          className={`action-prevent-modal absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
-            isFavorite ? 'bg-red-500 text-white' : 'bg-black/40 text-white hover:bg-black/60'
-          }`}
+          className={`action-prevent-modal absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${isFavorite ? 'bg-red-500 text-white' : 'bg-black/40 text-white hover:bg-black/60'
+            }`}
           aria-label={`Favorite ${displayName}`}
         >
           <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
@@ -138,7 +142,7 @@ export function ItemCard({
                 {t.soldOut}
               </span>
             )}
-            {/* 3-Review Threshold: Show rating & count ONLY when review count >= 3 */}
+            {/* 3-Review Threshold */}
             {reviewStats?.is_threshold_met && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 inline-flex items-center gap-0.5">
                 <Star className="w-2.5 h-2.5 fill-current text-amber-500" />
@@ -148,7 +152,10 @@ export function ItemCard({
             )}
           </div>
 
-          <h3 className="font-bold text-sm text-[var(--foreground)] leading-tight truncate">
+          <h3
+            className={`font-bold text-[var(--foreground)] leading-snug ${layout === 'grid' ? 'text-sm truncate' : 'text-base line-clamp-2'
+              }`}
+          >
             {displayName}
           </h3>
 
@@ -193,7 +200,7 @@ export function ItemCard({
           </div>
         </div>
 
-        {/* Bottom Price & Quick Add */}
+        {/* Bottom Price & Add/Stepper Control */}
         <div className="flex items-center justify-between mt-3 pt-2 border-t border-[var(--border)]">
           <div className="flex items-baseline gap-1.5">
             {hasOffer ? (
@@ -212,23 +219,63 @@ export function ItemCard({
             )}
           </div>
 
-          <button
-            disabled={!item.is_available}
-            onClick={(e) => {
-              e.stopPropagation();
-              triggerHaptic(18);
-              if (item.options && item.options.length > 0) {
-                onOpenDetails(item);
-              } else {
-                onQuickAdd(item);
-              }
-            }}
-            className="action-prevent-modal w-8 h-8 rounded-full flex items-center justify-center text-white shadow-xs disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform active:scale-90"
-            style={{ backgroundColor: item.is_available ? 'var(--primary)' : undefined }}
-            aria-label={`Add ${displayName} to order`}
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+          {cartQuantity > 0 ? (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="action-prevent-modal flex items-center gap-1 bg-[var(--primary)] text-white rounded-full p-0.5 shadow-xs"
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic(10);
+                  onDecrement?.(item);
+                }}
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-black/20 active:scale-90 transition-transform"
+                aria-label={`Remove one ${displayName}`}
+              >
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-xs font-black min-w-[16px] text-center px-0.5">
+                {cartQuantity}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic(10);
+                  if (item.options && item.options.length > 0) {
+                    onOpenDetails(item);
+                  } else {
+                    onQuickAdd(item);
+                  }
+                }}
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-black/20 active:scale-90 transition-transform"
+                aria-label={`Add another ${displayName}`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              disabled={!item.is_available}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerHaptic(18);
+                if (item.options && item.options.length > 0) {
+                  onOpenDetails(item);
+                } else {
+                  onQuickAdd(item);
+                }
+              }}
+              className="action-prevent-modal h-8 px-2.5 sm:px-3 rounded-full flex items-center justify-center gap-1 text-white text-xs font-bold shadow-xs disabled:bg-neutral-400 disabled:cursor-not-allowed transition-transform active:scale-95"
+              style={{ backgroundColor: item.is_available ? 'var(--primary)' : undefined }}
+              aria-label={`Add ${displayName} to order`}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold">
+                {item.options && item.options.length > 0 ? 'Options' : 'Add'}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </article>

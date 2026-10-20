@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { Restaurant } from '@/types/database';
-import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Bell, UtensilsCrossed } from 'lucide-react';
+import { Search, Heart, Settings, Wifi, Info, Globe, MapPin, Bell } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { triggerHaptic } from '@/lib/utils';
 
 interface MenuHeaderProps {
   restaurant: Restaurant;
-  tableNumber: string;
+  tableNumber?: string;
   favCount: number;
   locale: Language;
   onLocaleChange: (lang: Language) => void;
@@ -173,13 +173,8 @@ export function MenuHeader({
         </div>
       )}
 
-      {/* Table & Quick Info Strip */}
-      <div className="flex items-center justify-between px-3.5 py-1 border-t border-[var(--border)] text-xs text-[var(--muted)]">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] font-bold text-[var(--foreground)] text-[11px] shadow-2xs">
-          <UtensilsCrossed className="w-3 h-3 text-amber-500 flex-shrink-0" />
-          <span>{tableNumber.toLowerCase().includes('table') ? tableNumber : `Table ${tableNumber}`}</span>
-        </div>
-
+      {/* Quick Info & Action Strip */}
+      <div className="flex items-center justify-end px-3.5 py-1 border-t border-[var(--border)] text-xs text-[var(--muted)]">
         <div className="flex items-center gap-1.5">
           <button
             type="button"

@@ -18,7 +18,6 @@ import { ServiceAssistanceModal } from './ServiceAssistanceModal';
 import { SettingsModal } from './SettingsModal';
 import { AllergenLegendModal } from './AllergenLegendModal';
 import { QrModal } from './QrModal';
-import { IosInstallModal } from './IosInstallModal';
 import { applyThemeTokensToDOM } from './ThemeManager';
 import { createClient } from '@/lib/supabase/client';
 import { subscribeSync } from '@/lib/sync-channel';
@@ -151,12 +150,8 @@ export function ClientMenuContainer({
     return () => clearInterval(timer);
   }, []);
 
-  // PWA Offline detection & Real Mobile Install Prompt
+  // PWA Offline detection
   const [isOffline, setIsOffline] = useState(false);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
-  const [isIosInstallModalOpen, setIsIosInstallModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
@@ -169,104 +164,19 @@ export function ClientMenuContainer({
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // 1. Standalone check: If app is ALREADY installed and running in standalone mode, NEVER prompt
-    const isStandalone =
-      typeof window !== 'undefined' &&
-      (window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as any).standalone === true ||
-        document.referrer.includes('android-app://'));
-
-    if (isStandalone) {
-      setShowInstallPrompt(false);
-      return () => {
-        window.removeEventListener('online', handleOnline);
-        window.removeEventListener('offline', handleOffline);
-      };
-    }
-
-    const isIOSDevice =
-      typeof navigator !== 'undefined' &&
-      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-      !(window as any).MSStream;
-
-    let isDismissed = false;
-    try {
-      isDismissed = localStorage.getItem('menu_pwa_install_dismissed') === 'true';
-    } catch {}
-
-    // 2. Android / Chromium: Listen for real beforeinstallprompt event from browser
-    const handleBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setDeferredInstallPrompt(e);
-      if (!isDismissed) {
-        setShowInstallPrompt(true);
-      }
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-    // 3. iOS Safari (does not support beforeinstallprompt event): show banner if not dismissed
-    if (isIOSDevice && !isDismissed) {
-      setShowInstallPrompt(true);
-    }
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
   }, []);
 
-  const handleInstallClick = async () => {
-    triggerHaptic(10);
-    const isIOSDevice =
-      typeof navigator !== 'undefined' &&
-      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-      !(window as any).MSStream;
-
-    if (deferredInstallPrompt) {
-      // Real native Android/Chrome system install prompt
-      try {
-        deferredInstallPrompt.prompt();
-        const choiceResult = await deferredInstallPrompt.userChoice;
-        if (choiceResult?.outcome === 'accepted') {
-          setShowInstallPrompt(false);
-          try {
-            localStorage.setItem('menu_pwa_install_dismissed', 'true');
-          } catch {}
-        }
-      } catch (err) {
-        console.warn('Install prompt error:', err);
-      }
-      setDeferredInstallPrompt(null);
-    } else if (isIOSDevice) {
-      // iPhone/iPad: Open dedicated step-by-step visual instructions sheet
-      setIsIosInstallModalOpen(true);
-    } else {
-      // Desktop Chrome / Edge: Guide user to native install icon in address bar
-      showToast('Tap the install icon (⊕) in your browser address bar or menu (⋮) to install');
-      setShowInstallPrompt(false);
-      try {
-        localStorage.setItem('menu_pwa_install_dismissed', 'true');
-      } catch {}
-    }
-  };
-
-  const handleDismissInstall = () => {
-    triggerHaptic(5);
-    setShowInstallPrompt(false);
-    try {
-      localStorage.setItem('menu_pwa_install_dismissed', 'true');
-    } catch {}
-  };
-
   // User state
   const [tableNumber, setTableNumber] = useState<string>(
-    initialTable || restaurant.default_table || 'Table 1'
+    initialTable || ''
   );
   const [locale, setLocale] = useState<Language>('en');
   const [layout, setLayout] = useState<'list' | 'grid'>(
-    restaurant.theme_config?.defaultLayout || 'grid'
+    restaurant.theme_config?.defaultLayout || 'list'
   );
   const [activeCategoryId, setActiveCategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -554,7 +464,7 @@ export function ClientMenuContainer({
   // Record view on top banner if shown
   useEffect(() => {
     if (bannerOffer) {
-      recordOfferInteraction(bannerOffer.id, 'view').catch(() => {});
+      recordOfferInteraction(bannerOffer.id, 'view').catch(() => { });
     }
   }, [bannerOffer]);
 
@@ -612,7 +522,7 @@ export function ClientMenuContainer({
 
     // If an offer was applied, record analytics tap/order
     if (pricing?.appliedOffer) {
-      recordOfferInteraction(pricing.appliedOffer.id, 'tap', pricing.savings * quantity).catch(() => {});
+      recordOfferInteraction(pricing.appliedOffer.id, 'tap', pricing.savings * quantity).catch(() => { });
     }
 
     setCart((prev) => {
@@ -668,6 +578,32 @@ export function ClientMenuContainer({
     sessionStorage.removeItem(`cart_${restaurant.id}`);
   };
 
+  // Item ID -> total quantity in cart for immediate visual feedback on cards
+  const cartQuantityMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const c of cart) {
+      map.set(c.item.id, (map.get(c.item.id) || 0) + c.quantity);
+    }
+    return map;
+  }, [cart]);
+
+  const handleDecrementItem = (item: MenuItem) => {
+    triggerHaptic(10);
+    setCart((prev) => {
+      const idx = prev.findIndex((c) => c.item.id === item.id);
+      if (idx === -1) return prev;
+      const entry = prev[idx];
+      let nextCart: CartItem[];
+      if (entry.quantity > 1) {
+        nextCart = prev.map((c, i) => (i === idx ? { ...c, quantity: c.quantity - 1 } : c));
+      } else {
+        nextCart = prev.filter((_, i) => i !== idx);
+      }
+      sessionStorage.setItem(`cart_${restaurant.id}`, JSON.stringify(nextCart));
+      return nextCart;
+    });
+  };
+
   const handleToggleFavorite = (itemId: string) => {
     setFavorites((prev) => {
       const next = new Set(prev);
@@ -696,12 +632,12 @@ export function ClientMenuContainer({
       bill: 'The check has been requested!',
     };
 
-    showToast(`${labels[type]} for ${tableNumber}`);
+    showToast(tableNumber ? `${labels[type]} for ${tableNumber}` : labels[type]);
   };
 
   // Banner action handler: smoothly jumps to dishes on offer
   const handleSeeOffer = (offer: Offer) => {
-    recordOfferInteraction(offer.id, 'tap').catch(() => {});
+    recordOfferInteraction(offer.id, 'tap').catch(() => { });
     setActiveFilter('onOffer');
     setActiveCategoryId('offers');
     window.scrollTo({ top: 120, behavior: 'smooth' });
@@ -817,46 +753,6 @@ export function ClientMenuContainer({
         </div>
       )}
 
-      {/* 0.1 PWA REPEAT VISITOR INSTALL PROMPT */}
-      {showInstallPrompt && (
-        <div
-          data-testid="pwa-install-banner"
-          className="mx-3 mt-2 p-2.5 rounded-2xl bg-[#141620]/95 border border-white/10 shadow-lg flex items-center justify-between gap-3 text-xs animate-in slide-in-from-top-2"
-        >
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div
-              className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
-              style={{ backgroundColor: restaurant.theme_config.primaryColor || '#E8590C' }}
-            >
-              {restaurant.logo_letter || 'A'}
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-white truncate text-[11px]">Install {restaurant.name}</p>
-              <p className="text-[10px] text-neutral-400 truncate">Instant access & offline dining</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <button
-              type="button"
-              data-testid="pwa-install-action"
-              onClick={handleInstallClick}
-              className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-[10px] transition-colors"
-            >
-              Install
-            </button>
-            <button
-              type="button"
-              data-testid="pwa-install-dismiss"
-              onClick={handleDismissInstall}
-              className="text-neutral-400 hover:text-white p-1"
-              aria-label="Dismiss installation prompt"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 1. STICKY TOP HEADER */}
       <MenuHeader
         restaurant={restaurant}
@@ -869,8 +765,8 @@ export function ClientMenuContainer({
             newLocale === 'am'
               ? 'ቋንቋ ወደ አማርኛ ተቀይሯል'
               : newLocale === 'so'
-              ? 'Af-Soomaali ayaa loo beddelay'
-              : 'Switched to English'
+                ? 'Af-Soomaali ayaa loo beddelay'
+                : 'Switched to English'
           );
         }}
         onToggleSearch={() => setIsSearchOpen(!isSearchOpen)}
@@ -955,8 +851,8 @@ export function ClientMenuContainer({
               {activeFilter === 'onOffer' || activeCategoryId === 'offers'
                 ? (TRANSLATIONS[locale]?.noActiveOffers || 'No active offers right now')
                 : activeFilter === 'favorites'
-                ? (TRANSLATIONS[locale]?.noFavoritesSaved || 'No favorites saved yet')
-                : (TRANSLATIONS[locale]?.noMatchingDishes || 'No matching dishes found')}
+                  ? (TRANSLATIONS[locale]?.noFavoritesSaved || 'No favorites saved yet')
+                  : (TRANSLATIONS[locale]?.noMatchingDishes || 'No matching dishes found')}
             </h3>
             <p className="text-xs mt-1">
               {activeFilter === 'onOffer'
@@ -1008,9 +904,11 @@ export function ClientMenuContainer({
                   reviewStats={reviewStatsMap.get(item.id)}
                   currencySymbol={restaurant.currency}
                   isFavorite={favorites.has(item.id)}
+                  cartQuantity={cartQuantityMap.get(item.id) || 0}
                   onToggleFavorite={handleToggleFavorite}
                   onOpenDetails={setSelectedDetailItem}
                   onQuickAdd={(i) => handleAddToCart(i, 1, [], '')}
+                  onDecrement={handleDecrementItem}
                   layout={layout}
                   locale={locale}
                 />
@@ -1101,10 +999,10 @@ export function ClientMenuContainer({
               );
               const nextDisplayName = nextCat
                 ? (CATEGORY_TRANSLATIONS[nextCat.id]?.[locale]?.name ||
-                   (locale === 'am' && nextCat.name_am) ||
-                   (locale === 'so' && nextCat.name_so) ||
-                   (locale === 'es' && nextCat.name_es) ||
-                   nextCat.name)
+                  (locale === 'am' && nextCat.name_am) ||
+                  (locale === 'so' && nextCat.name_so) ||
+                  (locale === 'es' && nextCat.name_es) ||
+                  nextCat.name)
                 : '';
 
               return (
@@ -1133,9 +1031,11 @@ export function ClientMenuContainer({
                         reviewStats={reviewStatsMap.get(item.id)}
                         currencySymbol={restaurant.currency || 'ETB'}
                         isFavorite={favorites.has(item.id)}
+                        cartQuantity={cartQuantityMap.get(item.id) || 0}
                         onToggleFavorite={handleToggleFavorite}
                         onOpenDetails={setSelectedDetailItem}
                         onQuickAdd={(i) => handleAddToCart(i, 1, [], '')}
+                        onDecrement={handleDecrementItem}
                         layout={layout}
                         locale={locale}
                       />
@@ -1231,7 +1131,7 @@ export function ClientMenuContainer({
       )}
 
       {/* 6. FOOTER */}
-      <footer className="px-5 py-8 border-t border-[var(--border)] text-center text-xs text-[var(--muted)] flex flex-col gap-3 mt-auto">
+      <footer className="px-5 pt-8 pb-36 sm:pb-28 border-t border-[var(--border)] text-center text-xs text-[var(--muted)] flex flex-col gap-3 mt-auto">
         <h3 className="font-bold text-sm text-[var(--foreground)] font-brand">
           {restaurant.name}
         </h3>
@@ -1254,7 +1154,7 @@ export function ClientMenuContainer({
         <div className="flex justify-center gap-4 text-xs font-semibold" style={{ color: 'var(--primary)' }}>
           <button onClick={() => setIsQrModalOpen(true)} className="inline-flex items-center gap-1">
             <QrCode className="w-3.5 h-3.5" />
-            <span>{TRANSLATIONS[locale]?.tableQr || 'Table QR'}</span>
+            <span>{tableNumber ? (TRANSLATIONS[locale]?.tableQr || 'Table QR') : (TRANSLATIONS[locale]?.menuQr || 'Menu QR')}</span>
           </button>
           <button
             onClick={() => {
@@ -1263,7 +1163,7 @@ export function ClientMenuContainer({
                   title: restaurant.name,
                   text: restaurant.tagline,
                   url: window.location.href,
-                }).catch(() => {});
+                }).catch(() => { });
               } else {
                 setIsQrModalOpen(true);
               }
@@ -1278,14 +1178,28 @@ export function ClientMenuContainer({
             <span>{TRANSLATIONS[locale]?.allergenGuide || 'Allergen Guide'}</span>
           </button>
         </div>
-        <div className="pt-3 border-t border-[var(--border)]/50 mt-1 flex justify-center">
+        <div className="pt-3 border-t border-[var(--border)]/50 mt-1 flex flex-col sm:flex-row items-center justify-center gap-2 text-[11px] text-[var(--muted)]/60">
           <Link
             href="/admin"
-            className="text-[11px] text-[var(--muted)]/60 hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-[var(--border)]/30"
+            className="hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-[var(--border)]/30"
           >
             <Lock className="w-3 h-3 opacity-70" />
             <span>{TRANSLATIONS[locale]?.staffOwnerPortal || 'Staff & Owner Portal'}</span>
           </Link>
+          <span className="hidden sm:inline-block opacity-40">•</span>
+          <span className="inline-flex items-center gap-1">
+            <span>Powered by</span>
+            <a
+              href="https://www.rhizantech.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[var(--muted)]/80 hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-0.5 underline underline-offset-2 decoration-[var(--border)] hover:decoration-current"
+              title="Rhizantech - Web & Digital Solutions"
+            >
+              <span>Rhizantech</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+            </a>
+          </span>
         </div>
       </footer>
 
@@ -1365,8 +1279,6 @@ export function ClientMenuContainer({
         onClose={() => setIsSettingsModalOpen(false)}
         locale={locale}
         onLocaleChange={(loc: string) => setLocale(loc as Language)}
-        tableNumber={tableNumber}
-        onTableNumberChange={setTableNumber}
         wifiInfo={restaurant.wifi_config}
       />
 
@@ -1382,12 +1294,6 @@ export function ClientMenuContainer({
         restaurantName={restaurant.name}
         tableNumber={tableNumber}
         locale={locale}
-      />
-
-      <IosInstallModal
-        isOpen={isIosInstallModalOpen}
-        onClose={() => setIsIosInstallModalOpen(false)}
-        restaurantName={restaurant.name}
       />
 
       {/* Category Directory Modal / Drawer */}
@@ -1432,11 +1338,10 @@ export function ClientMenuContainer({
                   setIsCategoryDrawerOpen(false);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                  activeCategoryId === 'all' && activeFilter !== 'onOffer'
+                className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${activeCategoryId === 'all' && activeFilter !== 'onOffer'
                     ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.08)] shadow-xs font-bold'
                     : 'border-[var(--border)] bg-[var(--background)] hover:border-[var(--muted)]'
-                }`}
+                  }`}
               >
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="w-8 h-8 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center flex-shrink-0 mt-0.5 text-[var(--primary)]">
@@ -1444,11 +1349,10 @@ export function ClientMenuContainer({
                   </div>
                   <div className="min-w-0">
                     <div
-                      className={`text-sm font-bold truncate ${
-                        activeCategoryId === 'all' && activeFilter !== 'onOffer'
+                      className={`text-sm font-bold truncate ${activeCategoryId === 'all' && activeFilter !== 'onOffer'
                           ? 'text-[var(--primary)]'
                           : 'text-[var(--foreground)]'
-                      }`}
+                        }`}
                     >
                       {TRANSLATIONS[locale]?.allCategories || 'All Categories'}
                     </div>
@@ -1472,11 +1376,10 @@ export function ClientMenuContainer({
                     setIsCategoryDrawerOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                    activeCategoryId === 'offers' || activeFilter === 'onOffer'
+                  className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${activeCategoryId === 'offers' || activeFilter === 'onOffer'
                       ? 'border-amber-500 bg-amber-500/10 shadow-xs'
                       : 'border-[var(--border)] bg-[var(--background)] hover:border-amber-400'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
                     <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center flex-shrink-0 mt-0.5 text-amber-500">
@@ -1523,19 +1426,17 @@ export function ClientMenuContainer({
                       setIsCategoryDrawerOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                      isSelected
+                    className={`flex items-start justify-between p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${isSelected
                         ? 'border-[var(--primary)] bg-[rgba(var(--primary-rgb),0.08)] shadow-xs'
                         : 'border-[var(--border)] bg-[var(--background)] hover:border-[var(--muted)]'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       <span className="text-2xl flex-shrink-0 mt-0.5">{cat.icon}</span>
                       <div className="min-w-0">
                         <div
-                          className={`text-sm font-bold truncate ${
-                            isSelected ? 'text-[var(--primary)]' : 'text-[var(--foreground)]'
-                          }`}
+                          className={`text-sm font-bold truncate ${isSelected ? 'text-[var(--primary)]' : 'text-[var(--foreground)]'
+                            }`}
                         >
                           {translatedName}
                         </div>

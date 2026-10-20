@@ -993,6 +993,7 @@ export default function AdminDashboardPage() {
           {activeSection === 'qr' && userRole === 'owner' && (
             <QRStudio
               restaurant={restaurant}
+              onSaveRestaurant={handleSaveRestaurantSettings}
               onShowToast={showToast}
             />
           )}

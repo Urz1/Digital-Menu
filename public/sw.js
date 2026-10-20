@@ -64,7 +64,7 @@ self.addEventListener('fetch', (event) => {
         .then((networkResponse) => {
           if (
             networkResponse &&
-            networkResponse.status === 200 &&
+            (networkResponse.status === 200 || networkResponse.type === 'opaque') &&
             (event.request.destination === 'image' ||
              event.request.destination === 'font' ||
              event.request.destination === 'style' ||

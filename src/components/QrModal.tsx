@@ -10,7 +10,7 @@ interface QrModalProps {
   isOpen: boolean;
   onClose: () => void;
   restaurantName: string;
-  tableNumber: string;
+  tableNumber?: string;
   locale?: Language | string;
 }
 
@@ -58,9 +58,9 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber, locale =
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.tableQrTitle}</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{tableNumber ? t.tableQrTitle : 'Menu QR Code'}</h2>
           <p className="text-xs text-[var(--muted)] mt-1">
-            {t.tableQrDesc} {restaurantName} ({tableNumber}).
+            {t.tableQrDesc} {restaurantName}{tableNumber ? ` (${tableNumber})` : ''}.
           </p>
         </div>
 
