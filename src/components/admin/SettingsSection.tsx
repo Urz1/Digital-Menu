@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Restaurant, StaffAccount } from '@/types/database';
 import { triggerHaptic } from '@/lib/utils';
+import { generateQrSvgDataUri } from '@/lib/qr-code';
 import {
   getOwnerProfile,
   updateOwnerProfile,
@@ -54,8 +55,7 @@ export function SettingsSection({
   onSaveSettings,
   onShowToast,
 }: SettingsSectionProps) {
-  // Settings Form State
-  const [selectedTable, setSelectedTable] = useState('Table 14');
+
   const [hours, setHours] = useState(restaurant.hours || 'Mon – Sun: 6:30 AM – 11:00 PM');
   const [address, setAddress] = useState(
     restaurant.address || 'XQHC+MJP Addis Cafe and Bakery, Addis Ababa, Ethiopia'
@@ -305,8 +305,10 @@ export function SettingsSection({
     }
   };
 
-  const qrUrl = `/${restaurant.slug}?table=${encodeURIComponent(selectedTable.replace('Table ', ''))}`;
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(qrUrl)}&color=000000&bgcolor=FFFFFF&margin=1`;
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://digitalmenu.app';
+  const qrUrl = `/${restaurant.slug}`;
+  const fullMenuUrl = `${baseUrl}/${restaurant.slug}`;
+  const qrImageUrl = generateQrSvgDataUri(fullMenuUrl, { color: '#000000', bgColor: '#FFFFFF', margin: 1 });
 
   return (
     <>
@@ -325,36 +327,20 @@ export function SettingsSection({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: TABLE QR GENERATOR & PRINT STAND (5 Cols) */}
+        {/* LEFT COLUMN: DIGITAL MENU QR & PRINT STAND (5 Cols) */}
         <div className="lg:col-span-5 flex flex-col gap-5">
           <div className="p-6 rounded-2xl bg-[#12141C] border border-white/5 space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5 text-amber-400" />
-                <h3 className="text-sm font-bold text-white">Table QR Stand Generator</h3>
+                <h3 className="text-sm font-bold text-white">Digital Menu QR Stand</h3>
               </div>
-              <span className="text-xs font-mono text-neutral-400">Instant Vector</span>
+              <span className="text-xs font-mono text-emerald-400">Offline Vector</span>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                Select Dining Table
-              </label>
-              <select
-                value={selectedTable}
-                onChange={(e) => {
-                  triggerHaptic(8);
-                  setSelectedTable(e.target.value);
-                }}
-                className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500 font-bold"
-              >
-                {Array.from({ length: 30 }).map((_, i) => (
-                  <option key={i + 1} value={`Table ${i + 1}`} className="bg-[#12141C]">
-                    Table {i + 1}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <p className="text-xs text-neutral-400">
+              Universal QR code for your tables, bar counter, and entrance. No table number configuration required.
+            </p>
 
             {/* Printable Table Card Preview */}
             <div className="p-6 rounded-2xl bg-white text-black shadow-xl flex flex-col items-center text-center">
@@ -372,13 +358,13 @@ export function SettingsSection({
                 {/* eslint-disable-next-js/no-img-element */}
                 <img
                   src={qrImageUrl}
-                  alt={`QR code for ${selectedTable}`}
+                  alt="QR code for digital menu"
                   className="w-40 h-40 block mx-auto rounded-lg"
                 />
               </div>
 
               <div className="px-4 py-1.5 rounded-full bg-neutral-100 font-mono text-xs font-bold text-neutral-800">
-                {selectedTable} • /{restaurant.slug}
+                Digital Menu • /{restaurant.slug}
               </div>
 
               {wifiSsid && (
@@ -1194,14 +1180,14 @@ export function SettingsSection({
       <p className="text-xs text-neutral-600 mt-1 mb-2">{restaurant.tagline || 'Scan to view menu & order'}</p>
 
       <div className="px-5 py-1.5 rounded-full bg-black text-white font-mono text-sm font-extrabold uppercase tracking-wider my-2">
-        {selectedTable}
+        DIGITAL MENU
       </div>
 
       <div className="my-3 p-4 bg-white border-4 border-black rounded-3xl">
         {/* eslint-disable-next-js/no-img-element */}
         <img
           src={qrImageUrl}
-          alt={`Print QR Code for ${selectedTable}`}
+          alt="Print QR Code for Digital Menu"
           className="w-52 h-52 block mx-auto"
         />
       </div>

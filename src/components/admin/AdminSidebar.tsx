@@ -280,7 +280,7 @@ export function AdminSidebar({
         {/* Quick Links & Help */}
         <div className="flex items-center justify-between text-xs pt-1 px-1">
           <Link
-            href={`/${restaurant.slug}?table=1`}
+            href={`/${restaurant.slug}`}
             target="_blank"
             className="text-neutral-400 hover:text-white flex items-center gap-1 transition-colors text-[11px]"
           >

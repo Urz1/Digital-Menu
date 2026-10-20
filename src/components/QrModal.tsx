@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { triggerHaptic } from '@/lib/utils';
+import { generateQrSvgDataUri } from '@/lib/qr-code';
 import { X, Copy, Check } from 'lucide-react';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 
@@ -14,7 +14,7 @@ interface QrModalProps {
   locale?: Language | string;
 }
 
-export function QrModal({ isOpen, onClose, restaurantName, tableNumber, locale = 'en' }: QrModalProps) {
+export function QrModal({ isOpen, onClose, restaurantName, locale = 'en' }: QrModalProps) {
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -23,7 +23,11 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber, locale =
   const t = TRANSLATIONS[currentLocale] || TRANSLATIONS.en;
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentUrl)}&color=1a1a1a&bgcolor=ffffff`;
+  const qrUrl = generateQrSvgDataUri(currentUrl, {
+    color: '#1a1a1a',
+    bgColor: '#ffffff',
+    margin: 1,
+  });
 
   const handleCopy = () => {
     triggerHaptic(15);
@@ -58,21 +62,19 @@ export function QrModal({ isOpen, onClose, restaurantName, tableNumber, locale =
         </button>
 
         <div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{tableNumber ? t.tableQrTitle : 'Menu QR Code'}</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] font-brand">{t.tableQrTitle || 'Digital Menu QR'}</h2>
           <p className="text-xs text-[var(--muted)] mt-1">
-            {t.tableQrDesc} {restaurantName}{tableNumber ? ` (${tableNumber})` : ''}.
+            {t.tableQrDesc} {restaurantName}.
           </p>
         </div>
 
         {/* QR Code Container */}
         <div className="p-4 bg-white rounded-3xl shadow-md border border-neutral-200 inline-flex my-2">
-          <Image
+          {/* eslint-disable-next-js/no-img-element */}
+          <img
             src={qrUrl}
-            alt="Table QR Code"
-            width={200}
-            height={200}
+            alt="Digital Menu QR Code"
             className="w-48 h-48 block"
-            unoptimized
           />
         </div>
 

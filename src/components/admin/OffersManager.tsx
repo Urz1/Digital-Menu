@@ -1490,7 +1490,7 @@ export function OffersManager({
 
             <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Link
-                href={`/${restaurant.slug}?table=1`}
+                href={`/${restaurant.slug}`}
                 target="_blank"
                 className="flex-1 h-11 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
               >

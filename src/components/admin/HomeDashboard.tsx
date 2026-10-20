@@ -91,13 +91,13 @@ export function HomeDashboard({
                 </span>
               </div>
               <p className="text-xs md:text-sm text-neutral-400 mt-0.5 banner-subtitle">
-                Guests can view your artisanal menu on any phone. Print table QR stands to start serving.
+                Guests can view your artisanal menu on any phone. Print menu QR stands to start serving.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <Link
-              href={`/${restaurant.slug}?table=1`}
+              href={`/${restaurant.slug}`}
               target="_blank"
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 flex-shrink-0"
             >

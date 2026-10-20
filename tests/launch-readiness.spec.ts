@@ -22,28 +22,30 @@ test.describe('STAGE 6: Launch Readiness & QR Studio Suite', () => {
     await expect(page.getByText('Minimum Size:')).toBeVisible();
     await expect(page.getByText('Contrast:')).toBeVisible();
 
-    // Verify Table Tent template preview is displayed by default
+    // Verify Table Tent template preview is displayed by default with Digital Menu badge
     await expect(page.getByTestId('preview-tent-card')).toBeVisible();
+    await expect(page.getByTestId('preview-tent-card').getByText('Digital Menu')).toBeVisible();
+
+    // Verify QR code uses offline vector SVG data URI
+    const tentQrImg = page.getByTestId('preview-tent-card').locator('img');
+    await expect(tentQrImg).toBeVisible();
+    const tentQrSrc = await tentQrImg.getAttribute('src');
+    expect(tentQrSrc).toContain('data:image/svg+xml');
 
     // Switch to Compact Sticker template
     await page.getByTestId('template-sticker-btn').click();
     await expect(page.getByTestId('preview-sticker-card')).toBeVisible();
+    await expect(page.getByTestId('preview-sticker-card').getByText('Scan Menu')).toBeVisible();
 
-    // Switch to A4 Cut Sheet template
+    // Switch to A4 Cut Sheet template (8 Cards)
     await page.getByTestId('template-a4-btn').click();
     await expect(page.getByTestId('preview-a4-sheet')).toBeVisible();
     await expect(page.getByText('A4 Sheet Cutting Guide')).toBeVisible();
+    await expect(page.getByText('Cut along dotted lines to separate stands (8 cards)')).toBeVisible();
 
-    // Switch back to Tent & test Table parameter
-    await page.getByTestId('template-tent-btn').click();
-    const tableInput = page.getByTestId('qr-table-input');
-    await expect(tableInput).toBeVisible();
-    await tableInput.fill('42');
-    await expect(page.getByTestId('preview-tent-card').getByText('Table 42')).toBeVisible();
-
-    // Switch to Main Menu target
-    await page.getByTestId('qr-target-main').click();
-    await expect(page.getByText('Full Digital Menu')).toBeVisible();
+    // Verify 8 cards rendered without table numbers
+    const a4CardImages = page.getByTestId('preview-a4-sheet').locator('img');
+    await expect(a4CardImages).toHaveCount(8);
   });
 
   test('2. PWA: Repeat-Visitor Install Hint & Graceful Offline Banner', async ({ page }) => {

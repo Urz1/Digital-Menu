@@ -529,13 +529,13 @@ export function OnboardingWizardModal({
                 </div>
 
                 <span className="text-[11px] font-mono font-bold text-neutral-700 bg-neutral-100 px-3 py-1 rounded-full">
-                  Table 1 • /{restaurant.slug || 'addis'}
+                  Digital Menu • /{restaurant.slug || 'addis'}
                 </span>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <a
-                  href={`/${restaurant.slug || 'addis'}?table=1`}
+                  href={`/${restaurant.slug || 'addis'}`}
                   target="_blank"
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2"
                 >

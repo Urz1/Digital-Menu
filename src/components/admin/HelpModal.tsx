@@ -131,8 +131,8 @@ export function HelpModal({ isOpen, onClose, activeSection }: HelpModalProps) {
           desc: 'Avoid glossy lamination that causes harsh light reflections under dining room spotlights.',
         },
         {
-          heading: 'Table-Specific vs Main Menu',
-          desc: 'Table QR codes automatically attach ?table=N so guests can order without manually typing their table number.',
+          heading: 'Offline Vector QR Engine',
+          desc: 'Menu QR codes are generated directly in-browser with zero external dependencies, guaranteeing instant scanning for your guests.',
         },
       ],
     },
